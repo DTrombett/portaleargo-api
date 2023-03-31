@@ -4,6 +4,7 @@ import { clientId, randomString } from "../util";
 
 /**
  * Get the code for the login.
+ * @param codeChallenge - The code challenge to use
  * @returns The code to use for the login
  */
 export const getCode = async (codeChallenge: string) => {

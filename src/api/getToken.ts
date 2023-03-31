@@ -6,6 +6,7 @@ import { clientId, writeToFile } from "../util";
 /**
  * Get the token from the API.
  * @param code - The code to use
+ * @param codeVerifier - The code verifier to use
  * @returns The data for the login
  */
 export const getToken = async (code: string, codeVerifier: string) => {

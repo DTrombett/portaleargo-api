@@ -1,4 +1,5 @@
 export * from "./dashboard";
+export * from "./deleteProfile";
 export * from "./getCode";
 export * from "./getToken";
 export * from "./logToken";
