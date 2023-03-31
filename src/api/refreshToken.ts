@@ -26,7 +26,7 @@ export const refreshToken = async (token: Token, login: Login) => {
 				"ripeti-login": "false",
 				"exp-bearer": formatDate(token.expireDate),
 				"ts-app": formatDate(new Date()),
-				"proc": "initState_global_random_12749",
+				"proc": "initState_global_random_12345",
 				"username": login.username,
 			},
 		}

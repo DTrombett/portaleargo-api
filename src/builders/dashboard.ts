@@ -10,6 +10,7 @@ export const buildDashboard = (body: APIDashboard): Dashboard => {
 	const [data] = body.data.dati;
 
 	return {
+		updateDate: Date.now(),
 		outOfClass: arrayToObject(data.fuoriClasse, (d) => ({
 			type: d.operazione,
 			date: new Date(d.datEvento).getTime(),

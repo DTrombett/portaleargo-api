@@ -65,6 +65,7 @@ export type Profile = {
 	historicalProfile: boolean;
 };
 export type Dashboard = {
+	updateDate: number;
 	outOfClass: Record<
 		string,
 		{

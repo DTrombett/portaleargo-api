@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildDashboard } from "../builders";
 import type { APIDashboard, Login, Token } from "../types";
-import { apiRequest, AuthFolder } from "../util";
+import { AuthFolder, apiRequest, formatDate } from "../util";
 
 /**
  * Fetch all the data for the authenticated user.
@@ -10,7 +10,11 @@ import { apiRequest, AuthFolder } from "../util";
  * @param login - The login data
  * @returns All the data for the user
  */
-export const dashboard = async (token: Token, login: Login) => {
+export const dashboard = async (
+	token: Token,
+	login: Login,
+	lastUpdate: Date | number | string
+) => {
 	const { res, body } = await apiRequest<APIDashboard>(
 		"https://www.portaleargo.it/appfamiglia/api/rest/dashboard/dashboard",
 		token,
@@ -18,7 +22,7 @@ export const dashboard = async (token: Token, login: Login) => {
 		{
 			body: {
 				// TODO: change this using profile.year.startDate
-				dataultimoaggiornamento: "2022-09-01 00:00:00",
+				dataultimoaggiornamento: formatDate(lastUpdate),
 				opzioni: JSON.stringify(login.options),
 			},
 			method: "POST",

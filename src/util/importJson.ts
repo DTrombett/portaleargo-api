@@ -1,12 +1,14 @@
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { AuthFolder } from "./Constants";
 
 /**
- * Import a json file.
- * @param path - The path to the file
+ * Import a data file.
+ * @param name - The file name without the extension
  * @returns The imported json
  */
-export const importJson = async <T>(path: string) =>
-	readFile(path, {
+export const importData = async <T>(name: string) =>
+	readFile(join(AuthFolder, `${name}.json`), {
 		encoding: "utf8",
 	})
 		.then(async (content) => JSON.parse(content) as T)
