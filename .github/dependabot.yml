@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "14:00"
+      timezone: "Europe/Rome"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "devDeps"
+      include: "scope"
+    reviewers:
+      - "DTrombett"

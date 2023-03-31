@@ -1,0 +1,15 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Start project",
+			"command": "npm run start",
+			"request": "launch",
+			"type": "node-terminal",
+			"autoAttachChildProcesses": true,
+			"envFile": "${workspaceFolder}/.env",
+			"cwd": "${workspaceFolder}",
+			"sourceMaps": true
+		},
+	]
+}

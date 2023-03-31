@@ -1,0 +1,47 @@
+{
+	"name": "portaleargo-api",
+	"version": "1.0.0",
+	"description": "A library to interact with the api of Argoscuolanext",
+	"exports": "./dist/index.js",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsup",
+		"lint": "eslint src --fix",
+		"prepare": "npm test",
+		"prettier": "prettier --write src/**/*.ts",
+		"start": "npm run build && node --trace-warnings --enable-source-maps .",
+		"test": "eslint src && tsc --noEmit"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/DTrombett/portaleargo-api.git"
+	},
+	"author": "DTrombett",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/DTrombett/portaleargo-api/issues"
+	},
+	"homepage": "https://github.com/DTrombett/portaleargo-api#readme",
+	"type": "module",
+	"engines": {
+		"node": ">=18"
+	},
+	"dependencies": {
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"open": "^9.1.0",
+		"undici": "^5.21.0"
+	},
+	"devDependencies": {
+		"@tsconfig/node18": "^1.0.1",
+		"@types/express": "^4.17.17",
+		"@types/node": "^18.15.10",
+		"@typescript-eslint/eslint-plugin": "^5.57.0",
+		"@typescript-eslint/parser": "^5.57.0",
+		"eslint": "^8.36.0",
+		"eslint-plugin-node": "^11.1.0",
+		"prettier": "^2.8.7",
+		"tsup": "^6.7.0",
+		"typescript": "^5.0.2"
+	}
+}

@@ -1,0 +1,6 @@
+node_modules/
+.env
+coverage/
+dist/
+data/
+.vscode/settings.json
