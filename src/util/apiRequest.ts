@@ -12,7 +12,7 @@ import { formatDate } from "./formatDate";
  * @returns The json response
  */
 export const apiRequest = async <T extends Json, R extends boolean = false>(
-	url: string,
+	path: string,
 	token: Token,
 	login: Login,
 	options?: Partial<{
@@ -22,20 +22,25 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		headers: IncomingHttpHeaders;
 	}>
 ) => {
-	const res = await request(url, {
-		headers: {
-			"accept": "application/json",
-			"argo-client-version": "1.15.1",
-			"authorization": `Bearer ${token.accessToken}`,
-			"content-type": "application/json; charset=utf-8",
-			"x-auth-token": login.token,
-			"x-cod-min": login.schoolCode,
-			"x-date-exp-auth": formatDate(token.expireDate),
-			...options?.headers,
-		},
-		method: options?.method,
-		body: options?.method === "POST" ? JSON.stringify(options.body) : undefined,
-	});
+	const res = await request(
+		`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
+		{
+			headers: {
+				"accept": "application/json",
+				"argo-client-version": "1.15.1",
+				"authorization": `Bearer ${token.accessToken}`,
+				"content-type": "application/json; charset=utf-8",
+				"x-auth-token": login.token,
+				"x-cod-min": login.schoolCode,
+				"x-date-exp-auth": formatDate(token.expireDate),
+				...options?.headers,
+			},
+			method: options?.method,
+			body:
+				options?.method === "POST" ? JSON.stringify(options.body) : undefined,
+		}
+	);
+	console.log(`${options?.method ?? "GET"} /${path} ${res.statusCode}`);
 	const result = {
 		res,
 	} as {

@@ -10,7 +10,7 @@ import { apiRequest, clientId, formatDate, writeToFile } from "../util";
  */
 export const refreshToken = async (token: Token, login: Login) => {
 	const { res, body } = await apiRequest<APIToken>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/auth/refresh-token",
+		"auth/refresh-token",
 		token,
 		login,
 		{

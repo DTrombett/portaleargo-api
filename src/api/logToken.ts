@@ -9,7 +9,7 @@ import { apiRequest, formatDate } from "../util";
  */
 export const logToken = async (token: Token, login: Login, oldToken: Token) => {
 	const { res, body } = await apiRequest<APIResponse>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/logtoken",
+		"logtoken",
 		token,
 		login,
 		{

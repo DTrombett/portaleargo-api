@@ -10,7 +10,7 @@ import { apiRequest, writeToFile } from "../util";
  */
 export const profileDetails = async (token: Token, login: Login) => {
 	const { res, body } = await apiRequest<APIProfileDetails>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/dettaglioprofilo",
+		"dettaglioprofilo",
 		token,
 		login,
 		{

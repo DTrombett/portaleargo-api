@@ -14,7 +14,7 @@ export const dashboard = async (
 	lastUpdate: Date | number | string
 ) => {
 	const { res, body } = await apiRequest<APIDashboard>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/dashboard/dashboard",
+		"dashboard/dashboard",
 		token,
 		login,
 		{

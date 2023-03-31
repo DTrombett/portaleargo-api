@@ -9,11 +9,7 @@ import { apiRequest, writeToFile } from "../util";
  * @returns The profile data
  */
 export const profile = async (token: Token, login: Login) => {
-	const { res, body } = await apiRequest<APIProfile>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/profilo",
-		token,
-		login
-	);
+	const { res, body } = await apiRequest<APIProfile>("profilo", token, login);
 
 	if (!body.success)
 		throw new Error(

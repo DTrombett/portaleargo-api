@@ -8,7 +8,7 @@ import { apiRequest, formatDate } from "../util";
  */
 export const updateDate = async (token: Token, login: Login) => {
 	const { res, body } = await apiRequest<APIResponse>(
-		"https://www.portaleargo.it/appfamiglia/api/rest/dashboard/aggiornadata",
+		"dashboard/aggiornadata",
 		token,
 		login,
 		{
