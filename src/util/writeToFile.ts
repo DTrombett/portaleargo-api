@@ -6,7 +6,9 @@ import { AuthFolder } from "./Constants";
 /**
  * Write the response of a request to a json file.
  * @param name - The file name without the extension
- * @param body - The content to write
+ * @param value - The content to write
  */
-export const writeToFile = (name: string, body: Json) =>
-	writeFile(join(AuthFolder, name), JSON.stringify(body)).catch(console.error);
+export const writeToFile = (name: string, value: Json) =>
+	writeFile(`${join(AuthFolder, name)}.json`, JSON.stringify(value)).catch(
+		console.error
+	);

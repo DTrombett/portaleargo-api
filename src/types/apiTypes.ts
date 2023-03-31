@@ -306,3 +306,36 @@ export type APIDashboard = APIResponse<{
 		classiExtra: boolean;
 	}[];
 }>;
+export type APIProfileDetails = APIResponse<{
+	utente: {
+		flgUtente: string;
+	};
+	genitore: {
+		flgSesso: string;
+		desCognome: string;
+		desEMail: string;
+		desCellulare: null;
+		desTelefono: string;
+		desNome: string;
+		datNascita: string;
+	};
+	alunno: {
+		cognome: string;
+		desCellulare: null;
+		desCf: string;
+		datNascita: string;
+		desCap: string;
+		desComuneResidenza: string;
+		nome: string;
+		desComuneNascita: string;
+		desCapResidenza: string;
+		cittadinanza: string;
+		desIndirizzoRecapito: string;
+		desEMail: null;
+		nominativo: string;
+		desVia: string;
+		desTelefono: string;
+		sesso: string;
+		desComuneRecapito: string;
+	};
+}>;

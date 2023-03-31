@@ -308,3 +308,36 @@ export type Dashboard = {
 	>;
 	extraClasses: boolean;
 };
+export type ProfileDetails = {
+	user: {
+		flag: string;
+	};
+	parent: {
+		gender: string;
+		surname: string;
+		email: string;
+		mobile: null;
+		telephone: string;
+		name: string;
+		birth: number;
+	};
+	student: {
+		surname: string;
+		mobile: null;
+		taxCode: string;
+		birth: number;
+		cap: string;
+		residenceCity: string;
+		name: string;
+		birthCity: string;
+		residenceCap: string;
+		nationality: string;
+		address: string;
+		email: null;
+		fullName: string;
+		street: string;
+		telephone: string;
+		gender: string;
+		city: string;
+	};
+};

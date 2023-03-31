@@ -1,8 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { buildDashboard } from "../builders";
 import type { APIDashboard, Login, Token } from "../types";
-import { AuthFolder, apiRequest, formatDate } from "../util";
+import { apiRequest, formatDate, writeToFile } from "../util";
 
 /**
  * Fetch all the data for the authenticated user.
@@ -21,7 +19,6 @@ export const dashboard = async (
 		login,
 		{
 			body: {
-				// TODO: change this using profile.year.startDate
 				dataultimoaggiornamento: formatDate(lastUpdate),
 				opzioni: JSON.stringify(login.options),
 			},
@@ -36,8 +33,6 @@ export const dashboard = async (
 		);
 	const value = buildDashboard(body);
 
-	writeFile(join(AuthFolder, "dashboard.json"), JSON.stringify(value)).catch(
-		console.error
-	);
+	void writeToFile("dashboard", value);
 	return value;
 };

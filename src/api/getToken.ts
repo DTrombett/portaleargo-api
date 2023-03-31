@@ -1,9 +1,7 @@
-import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
 import { buildToken } from "../builders";
-import { AuthFolder, clientId } from "../util";
+import { clientId, writeToFile } from "../util";
 
 /**
  * Get the token from the API.
@@ -29,8 +27,6 @@ export const getToken = async (code: string, codeVerifier: string) => {
 		new Date(res.headers.date as string)
 	);
 
-	writeFile(join(AuthFolder, "token.json"), JSON.stringify(value)).catch(
-		console.error
-	);
+	void writeToFile("token", value);
 	return value;
 };

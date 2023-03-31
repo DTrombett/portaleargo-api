@@ -1,8 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { buildToken } from "../builders";
 import type { APIToken, Login, Token } from "../types";
-import { apiRequest, AuthFolder, clientId, formatDate } from "../util";
+import { apiRequest, clientId, formatDate, writeToFile } from "../util";
 
 /**
  * Refresh the token.
@@ -33,8 +31,6 @@ export const refreshToken = async (token: Token, login: Login) => {
 	);
 	const value = buildToken(body, new Date(res.headers.date as string));
 
-	writeFile(join(AuthFolder, "token.json"), JSON.stringify(value)).catch(
-		console.error
-	);
+	void writeToFile("token", value);
 	return value;
 };

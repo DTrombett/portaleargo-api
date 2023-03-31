@@ -1,9 +1,7 @@
-import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { request } from "undici";
 import { buildLogin } from "../builders";
 import type { APILogin, Token } from "../types";
-import { AuthFolder, formatDate, randomString } from "../util";
+import { formatDate, randomString, writeToFile } from "../util";
 
 /**
  * Login to the API.
@@ -36,8 +34,6 @@ export const login = async (token: Token) => {
 		);
 	const value = buildLogin(body);
 
-	writeFile(join(AuthFolder, "login.json"), JSON.stringify(value)).catch(
-		console.error
-	);
+	void writeToFile("login", value);
 	return value;
 };

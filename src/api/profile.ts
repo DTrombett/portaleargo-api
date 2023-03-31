@@ -1,8 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { buildProfile } from "../builders";
 import type { APIProfile, Login, Token } from "../types";
-import { apiRequest, AuthFolder } from "../util";
+import { apiRequest, writeToFile } from "../util";
 
 /**
  * Fetch profile information for the authenticated user.
@@ -24,8 +22,6 @@ export const profile = async (token: Token, login: Login) => {
 		);
 	const value = buildProfile(body);
 
-	writeFile(join(AuthFolder, "profile.json"), JSON.stringify(value)).catch(
-		console.error
-	);
+	void writeToFile("profile", value);
 	return value;
 };
