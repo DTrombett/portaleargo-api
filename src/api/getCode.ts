@@ -1,6 +1,23 @@
 import { env } from "node:process";
-import { chromium } from "playwright";
+import { URL } from "node:url";
+import { request } from "undici";
 import { clientId, randomString } from "../util";
+
+const baseHeaders = {
+	"accept":
+		"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+	"accept-encoding": "gzip, deflate, br",
+	"sec-fetch-dest": "document",
+	"sec-fetch-mode": "navigate",
+	"sec-fetch-user": "?1",
+	"upgrade-insecure-requests": "1",
+	"user-agent":
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.29 Safari/537.36",
+} as const;
+const redirectUri = encodeURIComponent(
+	"it.argosoft.didup.famiglia.new://login-callback"
+);
+const scopes = encodeURIComponent("openid offline profile user.roles argo");
 
 /**
  * Get the code for the login.
@@ -8,33 +25,114 @@ import { clientId, randomString } from "../util";
  * @returns The code to use for the login
  */
 export const getCode = async (codeChallenge: string) => {
-	const browser = await chromium.launch();
-	const page = await browser.newPage();
-
-	await page.goto(
-		`https://auth.portaleargo.it/oauth2/auth?redirect_uri=it.argosoft.didup.famiglia.new%3A%2F%2Flogin-callback&client_id=${clientId}&response_type=code&prompt=login&state=${randomString(
+	const { headers, statusCode } = await request(
+		`https://auth.portaleargo.it/oauth2/auth?redirect_uri=${redirectUri}&client_id=${clientId}&response_type=code&prompt=login&state=${randomString(
 			22
 		)}&nonce=${randomString(
 			22
-		)}&scope=openid%20offline%20profile%20user.roles%20argo&code_challenge=${codeChallenge}&code_challenge_method=S256`
+		)}&scope=${scopes}&code_challenge=${codeChallenge}&code_challenge_method=S256`,
+		{
+			headers: {
+				...baseHeaders,
+				"sec-fetch-site": "none",
+			},
+			method: "GET",
+		}
 	);
-	await page.getByLabel("Codice Scuola").first().fill(env.CODICE_SCUOLA!);
-	await page.getByLabel("Nome Utente").fill(env.NOME_UTENTE!);
-	await page.getByLabel("Password").fill(env.PASSWORD!);
-	void page.getByRole("button", { name: "Entra" }).click({ noWaitAfter: true });
-	const code = await new Promise<string | null>((resolve) => {
-		page.on("response", (res) => {
-			const { location } = res.headers();
+	const url = headers.location;
+	const cookies: string[] = [];
+	let cookieHeaders = headers["set-cookie"];
 
-			if (!location) return;
-			const url = new URL(location);
-
-			if (url.protocol === "it.argosoft.didup.famiglia.new:")
-				resolve(url.searchParams.get("code"));
-		});
+	if (typeof url !== "string")
+		throw new TypeError(
+			`Auth request returned an invalid redirect url with status code ${statusCode}`
+		);
+	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
+	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
+	const challenge = new URL(url).searchParams.get("login_challenge")!;
+	const {
+		headers: { location },
+		statusCode: status,
+	} = await request("https://www.portaleargo.it/auth/sso/login", {
+		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${env.CODICE_SCUOLA!}&username=${env.NOME_UTENTE!}&password=${env.PASSWORD!}&login=true`,
+		headers: {
+			...baseHeaders,
+			"cache-control": "max-age=0",
+			"connection": "keep-alive",
+			"content-type": "application/x-www-form-urlencoded",
+			"host": "www.portaleargo.it",
+			"origin": "https://www.portaleargo.it",
+			"referer": url,
+			"sec-fetch-site": "same-origin",
+		},
+		method: "POST",
 	});
 
-	void page.close().then(() => browser.close());
-	if (code == null) throw new TypeError("Code not found");
+	if (typeof location !== "string")
+		throw new TypeError(
+			`Login request returned an invalid redirect url with status code ${status}`
+		);
+	const { headers: newHeaders, statusCode: newStatus } = await request(
+		location,
+		{
+			headers: {
+				...baseHeaders,
+				"cache-control": "max-age=0",
+				"cookie": cookies.join("; "),
+				"referer": "https://www.portaleargo.it/",
+				"sec-fetch-site": "same-site",
+			},
+			method: "GET",
+		}
+	);
+
+	if (typeof newHeaders.location !== "string")
+		throw new TypeError(
+			`First redirect returned an invalid redirect url with status code ${newStatus}`
+		);
+	cookieHeaders = newHeaders["set-cookie"];
+	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
+	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
+	const {
+		headers: { location: redirect },
+		statusCode: middleStatus,
+	} = await request(newHeaders.location, {
+		headers: {
+			...baseHeaders,
+			"cache-control": "max-age=0",
+			"connection": "keep-alive",
+			"host": "www.portaleargo.it",
+			"referer": "https://www.portaleargo.it/",
+			"sec-fetch-site": "same-site",
+		},
+		method: "GET",
+	});
+
+	if (typeof redirect !== "string")
+		throw new TypeError(
+			`Third redirect returned an invalid redirect url with status code ${middleStatus}`
+		);
+	const {
+		headers: { location: finalRedirect },
+		statusCode: finalStatus,
+	} = await request(redirect, {
+		headers: {
+			...baseHeaders,
+			"cache-control": "max-age=0",
+			"cookie": cookies.join("; "),
+			"referer": "https://www.portaleargo.it/",
+			"sec-fetch-site": "same-site",
+		},
+		method: "GET",
+	});
+
+	if (typeof finalRedirect !== "string")
+		throw new TypeError(
+			`Last redirect returned an invalid redirect url with status code ${finalStatus}`
+		);
+	const code = new URL(finalRedirect).searchParams.get("code");
+
+	if (code == null)
+		throw new TypeError(`Invalid code returned by API: ${finalRedirect}`);
 	return code;
 };
