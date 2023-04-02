@@ -8,7 +8,7 @@ import { apiRequest, writeToFile } from "../util";
  * @param login - The login data
  * @returns The profile data
  */
-export const profile = async (token: Token, login: Login) => {
+export const getProfile = async (token: Token, login: Login) => {
 	const { res, body } = await apiRequest<APIProfile>("profilo", token, login);
 
 	if (!body.success)

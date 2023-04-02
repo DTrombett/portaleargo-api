@@ -8,7 +8,7 @@ import { apiRequest, formatDate, writeToFile } from "../util";
  * @param login - The login data
  * @returns All the data for the user
  */
-export const dashboard = async (
+export const getDashboard = async (
 	token: Token,
 	login: Login,
 	lastUpdate: Date | number | string

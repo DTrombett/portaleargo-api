@@ -1,6 +1,6 @@
-import { env } from "node:process";
 import { URL } from "node:url";
 import { request } from "undici";
+import type { BasicCredentials } from "../types";
 import { clientId, randomString } from "../util";
 
 const baseHeaders = {
@@ -24,7 +24,10 @@ const scopes = encodeURIComponent("openid offline profile user.roles argo");
  * @param codeChallenge - The code challenge to use
  * @returns The code to use for the login
  */
-export const getCode = async (codeChallenge: string) => {
+export const getCode = async (
+	codeChallenge: string,
+	credentials: BasicCredentials
+) => {
 	const { headers, statusCode } = await request(
 		`https://auth.portaleargo.it/oauth2/auth?redirect_uri=${redirectUri}&client_id=${clientId}&response_type=code&prompt=login&state=${randomString(
 			22
@@ -54,7 +57,7 @@ export const getCode = async (codeChallenge: string) => {
 		headers: { location },
 		statusCode: status,
 	} = await request("https://www.portaleargo.it/auth/sso/login", {
-		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${env.CODICE_SCUOLA!}&username=${env.NOME_UTENTE!}&password=${env.PASSWORD!}&login=true`,
+		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${credentials.schoolCode}&username=${credentials.username}&password=${credentials.password}&login=true`,
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",

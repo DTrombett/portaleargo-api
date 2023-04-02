@@ -12,4 +12,4 @@ export const importData = async <T>(name: string) =>
 		encoding: "utf8",
 	})
 		.then(async (content) => JSON.parse(content) as T)
-		.catch(() => null);
+		.catch(() => undefined);
