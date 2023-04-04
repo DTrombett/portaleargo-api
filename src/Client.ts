@@ -156,7 +156,8 @@ export class Client {
 		this.dashboard = await getDashboard(
 			this.token,
 			this.loginData,
-			this.dashboard?.updateDate ?? this.profile.year.startDate
+			this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+			this.dashboard
 		);
 		updateDate(this.token, this.loginData).catch(console.error);
 		return this.dashboard;

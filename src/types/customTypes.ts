@@ -9,335 +9,297 @@ export type Token = {
 export type Login = {
 	schoolCode: string;
 	options: Record<string, boolean>;
-	isFirstAccess: boolean;
+	firstAccess: boolean;
 	disabledProfile: boolean;
-	isResetPassword: boolean;
-	isSpid: boolean;
+	resetPassword: boolean;
+	spid: boolean;
 	token: string;
 	username: string;
 };
 export type Profile = {
-	resetPassword: boolean;
-	lastPwdChange: null;
-	year: {
-		startDate: number;
-		year: string;
-		endDate: number;
+	ultimoCambioPassword: null;
+	anno: {
+		dataInizio: number;
+		dataFine: number;
 	};
-	parent: {
+	genitore: {
 		email: string;
-		fullName: string;
+		nomeCompleto: string;
 		id: string;
 	};
-	disabledProfile: boolean;
-	isSpid: boolean;
-	student: {
-		isLastYear: boolean;
-		fullName: string;
-		surname: string;
-		name: string;
+	alunno: {
+		ultimoAnno: boolean;
+		cognome: string;
+		nome: string;
 		id: string;
-		adult: boolean;
+		maggiorenne: boolean;
 		email: null;
 	};
-	card: {
-		class: {
-			id: string;
-			grade: number;
-			section: string;
-		};
-		course: {
-			description: string;
-			id: string;
-		};
-		site: {
-			description: string;
-			id: string;
-		};
-		school: {
-			order: string;
-			description: string;
-			id: string;
-		};
+	classe: {
+		id: string;
+		classe: number;
+		sezione: string;
+	};
+	corso: {
+		descrizione: string;
 		id: string;
 	};
-	firstAccess: boolean;
-	historicalProfile: boolean;
+	plesso: {
+		descrizione: string;
+		id: string;
+	};
+	scuola: {
+		ordine: string;
+		descrizione: string;
+		id: string;
+	};
+	id: string;
+	profiloStorico: boolean;
 };
 export type Dashboard = {
-	updateDate: number;
-	outOfClass: Record<
+	dataAggiornamento: number;
+	fuoriClasse: Record<
 		string,
 		{
-			type: string;
-			date: number;
-			description: string;
-			teacher: string;
+			data: string;
+			descrizione: string;
+			docente: string;
 			id: string;
-			annotations: string;
-			onLineFrequency: boolean;
+			note: string;
+			frequenzaOnline: boolean;
 		}
 	>;
 	msg: string;
-	options: Record<string, boolean>;
-	totalAverage: number;
+	opzioni: Record<string, boolean>;
+	mediaGenerale: number;
 	mensa: any;
-	monthlyAverage: number[];
-	subjectList: Record<
+	mediaMensile: Record<`${number}`, number>;
+	materie: Record<
 		string,
 		{
-			shortName: string;
-			scrut: boolean;
-			codTipo: string;
-			doAverage: false;
-			fullName: string;
+			nomeBreve: string;
+			scrutinio: boolean;
+			codice: string;
+			faMedia: false;
+			nome: string;
 			id: string;
 		}
 	>;
-	deleteLocalData: boolean;
-	periods: Record<
+	rimuoviDatiLocali: boolean;
+	periodi: Record<
 		string,
 		{
 			id: string;
-			startDate: number;
-			description: string;
-			singleVote: boolean;
-			finalAverage: number;
-			hasFinalAverage: boolean;
-			endDate: number;
-			periodCode: string;
-			isFinal: boolean;
+			dataInizio: string;
+			descrizione: string;
+			votoUnico: boolean;
+			mediaScrutinio: number;
+			haMediaScrutinio: boolean;
+			dataFine: string;
+			codicePeriodo: string;
+			scrutinioFinale: boolean;
 		}
 	>;
-	reminders: Record<
+	promemoria: Record<
 		string,
 		{
-			type: string;
-			date: number;
-			details: string;
-			idTeacher: string;
-			visibleType: string;
-			teacherName: string;
-			startTime: string;
+			data: string;
+			dettagli: string;
+			idDocente: string;
+			visibile: boolean;
+			oraInizio: string;
 			id: string;
-			endTime: string;
+			oraFine: string;
 		}
 	>;
-	board: Record<
+	bacheca: Record<
 		string,
 		{
-			date: number;
-			details: string;
-			needAcknowledgement: boolean;
-			category: string;
-			acknowledgementDate: number;
+			data: string;
+			dettagli: string;
+			richiestaPresaVisione: boolean;
+			categoria: string;
+			dataPresaVisione: string;
 			url: null;
-			author: string;
-			expirationDate: null;
-			type: string;
-			adRequest: boolean;
-			acknowledged: boolean;
-			confirmationDate: string;
+			autore: string;
+			dataScadenza: null;
+			adRichiesta: boolean;
+			dataConfermaAdesione: string;
 			id: string;
-			attachments: Record<
+			allegati: Record<
 				string,
 				{
-					fileName: string;
-					path: string;
-					description: null;
+					nome: string;
+					percorso: string;
+					descrizione: null;
 					id: string;
 					url: string;
 				}
 			>;
-			expirationConfirmDate: null;
-			confirmed: boolean;
+			dataScadenzaAdesione: null;
 		}
 	>;
-	sharedFile: { fileAlunniScollegati: []; listaFile: [] };
-	grades: Record<
+	fileCondivisi: { fileAlunniScollegati: any[]; listaFile: any[] };
+	voti: Record<
 		string,
 		{
-			date: number;
-			periodId: string;
-			gradeString: string;
-			grade: number;
-			practical: boolean;
-			teacher: string;
-			subjectId: string;
-			gradeType: null;
+			data: string;
+			idPeriodo: string;
+			valore: number;
+			voto: string;
+			pratico: boolean;
+			idMateria: string;
+			tipoValutazione: null;
 			prg: number;
-			type: string;
-			testDescription: string;
+			descrizioneProva: string;
 			faMenoMedia: string;
-			pkTeacher: string;
-			description: string;
-			codType: string;
-			averageCount: number;
+			idDocente: string;
+			descrizione: string;
+			tipo: string;
+			conteggioMedia: number;
 			id: string;
-			subject: string;
-			subjectDetails: {
-				subjectSchool: {
-					code: string;
-					schoolPrg: number;
-					year: number;
-					subjectPrg: number;
+			dettagliMateria: {
+				scuola: {
+					prg: number;
+					anno: number;
+					prgMateria: number;
 				};
-				code: string;
-				name: string;
-				shortName: string;
-				sectionCode: string;
-				typeCode: string;
-				hasAverage: boolean;
-				aggregateCode: string;
-				individualLessons: null;
-				codInvalsi: null;
-				ministerialCode: null;
-				icon: string;
-				description: null;
-				hasInsufficiency: boolean;
-				selected: boolean;
-				prgSubject: number;
-				type: string;
-				types: string;
-				hasIndividualLessons: boolean;
-				subjectId: string;
+				codice: string;
+				nome: string;
+				nomeBreve: string;
+				codiceSezione: string;
+				codiceTipo: string;
+				faMedia: boolean;
+				codiceAggregato: string;
+				lezioniIndividuali: null;
+				codiceInvalsi: null;
+				codiceMinisteriale: null;
+				icona: string;
+				descrizione: null;
+				haInsufficienze: boolean;
+				selezionata: boolean;
+				prg: number;
+				categoria: string;
+				tipo: string;
+				idMateria: string;
 			};
-			comment: string;
+			commento: string;
 		}
 	>;
-	newData: boolean;
-	teacherList: Record<
+	nuoviDati: boolean;
+	docenti: Record<
 		string,
 		{
-			surname: "DI LUCA";
-			subjects: string[];
-			name: string;
+			cognome: string;
+			materie: string[];
+			nome: string;
 			id: string;
 			email: string;
 		}
 	>;
-	studentBoard: Record<
+	bachecaAlunno: Record<
 		string,
 		{
-			type: string;
-			fileName: string;
-			date: number;
-			details: string;
-			parentDownload: string;
-			acknowledged: boolean;
+			nomeFile: string;
+			data: string;
+			dettagli: string;
+			downloadGenitore: string;
+			presaVisione: boolean;
 			id: string;
 		}
 	>;
-	disabledProfile: boolean;
-	periodAverage: Record<
+	profiloDisabilitato: boolean;
+	mediaPeriodo: Record<
 		string,
 		{
-			average: number;
-			subjects: Record<
+			media: number;
+			materie: Record<
 				string,
 				{
-					oralTestsTotal: number;
-					oralTestsCount: number;
-					average: number;
-					writtenAverage: number;
-					total: number;
-					valueCount: number;
-					testsCount: number;
-					writtenTestsCount: number;
-					writtenTestsTotal: number;
-					oralAverage: number;
+					sommaVotiOrali: number;
+					votiOrali: number;
+					conteggioMedia: number;
+					votiScritti: number;
+					sommaVotiScritti: number;
 				}
 			>;
-			monthlyAverage: Record<`${number}`, number>;
+			mediaMensile: Record<`${number}`, number>;
 		}
 	>;
-	subjectAverage: Record<
+	mediaMateria: Record<
 		string,
 		{
-			oralTestsTotal: number;
-			oralTestsCount: number;
-			average: number;
-			writtenAverage: number;
-			total: number;
-			valueCount: number;
-			testsCount: number;
-			writtenTestsCount: number;
-			writtenTestsTotal: number;
-			oralAverage: number;
+			sommaVotiOrali: number;
+			votiOrali: number;
+			conteggioMedia: number;
+			votiScritti: number;
+			sommaVotiScritti: number;
 		}
 	>;
-	selfCertification: any;
-	register: Record<
+	autoCertificazione: any;
+	registro: Record<
 		string,
 		{
-			type: string;
-			date: number;
+			data: string;
 			url: string;
-			teacherId: string;
-			homeworks: {
-				details: string;
-				dueDay: number;
+			idDocente: string;
+			compiti: {
+				dettagli: string;
+				scadenza: string;
 			}[];
-			teacher: string;
-			subject: string;
 			id: string;
-			subjectId: string;
-			activities: string;
-			hour: number;
+			idMateria: string;
+			attività: string;
+			ora: number;
 		}
 	>;
 	schede: any[];
 	prenotazioniAlunni: any[];
-	notes: any[];
+	note: any[];
 	id: string;
-	dailyEvents: Record<
+	appello: Record<
 		string,
 		{
-			type: string;
-			date: number;
-			description: string;
-			toJustify: boolean;
-			justified: boolean;
-			eventCode: string;
-			teacher: string;
-			justificationComment: string;
+			data: string;
+			descrizione: string;
+			daGiustificare: boolean;
+			giustificata: boolean;
+			codiceEvento: string;
+			dettagliGiustificazione: string;
 			id: string;
-			justificationDate: number;
-			annotation: string;
+			dataGiustificazione: string;
+			nota: string;
 		}
 	>;
-	extraClasses: boolean;
+	classiExtra: boolean;
 };
 export type ProfileDetails = {
-	user: {
-		flag: string;
-	};
-	parent: {
-		gender: string;
-		surname: string;
+	flgUtente: string;
+	genitore: {
+		sesso: string;
+		cognome: string;
 		email: string;
-		mobile: null;
-		telephone: string;
-		name: string;
-		birth: number;
+		cellulare: null;
+		telefono: string;
+		nome: string;
+		dataNascita: string;
 	};
-	student: {
-		surname: string;
-		mobile: null;
-		taxCode: string;
-		birth: number;
+	alunno: {
+		cognome: string;
+		cellulare: null;
+		codiceFiscale: string;
+		dataNascita: string;
 		cap: string;
-		residenceCity: string;
-		name: string;
-		birthCity: string;
-		residenceCap: string;
-		nationality: string;
-		address: string;
+		comuneResidenza: string;
+		nome: string;
+		comuneNascita: string;
+		capResidenza: string;
+		cittadinanza: string;
+		indirizzo: string;
 		email: null;
-		fullName: string;
-		street: string;
-		telephone: string;
-		gender: string;
-		city: string;
+		via: string;
+		telefono: string;
+		sesso: string;
+		comune: string;
 	};
 };

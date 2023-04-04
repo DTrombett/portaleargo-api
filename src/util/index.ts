@@ -6,3 +6,4 @@ export * from "./formatDate";
 export * from "./importData";
 export * from "./randomString";
 export * from "./writeToFile";
+export * from "./handleOperation";
