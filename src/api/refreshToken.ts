@@ -1,14 +1,19 @@
 import { buildToken } from "../builders";
-import type { APIToken, Login, Token } from "../types";
+import type { APIToken, Login, RequestOptions, Token } from "../types";
 import { apiRequest, clientId, formatDate, writeToFile } from "../util";
 
 /**
  * Refresh the token.
  * @param token - The token data
  * @param login - The login data
+ * @param options - Additional options for the request
  * @returns The token data
  */
-export const refreshToken = async (token: Token, login: Login) => {
+export const refreshToken = async (
+	token: Token,
+	login: Login,
+	options?: RequestOptions
+) => {
 	const { res, body } = await apiRequest<APIToken>(
 		"auth/refresh-token",
 		token,
@@ -27,6 +32,7 @@ export const refreshToken = async (token: Token, login: Login) => {
 				"proc": "initState_global_random_12345",
 				"username": login.username,
 			},
+			...options,
 		}
 	);
 	const value = buildToken(body, new Date(res.headers.date as string));

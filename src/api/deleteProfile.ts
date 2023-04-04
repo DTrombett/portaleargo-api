@@ -1,13 +1,18 @@
 import { rm } from "node:fs/promises";
-import type { APIResponse, Login, Token } from "../types";
+import type { APIResponse, Login, RequestOptions, Token } from "../types";
 import { AuthFolder, apiRequest } from "../util";
 
 /**
  * Delete the profile.
  * @param token - The token data
  * @param login - The login data
+ * @param options - Additional options for the request
  */
-export const deleteProfile = async (token: Token, login: Login) => {
+export const deleteProfile = async (
+	token: Token,
+	login: Login,
+	options?: RequestOptions
+) => {
 	const { res, body } = await apiRequest<APIResponse>(
 		"rimuoviprofilo",
 		token,
@@ -15,6 +20,7 @@ export const deleteProfile = async (token: Token, login: Login) => {
 		{
 			method: "POST",
 			body: {},
+			...options,
 		}
 	);
 

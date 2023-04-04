@@ -20,6 +20,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		method: HttpMethod;
 		noWaitAfter: R;
 		headers: IncomingHttpHeaders;
+		debug: boolean;
 	}>
 ) => {
 	const res = await request(
@@ -40,7 +41,8 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 				options?.method === "POST" ? JSON.stringify(options.body) : undefined,
 		}
 	);
-	console.log(`${options?.method ?? "GET"} /${path} ${res.statusCode}`);
+	if (options?.debug === true)
+		console.log(`${options.method ?? "GET"} /${path} ${res.statusCode}`);
 	const result = {
 		res,
 	} as {

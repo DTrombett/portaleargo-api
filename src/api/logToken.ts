@@ -1,13 +1,17 @@
-import type { APIResponse, Login, Token } from "../types";
+import type { APIResponse, Login, RequestOptions, Token } from "../types";
 import { apiRequest, formatDate } from "../util";
 
 /**
  * Log the token.
  * @param token - The token data
  * @param login - The login data
- * @param oldToken - The old token data
+ * @param options - Additional options for the request
  */
-export const logToken = async (token: Token, login: Login, oldToken: Token) => {
+export const logToken = async (
+	token: Token,
+	login: Login,
+	options: RequestOptions & { oldToken: Token }
+) => {
 	const { res, body } = await apiRequest<APIResponse>(
 		"logtoken",
 		token,
@@ -15,16 +19,19 @@ export const logToken = async (token: Token, login: Login, oldToken: Token) => {
 		{
 			method: "POST",
 			body: {
-				bearerOld: oldToken.accessToken,
-				dateExpOld: formatDate(oldToken.expireDate),
-				refreshOld: oldToken.refreshToken,
+				bearerOld: options.oldToken.accessToken,
+				dateExpOld: formatDate(options.oldToken.expireDate),
+				refreshOld: options.oldToken.refreshToken,
 				bearerNew: token.accessToken,
 				dateExpNew: formatDate(token.expireDate),
 				refreshNew: token.refreshToken,
 				isWhat: "false",
-				isRefreshed: (token.accessToken === oldToken.accessToken).toString(),
+				isRefreshed: (
+					token.accessToken === options.oldToken.accessToken
+				).toString(),
 				proc: "initState_global_random_12345",
 			},
+			...options,
 		}
 	);
 

@@ -1,5 +1,7 @@
 // config();
-// const client = new Client();
+// const client = new Client({
+// 	debug: true,
+// });
 //
 // await client.login();
 // await client.getDashboard();

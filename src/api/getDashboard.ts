@@ -1,18 +1,27 @@
 import { buildDashboard } from "../builders";
-import type { APIDashboard, Dashboard, Login, Token } from "../types";
+import type {
+	APIDashboard,
+	Dashboard,
+	Login,
+	RequestOptions,
+	Token,
+} from "../types";
 import { apiRequest, formatDate, writeToFile } from "../util";
 
 /**
  * Fetch all the data for the authenticated user.
  * @param token - The token data
  * @param login - The login data
+ * @param options - Additional options for the request
  * @returns All the data for the user
  */
 export const getDashboard = async (
 	token: Token,
 	login: Login,
-	lastUpdate: Date | number | string,
-	oldDashboard?: Dashboard
+	options: RequestOptions & {
+		lastUpdate: Date | number | string;
+		oldDashboard?: Dashboard;
+	}
 ) => {
 	const { res, body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
@@ -20,10 +29,11 @@ export const getDashboard = async (
 		login,
 		{
 			body: {
-				dataultimoaggiornamento: formatDate(lastUpdate),
+				dataultimoaggiornamento: formatDate(options.lastUpdate),
 				opzioni: JSON.stringify(login.options),
 			},
 			method: "POST",
+			...options,
 		}
 	);
 
@@ -32,7 +42,7 @@ export const getDashboard = async (
 			body.msg ??
 				`An error occurred while requesting the profile. Status code: ${res.statusCode}`
 		);
-	const value = buildDashboard(body, oldDashboard);
+	const value = buildDashboard(body, options.oldDashboard);
 
 	void writeToFile("dashboard", value);
 	return value;
