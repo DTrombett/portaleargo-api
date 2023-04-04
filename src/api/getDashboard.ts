@@ -1,5 +1,5 @@
 import { buildDashboard } from "../builders";
-import type { APIDashboard, Login, Token } from "../types";
+import type { APIDashboard, Dashboard, Login, Token } from "../types";
 import { apiRequest, formatDate, writeToFile } from "../util";
 
 /**
@@ -11,7 +11,8 @@ import { apiRequest, formatDate, writeToFile } from "../util";
 export const getDashboard = async (
 	token: Token,
 	login: Login,
-	lastUpdate: Date | number | string
+	lastUpdate: Date | number | string,
+	oldDashboard?: Dashboard
 ) => {
 	const { res, body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
@@ -31,7 +32,7 @@ export const getDashboard = async (
 			body.msg ??
 				`An error occurred while requesting the profile. Status code: ${res.statusCode}`
 		);
-	const value = buildDashboard(body);
+	const value = buildDashboard(body, oldDashboard);
 
 	void writeToFile("dashboard", value);
 	return value;

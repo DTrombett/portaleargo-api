@@ -11,10 +11,10 @@ export const buildLogin = (body: APILogin): Login => {
 	return {
 		schoolCode: data.codMin,
 		options: Object.fromEntries(data.opzioni.map((a) => [a.chiave, a.valore])),
-		isFirstAccess: data.isPrimoAccesso,
+		firstAccess: data.isPrimoAccesso,
 		disabledProfile: data.profiloDisabilitato,
-		isResetPassword: data.isResetPassword,
-		isSpid: data.isSpid,
+		resetPassword: data.isResetPassword,
+		spid: data.isSpid,
 		token: data.token,
 		username: data.username,
 	};
