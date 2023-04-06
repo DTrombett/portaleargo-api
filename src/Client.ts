@@ -116,7 +116,12 @@ export class Client {
 		const oldToken = this.token;
 
 		this.token = await this.refreshToken(oldToken);
-		this.loginData = this.loginData ?? (await login(this.token));
+		this.loginData =
+			this.loginData ??
+			(await login(this.token, {
+				headers: this.headers,
+				debug: this.debug,
+			}));
 		if (oldToken) {
 			await logToken(this.token, this.loginData, {
 				oldToken,
