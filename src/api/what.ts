@@ -16,21 +16,17 @@ export const what = async (
 	}
 ) => {
 	const authToken = JSON.stringify([login.token]);
-	const { res, body } = await apiRequest<APIWhat>(
-		"dashboard/what",
-		token,
+	const { res, body } = await apiRequest<APIWhat>("dashboard/what", token, {
+		method: "POST",
+		body: {
+			"dataultimoaggiornamento": formatDate(options.lastUpdate),
+			"opzioni": JSON.stringify(login.options),
+			"lista-x-auth-token": authToken,
+			"lista-x-auth-token-account": authToken,
+		},
 		login,
-		{
-			method: "POST",
-			body: {
-				"dataultimoaggiornamento": formatDate(options.lastUpdate),
-				"opzioni": JSON.stringify(login.options),
-				"lista-x-auth-token": authToken,
-				"lista-x-auth-token-account": authToken,
-			},
-			...options,
-		}
-	);
+		...options,
+	});
 
 	if (!body.success)
 		throw new Error(

@@ -14,12 +14,10 @@ export const getProfile = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIProfile>(
-		"profilo",
-		token,
+	const { res, body } = await apiRequest<APIProfile>("profilo", token, {
 		login,
-		options
-	);
+		...options,
+	});
 
 	if (!body.success)
 		throw new Error(

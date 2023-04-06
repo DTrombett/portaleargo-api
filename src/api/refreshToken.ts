@@ -17,7 +17,6 @@ export const refreshToken = async (
 	const { res, body } = await apiRequest<APIToken>(
 		"auth/refresh-token",
 		token,
-		login,
 		{
 			method: "POST",
 			body: {
@@ -32,6 +31,7 @@ export const refreshToken = async (
 				"proc": "initState_global_random_12345",
 				"username": login.username,
 			},
+			login,
 			...options,
 		}
 	);

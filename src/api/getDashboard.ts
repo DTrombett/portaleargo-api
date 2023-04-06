@@ -26,13 +26,13 @@ export const getDashboard = async (
 	const { res, body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
 		token,
-		login,
 		{
 			body: {
 				dataultimoaggiornamento: formatDate(options.lastUpdate),
 				opzioni: JSON.stringify(login.options),
 			},
 			method: "POST",
+			login,
 			...options,
 		}
 	);

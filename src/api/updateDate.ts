@@ -15,12 +15,12 @@ export const updateDate = async (
 	const { res, body } = await apiRequest<APIResponse>(
 		"dashboard/aggiornadata",
 		token,
-		login,
 		{
 			method: "POST",
 			body: {
 				dataultimoaggiornamento: formatDate(new Date()),
 			},
+			login,
 			...options,
 		}
 	);

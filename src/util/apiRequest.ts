@@ -14,8 +14,8 @@ import { formatDate } from "./formatDate";
 export const apiRequest = async <T extends Json, R extends boolean = false>(
 	path: string,
 	token: Token,
-	login: Login,
 	options?: Partial<{
+		login: Login;
 		body: Json;
 		method: HttpMethod;
 		noWaitAfter: R;
@@ -31,8 +31,8 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 				"argo-client-version": "1.15.1",
 				"authorization": `Bearer ${token.accessToken}`,
 				"content-type": "application/json; charset=utf-8",
-				"x-auth-token": login.token,
-				"x-cod-min": login.schoolCode,
+				"x-auth-token": options?.login?.token,
+				"x-cod-min": options?.login?.schoolCode,
 				"x-date-exp-auth": formatDate(token.expireDate),
 				...options?.headers,
 			},

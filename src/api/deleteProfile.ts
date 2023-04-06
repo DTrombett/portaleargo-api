@@ -13,16 +13,12 @@ export const deleteProfile = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIResponse>(
-		"rimuoviprofilo",
-		token,
+	const { res, body } = await apiRequest<APIResponse>("rimuoviprofilo", token, {
+		method: "POST",
+		body: {},
 		login,
-		{
-			method: "POST",
-			body: {},
-			...options,
-		}
-	);
+		...options,
+	});
 
 	if (!body.success)
 		throw new Error(

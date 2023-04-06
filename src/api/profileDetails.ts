@@ -17,10 +17,10 @@ export const profileDetails = async (
 	const { res, body } = await apiRequest<APIProfileDetails>(
 		"dettaglioprofilo",
 		token,
-		login,
 		{
 			body: null,
 			method: "POST",
+		login,
 			...options,
 		}
 	);
