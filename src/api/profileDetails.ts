@@ -14,7 +14,7 @@ export const profileDetails = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIProfileDetails>(
+	const { body } = await apiRequest<APIProfileDetails>(
 		"dettaglioprofilo",
 		token,
 		{
@@ -25,10 +25,6 @@ export const profileDetails = async (
 		}
 	);
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while requesting the profile details. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 	return buildProfileDetails(body);
 };

@@ -9,7 +9,7 @@ import { apiRequest, randomString, writeToFile } from "../util";
  * @returns The login data
  */
 export const login = async (token: Token, options?: RequestOptions) => {
-	const { res, body } = await apiRequest<APILogin>("login", token, {
+	const { body } = await apiRequest<APILogin>("login", token, {
 		method: "POST",
 		body: {
 			"lista-opzioni-notifiche": "{}",
@@ -21,8 +21,7 @@ export const login = async (token: Token, options?: RequestOptions) => {
 
 	if (!body.success)
 		throw new Error(
-			body.msg ??
-				`An error occurred in the login. Status code: ${res.statusCode}`
+			body.msg!
 		);
 	const value = buildLogin(body);
 

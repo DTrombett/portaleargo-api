@@ -16,7 +16,7 @@ export const what = async (
 	}
 ) => {
 	const authToken = JSON.stringify([login.token]);
-	const { res, body } = await apiRequest<APIWhat>("dashboard/what", token, {
+	const { body } = await apiRequest<APIWhat>("dashboard/what", token, {
 		method: "POST",
 		body: {
 			"dataultimoaggiornamento": formatDate(options.lastUpdate),
@@ -28,10 +28,6 @@ export const what = async (
 		...options,
 	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while requesting the what data. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 	return buildWhat(body);
 };

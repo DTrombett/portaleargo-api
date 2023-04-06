@@ -12,7 +12,7 @@ export const updateDate = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIResponse>(
+	const { body } = await apiRequest<APIResponse>(
 		"dashboard/aggiornadata",
 		token,
 		{
@@ -25,9 +25,5 @@ export const updateDate = async (
 		}
 	);
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while updating the date. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 };

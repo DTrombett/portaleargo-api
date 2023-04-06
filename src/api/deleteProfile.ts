@@ -13,17 +13,13 @@ export const deleteProfile = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIResponse>("rimuoviprofilo", token, {
+	const { body } = await apiRequest<APIResponse>("rimuoviprofilo", token, {
 		method: "POST",
 		body: {},
 		login,
 		...options,
 	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while deleting the profile. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 	await rm(AuthFolder, { recursive: true, force: true });
 };

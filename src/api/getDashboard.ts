@@ -23,7 +23,7 @@ export const getDashboard = async (
 		oldDashboard?: Dashboard;
 	}
 ) => {
-	const { res, body } = await apiRequest<APIDashboard>(
+	const { body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
 		token,
 		{
@@ -37,11 +37,7 @@ export const getDashboard = async (
 		}
 	);
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while requesting the profile. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 	const value = buildDashboard(body, options.oldDashboard);
 
 	void writeToFile("dashboard", value);

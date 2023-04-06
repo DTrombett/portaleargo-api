@@ -14,15 +14,14 @@ export const getProfile = async (
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { res, body } = await apiRequest<APIProfile>("profilo", token, {
+	const { body } = await apiRequest<APIProfile>("profilo", token, {
 		login,
 		...options,
 	});
 
 	if (!body.success)
 		throw new Error(
-			body.msg ??
-				`An error occurred while requesting the profile. Status code: ${res.statusCode}`
+			body.msg!
 		);
 	const value = buildProfile(body);
 

@@ -1,4 +1,5 @@
 export * from "./deleteProfile";
+export * from "./downloadAttachment";
 export * from "./getCode";
 export * from "./getDailyTimetable";
 export * from "./getDashboard";

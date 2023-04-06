@@ -1,9 +1,11 @@
 import { existsSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
+import { request } from "undici";
 import {
 	deleteProfile,
+	downloadAttachment,
 	getCode,
 	getDailyTimetable,
 	getDashboard,
@@ -152,9 +154,7 @@ export class Client {
 				headers: this.headers,
 			}));
 		this.ready = true;
-		await this.getDashboard({
-			updateDate: false,
-		});
+		await this.getDashboard(true);
 		return this.loginData;
 	}
 
@@ -200,10 +200,10 @@ export class Client {
 	 * Get the dashboard data from the API.
 	 * * **NOTE**: this will force an API call.
 	 * You can safely use `client.dashboard` which will provide data updated at login
-	 * @param
+	 * @param suppressDateUpdate - Whether to suppress the date update
 	 * @returns The dashboard data
 	 */
-	async getDashboard(options?: { updateDate?: boolean }) {
+	async getDashboard(suppressDateUpdate?: boolean) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		this.dashboard = await getDashboard(this.token, this.loginData, {
 			lastUpdate:
@@ -212,7 +212,7 @@ export class Client {
 			debug: this.debug,
 			headers: this.headers,
 		});
-		if (options?.updateDate !== false)
+		if (suppressDateUpdate !== false)
 			updateDate(this.token, this.loginData, {
 				debug: this.debug,
 				headers: this.headers,
@@ -262,5 +262,31 @@ export class Client {
 			month: date?.month,
 			year: date?.year,
 		});
+	}
+
+	/**
+	 * Get the url to download an attachment.
+	 * @param uid - The uid of the attachment
+	 * @returns The download url
+	 */
+	async getAttachmentLink(uid: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return downloadAttachment(this.token, this.loginData, {
+			uid,
+			debug: this.debug,
+			headers: this.headers,
+		});
+	}
+
+	/**
+	 * Download an attachment.
+	 * @param uid - The uid of the attachment
+	 * @param file - The path where the file should be saved
+	 */
+	async downloadAttachment(uid: string, file?: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		const { body } = await request(await this.getAttachmentLink(uid));
+
+		if (file !== undefined) await writeFile(file, body);
 	}
 }

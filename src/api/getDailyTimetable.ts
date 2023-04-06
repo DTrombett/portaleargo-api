@@ -18,27 +18,19 @@ export const getDailyTimetable = async (
 	}
 ) => {
 	const now = new Date();
-	const { res, body } = await apiRequest<APIDailyTimetable>(
-		"orario-giorno",
-		token,
-		{
-			method: "POST",
-			body: {
-				datGiorno: formatDate(
-					`${options?.year ?? now.getFullYear()}-${
-						options?.month ?? now.getMonth() + 1
-					}-${options?.day ?? now.getDate() + 1}`
-				),
-			},
-			login,
-			...options,
-		}
-	);
+	const { body } = await apiRequest<APIDailyTimetable>("orario-giorno", token, {
+		method: "POST",
+		body: {
+			datGiorno: formatDate(
+				`${options?.year ?? now.getFullYear()}-${
+					options?.month ?? now.getMonth() + 1
+				}-${options?.day ?? now.getDate() + 1}`
+			),
+		},
+		login,
+		...options,
+	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while requesting the daily timetable data. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 	return buildDailyTimetable(body);
 };

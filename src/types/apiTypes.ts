@@ -402,3 +402,12 @@ export type APIDailyTimetable = APIResponse<{
 		}[]
 	>;
 }>;
+export type APIDownloadAttachment =
+	| {
+			success: false;
+			msg: string;
+	  }
+	| {
+			success: true;
+			url: string;
+	  };

@@ -12,7 +12,7 @@ export const logToken = async (
 	login: Login,
 	options: RequestOptions & { oldToken: Token; isWhat?: boolean }
 ) => {
-	const { res, body } = await apiRequest<APIResponse>("logtoken", token, {
+	const { body } = await apiRequest<APIResponse>("logtoken", token, {
 		method: "POST",
 		body: {
 			bearerOld: options.oldToken.accessToken,
@@ -31,9 +31,5 @@ export const logToken = async (
 		...options,
 	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg ??
-				`An error occurred while logging the token. Status code: ${res.statusCode}`
-		);
+	if (!body.success) throw new Error(body.msg!);
 };
