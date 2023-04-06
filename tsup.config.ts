@@ -10,13 +10,11 @@ const options: Options = {
 	external: ["tsup"],
 	platform: "node",
 	target: "esnext",
+	minify: true,
 };
 
-if (env.NODE_ENV === "production") {
-	options.minify = true;
-} else {
+if (env.NODE_ENV !== "production") {
 	options.sourcemap = true;
-	options.minify = false;
 }
 
 export default defineConfig(options);
