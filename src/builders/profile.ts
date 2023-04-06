@@ -11,8 +11,8 @@ export const buildProfile = (body: APIProfile): Profile => {
 	return {
 		ultimoCambioPassword: data.ultimoCambioPwd,
 		anno: {
-			dataInizio: new Date(data.anno.dataInizio).getTime(),
-			dataFine: new Date(data.anno.dataFine).getTime(),
+			dataInizio: data.anno.dataInizio,
+			dataFine: data.anno.dataFine,
 		},
 		genitore: {
 			email: data.genitore.desEMail,

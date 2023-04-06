@@ -13,6 +13,7 @@ import {
 	profileDetails,
 	refreshToken,
 	updateDate,
+	what,
 } from "./api";
 import type { ClientOptions, Dashboard, Login, Profile, Token } from "./types";
 import {
@@ -20,6 +21,7 @@ import {
 	encryptCodeVerifier,
 	importData,
 	randomString,
+	writeToFile,
 } from "./util";
 
 /**
@@ -115,12 +117,27 @@ export class Client {
 
 		this.token = await this.refreshToken(oldToken);
 		this.loginData = this.loginData ?? (await login(this.token));
-		if (oldToken)
+		if (oldToken) {
 			await logToken(this.token, this.loginData, {
 				oldToken,
 				debug: this.debug,
 				headers: this.headers,
+				isWhat: this.profile !== undefined,
 			});
+			if (this.profile) {
+				this.ready = true;
+				const whatData = await what(this.token, this.loginData, {
+					debug: this.debug,
+					headers: this.headers,
+					lastUpdate:
+						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+				});
+
+				if (whatData.profiloModificato || whatData.differenzaSchede)
+					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
+				if (whatData.aggiornato) await this.getDashboard();
+			}
+		}
 		this.profile =
 			this.profile ??
 			(await getProfile(this.token, this.loginData, {
@@ -138,7 +155,6 @@ export class Client {
 	 */
 	async refreshToken(token?: Token) {
 		if (!this.loginData || !token) return this.getToken();
-
 		if (token.expireDate <= Date.now())
 			return refreshToken(token, this.loginData, {
 				debug: this.debug,
@@ -172,6 +188,8 @@ export class Client {
 
 	/**
 	 * Get the dashboard data from the API.
+	 * * **NOTE**: this will force an API call.
+	 * You can safely use `client.dashboard` which will provide data updated at login
 	 * @returns The dashboard data
 	 */
 	async getDashboard() {

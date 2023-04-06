@@ -10,7 +10,7 @@ import { apiRequest, formatDate } from "../util";
 export const logToken = async (
 	token: Token,
 	login: Login,
-	options: RequestOptions & { oldToken: Token }
+	options: RequestOptions & { oldToken: Token; isWhat?: boolean }
 ) => {
 	const { res, body } = await apiRequest<APIResponse>(
 		"logtoken",
@@ -25,7 +25,7 @@ export const logToken = async (
 				bearerNew: token.accessToken,
 				dateExpNew: formatDate(token.expireDate),
 				refreshNew: token.refreshToken,
-				isWhat: "false",
+				isWhat: (options.isWhat ?? false).toString(),
 				isRefreshed: (
 					token.accessToken === options.oldToken.accessToken
 				).toString(),

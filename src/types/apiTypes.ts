@@ -60,7 +60,7 @@ export type APIProfile = APIResponse<{
 		nome: string;
 		pk: string;
 		maggiorenne: boolean;
-		desEmail: null;
+		desEmail: string | null;
 	};
 	scheda: {
 		classe: {
@@ -144,20 +144,20 @@ export type APIDashboard = APIResponse<{
 				pvRichiesta: boolean;
 				categoria: string;
 				dataConfermaPresaVisione: string;
-				url: null;
+				url: string | null;
 				autore: string;
-				dataScadenza: null;
+				dataScadenza: string | null;
 				adRichiesta: boolean;
 				isPresaVisione: boolean;
 				dataConfermaAdesione: string;
 				listaAllegati: {
 					nomeFile: string;
 					path: string;
-					descrizioneFile: null;
+					descrizioneFile: string | null;
 					pk: string;
 					url: string;
 				}[];
-				dataScadAdesione: null;
+				dataScadAdesione: string | null;
 				isPresaAdesioneConfermata: boolean;
 			}>[];
 			fileCondivisi: {
@@ -201,7 +201,7 @@ export type APIDashboard = APIResponse<{
 					codAggrInvalsi: null;
 					codMinisteriale: null;
 					icona: string;
-					descrizione: null;
+					descrizione: string | null;
 					conInsufficienze: boolean;
 					selezionata: boolean;
 					prgMateria: number;
@@ -312,14 +312,14 @@ export type APIProfileDetails = APIResponse<{
 		flgSesso: string;
 		desCognome: string;
 		desEMail: string;
-		desCellulare: null;
+		desCellulare: string | null;
 		desTelefono: string;
 		desNome: string;
 		datNascita: string;
 	};
 	alunno: {
 		cognome: string;
-		desCellulare: null;
+		desCellulare: string | null;
 		desCf: string;
 		datNascita: string;
 		desCap: string;
@@ -329,11 +329,57 @@ export type APIProfileDetails = APIResponse<{
 		desCapResidenza: string;
 		cittadinanza: string;
 		desIndirizzoRecapito: string;
-		desEMail: null;
+		desEMail: string | null;
 		nominativo: string;
 		desVia: string;
 		desTelefono: string;
 		sesso: string;
 		desComuneRecapito: string;
 	};
+}>;
+export type APIWhat = APIResponse<{
+	dati: [
+		{
+			forceLogin: boolean;
+			isModificato: boolean;
+			pk: string;
+			alunno: {
+				isUltimaClasse: boolean;
+				nominativo: string;
+				cognome: string;
+				nome: string;
+				pk: string;
+				maggiorenne: boolean;
+				desEmail: string | null;
+			};
+			mostraPallino: boolean;
+			scheda: {
+				aggiornaSchedaPK: boolean;
+				classe: {
+					pk: string;
+					desDenominazione: string;
+					desSezione: string;
+				};
+				dataInizio: string;
+				anno: number;
+				corso: {
+					descrizione: string;
+					pk: string;
+				};
+				sede: {
+					descrizione: string;
+					pk: string;
+				};
+				scuola: {
+					desOrdine: string;
+					descrizione: string;
+					pk: string;
+				};
+				dataFine: string;
+				pk: string;
+			};
+			differenzaSchede: boolean;
+			profiloStorico: boolean;
+		}
+	];
 }>;

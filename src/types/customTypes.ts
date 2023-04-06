@@ -19,8 +19,8 @@ export type Login = {
 export type Profile = {
 	ultimoCambioPassword: null;
 	anno: {
-		dataInizio: number;
-		dataFine: number;
+		dataInizio: string;
+		dataFine: string;
 	};
 	genitore: {
 		email: string;
@@ -33,7 +33,7 @@ export type Profile = {
 		nome: string;
 		id: string;
 		maggiorenne: boolean;
-		email: null;
+		email: string | null;
 	};
 	classe: {
 		id: string;
@@ -120,9 +120,9 @@ export type Dashboard = {
 			richiestaPresaVisione: boolean;
 			categoria: string;
 			dataPresaVisione: string;
-			url: null;
+			url: string | null;
 			autore: string;
-			dataScadenza: null;
+			dataScadenza: string | null;
 			adRichiesta: boolean;
 			dataConfermaAdesione: string;
 			id: string;
@@ -131,12 +131,12 @@ export type Dashboard = {
 				{
 					nome: string;
 					percorso: string;
-					descrizione: null;
+					descrizione: string | null;
 					id: string;
 					url: string;
 				}
 			>;
-			dataScadenzaAdesione: null;
+			dataScadenzaAdesione: string | null;
 		}
 	>;
 	fileCondivisi: { fileAlunniScollegati: any[]; listaFile: any[] };
@@ -175,7 +175,7 @@ export type Dashboard = {
 				codiceInvalsi: null;
 				codiceMinisteriale: null;
 				icona: string;
-				descrizione: null;
+				descrizione: string | null;
 				haInsufficienze: boolean;
 				selezionata: boolean;
 				prg: number;
@@ -279,14 +279,14 @@ export type ProfileDetails = {
 		sesso: string;
 		cognome: string;
 		email: string;
-		cellulare: null;
+		cellulare: string | null;
 		telefono: string;
 		nome: string;
 		dataNascita: string;
 	};
 	alunno: {
 		cognome: string;
-		cellulare: null;
+		cellulare: string | null;
 		codiceFiscale: string;
 		dataNascita: string;
 		cap: string;
@@ -296,10 +296,51 @@ export type ProfileDetails = {
 		capResidenza: string;
 		cittadinanza: string;
 		indirizzo: string;
-		email: null;
+		email: string | null;
 		via: string;
 		telefono: string;
 		sesso: string;
 		comune: string;
+	};
+};
+export type What = {
+	idAggiornamentoScheda: boolean;
+	forzaLogin: boolean;
+	profiloModificato: boolean;
+	aggiornato: boolean;
+	differenzaSchede: boolean;
+	profilo: {
+		anno: {
+			dataInizio: string;
+			dataFine: string;
+		};
+		alunno: {
+			ultimoAnno: boolean;
+			cognome: string;
+			nome: string;
+			id: string;
+			maggiorenne: boolean;
+			email: string | null;
+		};
+		classe: {
+			id: string;
+			classe: number;
+			sezione: string;
+		};
+		corso: {
+			descrizione: string;
+			id: string;
+		};
+		plesso: {
+			descrizione: string;
+			id: string;
+		};
+		scuola: {
+			ordine: string;
+			descrizione: string;
+			id: string;
+		};
+		id: string;
+		profiloStorico: boolean;
 	};
 };
