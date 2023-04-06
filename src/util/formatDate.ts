@@ -5,16 +5,13 @@
  */
 export const formatDate = (date: Date | number | string) => {
 	date = new Date(date);
-	return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1)
+	return `${date.getFullYear()}-${(date.getMonth() + 1)
 		.toString()
-		.padStart(2, "0")}-${date.getUTCDate().toString().padStart(2, "0")} ${date
-		.getUTCHours()
+		.padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} ${date
+		.getHours()
 		.toString()
-		.padStart(2, "0")}:${date
-		.getUTCMinutes()
-		.toString()
-		.padStart(2, "0")}:${date
-		.getUTCSeconds()
+		.padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
+		.getSeconds()
 		.toString()
 		.padStart(2, "0")}.${date.getMilliseconds().toString().padStart(3, "0")}`;
 };

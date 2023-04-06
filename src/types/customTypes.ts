@@ -344,3 +344,17 @@ export type What = {
 		profiloStorico: boolean;
 	};
 };
+export type DailyTimetable = {
+	numOra: number;
+	mostra: boolean;
+	cognome: string;
+	nome: string;
+	docente: string;
+	materia: string;
+	id?: string;
+	idAnagrafe?: string;
+	denominazioneOra: string;
+	email: string;
+	sezione: string;
+	ora: null;
+}[][];

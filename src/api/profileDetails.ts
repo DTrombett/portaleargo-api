@@ -1,6 +1,6 @@
 import { buildProfileDetails } from "../builders";
 import type { APIProfileDetails, Login, RequestOptions, Token } from "../types";
-import { apiRequest, writeToFile } from "../util";
+import { apiRequest } from "../util";
 
 /**
  * Fetch all the profile details for the authenticated user.
@@ -20,7 +20,7 @@ export const profileDetails = async (
 		{
 			body: null,
 			method: "POST",
-		login,
+			login,
 			...options,
 		}
 	);
@@ -30,8 +30,5 @@ export const profileDetails = async (
 			body.msg ??
 				`An error occurred while requesting the profile details. Status code: ${res.statusCode}`
 		);
-	const value = buildProfileDetails(body);
-
-	void writeToFile("profileDetails", value);
-	return value;
+	return buildProfileDetails(body);
 };

@@ -383,3 +383,22 @@ export type APIWhat = APIResponse<{
 		}
 	];
 }>;
+export type APIDailyTimetable = APIResponse<{
+	dati: Record<
+		`${number}`,
+		{
+			numOra: number;
+			mostra: boolean;
+			desCognome: string;
+			desNome: string;
+			docente: string;
+			materia: string;
+			pk?: string;
+			scuAnagrafePK?: string;
+			desDenominazione: string;
+			desEmail: string;
+			desSezione: string;
+			ora: null;
+		}[]
+	>;
+}>;

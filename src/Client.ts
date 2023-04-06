@@ -5,6 +5,7 @@ import { env } from "node:process";
 import {
 	deleteProfile,
 	getCode,
+	getDailyTimetable,
 	getDashboard,
 	getProfile,
 	getToken,
@@ -141,6 +142,7 @@ export class Client {
 				if (whatData.profiloModificato || whatData.differenzaSchede)
 					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
 				if (whatData.aggiornato) await this.getDashboard();
+				return this.loginData;
 			}
 		}
 		this.profile =
@@ -150,6 +152,9 @@ export class Client {
 				headers: this.headers,
 			}));
 		this.ready = true;
+		await this.getDashboard({
+			updateDate: false,
+		});
 		return this.loginData;
 	}
 
@@ -195,9 +200,10 @@ export class Client {
 	 * Get the dashboard data from the API.
 	 * * **NOTE**: this will force an API call.
 	 * You can safely use `client.dashboard` which will provide data updated at login
+	 * @param
 	 * @returns The dashboard data
 	 */
-	async getDashboard() {
+	async getDashboard(options?: { updateDate?: boolean }) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		this.dashboard = await getDashboard(this.token, this.loginData, {
 			lastUpdate:
@@ -206,10 +212,11 @@ export class Client {
 			debug: this.debug,
 			headers: this.headers,
 		});
-		updateDate(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
-		}).catch(console.error);
+		if (options?.updateDate !== false)
+			updateDate(this.token, this.loginData, {
+				debug: this.debug,
+				headers: this.headers,
+			}).catch(console.error);
 		return this.dashboard;
 	}
 
@@ -238,6 +245,22 @@ export class Client {
 		return profileDetails(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
+		});
+	}
+
+	/**
+	 * Get the timetable for a specific day.
+	 * @param date - The date of the timetable
+	 * @returns The daily timetable
+	 */
+	async getTimetable(date?: { year?: number; month?: number; day?: number }) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getDailyTimetable(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			day: date?.day,
+			month: date?.month,
+			year: date?.year,
 		});
 	}
 }

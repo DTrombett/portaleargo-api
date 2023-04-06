@@ -1,5 +1,6 @@
 export * from "./deleteProfile";
 export * from "./getCode";
+export * from "./getDailyTimetable";
 export * from "./getDashboard";
 export * from "./getProfile";
 export * from "./getToken";
