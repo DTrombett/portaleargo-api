@@ -58,7 +58,6 @@ export const buildDashboard = (body: APIDashboard, old?: Dashboard) => {
 		schede: data.schede,
 		prenotazioniAlunni: data.prenotazioniAlunni,
 		note: data.noteDisciplinari,
-		id: data.pk,
 		classiExtra: data.classiExtra,
 		appello: old?.appello ?? {},
 	};

@@ -1,5 +1,6 @@
 export * from "./deleteProfile";
 export * from "./downloadAttachment";
+export * from "./downloadStudentAttachment";
 export * from "./getCode";
 export * from "./getDailyTimetable";
 export * from "./getDashboard";

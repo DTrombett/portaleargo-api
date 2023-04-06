@@ -256,7 +256,6 @@ export type Dashboard = {
 	schede: any[];
 	prenotazioniAlunni: any[];
 	note: any[];
-	id: string;
 	appello: Record<
 		string,
 		{

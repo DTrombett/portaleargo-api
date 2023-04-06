@@ -6,6 +6,7 @@ import { request } from "undici";
 import {
 	deleteProfile,
 	downloadAttachment,
+	downloadStudentAttachment,
 	getCode,
 	getDailyTimetable,
 	getDashboard,
@@ -200,6 +201,7 @@ export class Client {
 	 * Get the dashboard data from the API.
 	 * * **NOTE**: this will force an API call.
 	 * You can safely use `client.dashboard` which will provide data updated at login
+	 * If you want to refresh the data `client.login()` is recommended
 	 * @param suppressDateUpdate - Whether to suppress the date update
 	 * @returns The dashboard data
 	 */
@@ -283,10 +285,37 @@ export class Client {
 	 * @param uid - The uid of the attachment
 	 * @param file - The path where the file should be saved
 	 */
-	async downloadAttachment(uid: string, file?: string) {
+	async downloadAttachment(uid: string, file: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		const { body } = await request(await this.getAttachmentLink(uid));
 
-		if (file !== undefined) await writeFile(file, body);
+		await writeFile(file, body);
+	}
+
+	/**
+	 * Get the url to download a student attachment.
+	 * @param uid - The uid of the attachment
+	 * @returns The download url
+	 */
+	async getStudentAttachmentLink(uid: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return downloadStudentAttachment(this.token, this.loginData, {
+			uid,
+			id: this.profile.id,
+			debug: this.debug,
+			headers: this.headers,
+		});
+	}
+
+	/**
+	 * Download a student attachment.
+	 * @param uid - The uid of the attachment
+	 * @param file - The path where the file should be saved
+	 */
+	async downloadStudentAttachment(uid: string, file: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		const { body } = await request(await this.getStudentAttachmentLink(uid));
+
+		await writeFile(file, body);
 	}
 }
