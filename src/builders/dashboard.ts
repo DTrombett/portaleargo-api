@@ -51,39 +51,8 @@ export const buildDashboard = (body: APIDashboard, old?: Dashboard) => {
 		})),
 		bachecaAlunno: old?.bachecaAlunno ?? {},
 		profiloDisabilitato: data.profiloDisabilitato,
-		mediaPeriodo: Object.fromEntries(
-			Object.entries(data.mediaPerPeriodo).map(([key, a]) => [
-				key,
-				{
-					media: a.mediaGenerale,
-					mediaMensile: a.mediaMese,
-					materie: Object.fromEntries(
-						Object.entries(a.listaMaterie).map(([k, b]) => [
-							k,
-							{
-								sommaVotiOrali: b.sommaValutazioniOrale,
-								votiOrali: b.numValutazioniOrale,
-								conteggioMedia: b.numValori,
-								votiScritti: b.numValutazioniScritto,
-								sommaVotiScritti: b.sommaValutazioniScritto,
-							},
-						])
-					),
-				},
-			])
-		),
-		mediaMateria: Object.fromEntries(
-			Object.entries(data.mediaMaterie).map(([key, b]) => [
-				key,
-				{
-					sommaVotiOrali: b.sommaValutazioniOrale,
-					votiOrali: b.numValutazioniOrale,
-					conteggioMedia: b.numValori,
-					votiScritti: b.numValutazioniScritto,
-					sommaVotiScritti: b.sommaValutazioniScritto,
-				},
-			])
-		),
+		mediaPeriodo: {},
+		mediaMaterie: {},
 		autoCertificazione: data.autocertificazione,
 		registro: old?.registro ?? {},
 		schede: data.schede,
@@ -94,6 +63,34 @@ export const buildDashboard = (body: APIDashboard, old?: Dashboard) => {
 		appello: old?.appello ?? {},
 	};
 
+	for (const key in data.mediaMaterie)
+		if (Object.hasOwn(data.mediaMaterie, key))
+			dashboard.mediaMaterie[key] = {
+				sommaVotiOrali: data.mediaMaterie[key].sommaValutazioniOrale,
+				votiOrali: data.mediaMaterie[key].numValutazioniOrale,
+				conteggioMedia: data.mediaMaterie[key].numValori,
+				votiScritti: data.mediaMaterie[key].numValutazioniScritto,
+				sommaVotiScritti: data.mediaMaterie[key].sommaValutazioniScritto,
+			};
+	for (const key in data.mediaPerPeriodo)
+		if (Object.hasOwn(data.mediaPerPeriodo, key)) {
+			const { listaMaterie } = data.mediaPerPeriodo[key];
+
+			dashboard.mediaPeriodo[key] = {
+				media: data.mediaPerPeriodo[key].mediaGenerale,
+				mediaMensile: data.mediaPerPeriodo[key].mediaMese,
+				materie: {},
+			};
+			for (const k in listaMaterie)
+				if (Object.hasOwn(listaMaterie, k))
+					dashboard.mediaPeriodo[key].materie[k] = {
+						sommaVotiOrali: listaMaterie[k].sommaValutazioniOrale,
+						votiOrali: listaMaterie[k].numValutazioniOrale,
+						conteggioMedia: listaMaterie[k].numValori,
+						votiScritti: listaMaterie[k].numValutazioniScritto,
+						sommaVotiScritti: listaMaterie[k].sommaValutazioniScritto,
+					};
+		}
 	handleOperation(data.appello, dashboard.appello, (a) => ({
 		data: a.datEvento,
 		descrizione: a.descrizione,

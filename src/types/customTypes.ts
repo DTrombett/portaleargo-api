@@ -226,7 +226,7 @@ export type Dashboard = {
 			mediaMensile: Record<`${number}`, number>;
 		}
 	>;
-	mediaMateria: Record<
+	mediaMaterie: Record<
 		string,
 		{
 			sommaVotiOrali: number;
