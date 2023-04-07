@@ -32,7 +32,8 @@ export const refreshToken = async (
 				"username": login.username,
 			},
 			login,
-			...options,
+			debug: options?.debug,
+			headers: options?.headers,
 		}
 	);
 	const value = buildToken(body, new Date(res.headers.date as string));

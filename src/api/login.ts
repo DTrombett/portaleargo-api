@@ -16,13 +16,11 @@ export const login = async (token: Token, options?: RequestOptions) => {
 			"lista-x-auth-token": "[]",
 			"clientID": randomString(163),
 		},
-		...options,
+		debug: options?.debug,
+		headers: options?.headers,
 	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg!
-		);
+	if (!body.success) throw new Error(body.msg!);
 	const value = buildLogin(body);
 
 	void writeToFile("login", value);

@@ -6,6 +6,7 @@ export * from "./getDailyTimetable";
 export * from "./getDashboard";
 export * from "./getProfile";
 export * from "./getToken";
+export * from "./getVotiScrutinio";
 export * from "./logToken";
 export * from "./login";
 export * from "./profileDetails";

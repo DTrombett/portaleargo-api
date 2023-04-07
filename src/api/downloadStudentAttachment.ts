@@ -30,7 +30,8 @@ export const downloadStudentAttachment = async (
 				pk: options.id,
 			},
 			login,
-			...options,
+			debug: options.debug,
+			headers: options.headers,
 		}
 	);
 

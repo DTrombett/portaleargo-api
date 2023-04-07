@@ -21,7 +21,8 @@ export const updateDate = async (
 				dataultimoaggiornamento: formatDate(new Date()),
 			},
 			login,
-			...options,
+			debug: options?.debug,
+			headers: options?.headers,
 		}
 	);
 

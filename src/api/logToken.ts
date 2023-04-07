@@ -28,7 +28,8 @@ export const logToken = async (
 			proc: "initState_global_random_12345",
 		},
 		login,
-		...options,
+		debug: options.debug,
+		headers: options.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);

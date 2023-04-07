@@ -5,12 +5,9 @@
 // const client = new Client({
 // 	debug: true,
 // });
-// const dashboard = await client.login();
 //
-// await client.downloadStudentAttachment(
-// 	dashboard.bachecaAlunno[0].id,
-// 	"./file.pdf"
-// );
+// await client.login();
+// console.log(await client.getVotiScrutinio());
 
 export * from "./Client";
 export * from "./api";

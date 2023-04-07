@@ -28,7 +28,8 @@ export const getDailyTimetable = async (
 			),
 		},
 		login,
-		...options,
+		debug: options?.debug,
+		headers: options?.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);

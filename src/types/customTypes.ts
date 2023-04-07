@@ -320,3 +320,12 @@ export type DailyTimetable = {
 	sezione: string;
 	ora: null;
 }[][];
+export type VotiScrutinio = {
+	periodi: {
+		descrizione: string;
+		materie: any[];
+		suddivisione: string;
+		voti: boolean;
+		scrutinioFinale: boolean;
+	}[];
+};

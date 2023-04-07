@@ -33,7 +33,8 @@ export const getDashboard = async (
 			},
 			method: "POST",
 			login,
-			...options,
+			debug: options.debug,
+			headers: options.headers,
 		}
 	);
 

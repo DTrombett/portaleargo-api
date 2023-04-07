@@ -21,7 +21,8 @@ export const profileDetails = async (
 			body: null,
 			method: "POST",
 			login,
-			...options,
+			debug: options?.debug,
+			headers: options?.headers,
 		}
 	);
 

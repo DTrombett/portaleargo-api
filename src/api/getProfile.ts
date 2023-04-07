@@ -16,13 +16,11 @@ export const getProfile = async (
 ) => {
 	const { body } = await apiRequest<APIProfile>("profilo", token, {
 		login,
-		...options,
+		debug: options?.debug,
+		headers: options?.headers,
 	});
 
-	if (!body.success)
-		throw new Error(
-			body.msg!
-		);
+	if (!body.success) throw new Error(body.msg!);
 	const value = buildProfile(body);
 
 	void writeToFile("profile", value);

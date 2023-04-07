@@ -28,7 +28,8 @@ export const downloadAttachment = async (
 				uid: options.uid,
 			},
 			login,
-			...options,
+			debug: options.debug,
+			headers: options.headers,
 		}
 	);
 

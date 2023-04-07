@@ -411,3 +411,17 @@ export type APIDownloadAttachment =
 			success: true;
 			url: string;
 	  };
+export type APIVotiScrutinio = APIResponse<{
+	votiScrutinio: [
+		{
+			periodi: {
+				desDescrizione: string;
+				materie: any[];
+				suddivisione: string;
+				votiGiudizi: boolean;
+				scrutinioFinale: boolean;
+			}[];
+			pk: string;
+		}
+	];
+}>;

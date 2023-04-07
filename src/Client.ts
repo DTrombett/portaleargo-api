@@ -12,6 +12,7 @@ import {
 	getDashboard,
 	getProfile,
 	getToken,
+	getVotiScrutinio,
 	logToken,
 	login,
 	profileDetails,
@@ -316,5 +317,17 @@ export class Client {
 		const { body } = await request(await this.getStudentAttachmentLink(uid));
 
 		await writeFile(file, body);
+	}
+
+	/**
+	 * Get the final grades for the student.
+	 * @returns The final grades
+	 */
+	async getVotiScrutinio() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getVotiScrutinio(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+		});
 	}
 }
