@@ -1,12 +1,16 @@
-import { config } from "dotenv";
-import { Client } from "./Client";
-
-config();
-const client = new Client({
-	debug: true,
-});
-
-await client.login();
+// import { config } from "dotenv";
+// import { Client } from "./Client";
+//
+// config();
+// const client = new Client({
+// 	debug: true,
+// });
+// const dashboard = await client.login();
+//
+// await client.downloadStudentAttachment(
+// 	dashboard.bachecaAlunno[0].id,
+// 	"./file.pdf"
+// );
 
 export * from "./Client";
 export * from "./api";

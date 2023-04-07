@@ -102,7 +102,7 @@ export class Client {
 
 	/**
 	 * Login to the API.
-	 * @returns The login data
+	 * @returns The dashboard data
 	 */
 	async login() {
 		await Promise.all([
@@ -144,8 +144,8 @@ export class Client {
 
 				if (whatData.profiloModificato || whatData.differenzaSchede)
 					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
-				if (whatData.aggiornato) await this.getDashboard();
-				return this.loginData;
+				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
+				return this.dashboard!;
 			}
 		}
 		this.profile =
@@ -155,8 +155,7 @@ export class Client {
 				headers: this.headers,
 			}));
 		this.ready = true;
-		await this.getDashboard(true);
-		return this.loginData;
+		return this.getDashboard(true);
 	}
 
 	/**
@@ -214,7 +213,7 @@ export class Client {
 			debug: this.debug,
 			headers: this.headers,
 		});
-		if (suppressDateUpdate !== false)
+		if (suppressDateUpdate !== true)
 			updateDate(this.token, this.loginData, {
 				debug: this.debug,
 				headers: this.headers,
