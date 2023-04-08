@@ -27,7 +27,7 @@ export const downloadAllegatoStudente = async (
 			method: "POST",
 			body: {
 				uid: options.uid,
-				pk: options.id,
+				pkScheda: options.id,
 			},
 			login,
 			debug: options.debug,

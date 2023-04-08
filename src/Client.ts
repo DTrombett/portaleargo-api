@@ -285,6 +285,7 @@ export class Client {
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca alunno.
 	 * @param uid - The uid of the attachment
+	 * @param id - The profile id
 	 * @returns The url
 	 */
 	async getLinkAllegatoStudente(uid: string, id?: string) {
@@ -301,10 +302,11 @@ export class Client {
 	 * Scarica un allegato dello studente.
 	 * @param uid - The uid of the attachment
 	 * @param file - The path where the file should be saved
+	 * @param id - The profile id
 	 */
-	async downloadAllegatoStudente(uid: string, file: string) {
+	async downloadAllegatoStudente(uid: string, file: string, id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		const { body } = await request(await this.getLinkAllegatoStudente(uid));
+		const { body } = await request(await this.getLinkAllegatoStudente(uid, id));
 
 		await writeFile(file, body);
 	}

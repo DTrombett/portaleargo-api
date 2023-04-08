@@ -9,7 +9,8 @@ export type Json =
 	| {
 			[key: string]: Json;
 	  }
-	| null;
+	| null
+	| undefined;
 export type HttpMethod =
 	| "CONNECT"
 	| "DELETE"
