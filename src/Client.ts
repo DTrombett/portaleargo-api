@@ -16,6 +16,8 @@ import {
 	getPCTOData,
 	getProfilo,
 	getRicevimenti,
+	getStoricoBacheca,
+	getStoricoBachecaAlunno,
 	getTasse,
 	getToken,
 	getVotiScrutinio,
@@ -333,6 +335,7 @@ export class Client {
 
 	/**
 	 * Ottieni le tasse dello studente.
+	 * @param id - The profile id
 	 * @returns The data
 	 */
 	async getTasse(id?: string) {
@@ -346,6 +349,7 @@ export class Client {
 
 	/**
 	 * Ottieni i dati del PCTO dello studente.
+	 * @param id - The profile id
 	 * @returns The data
 	 */
 	async getPCTOData(id?: string) {
@@ -359,6 +363,7 @@ export class Client {
 
 	/**
 	 * Ottieni i dati dei corsi di recupero dello studente.
+	 * @param id - The profile id
 	 * @returns The data
 	 */
 	async getCorsiRecupero(id?: string) {
@@ -372,6 +377,7 @@ export class Client {
 
 	/**
 	 * Ottieni il curriculum dello studente.
+	 * @param id - The profile id
 	 * @returns The data
 	 */
 	async getCurriculum(id?: string) {
@@ -380,6 +386,34 @@ export class Client {
 			debug: this.debug,
 			headers: this.headers,
 			id: id ?? this.profile.id,
+		});
+	}
+
+	/**
+	 * Ottieni lo storico della bacheca.
+	 * @param id - The profile id
+	 * @returns The data
+	 */
+	async getStoricoBacheca(id: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getStoricoBacheca(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id,
+		});
+	}
+
+	/**
+	 * Ottieni lo storico della bacheca alunno.
+	 * @param id - The profile id
+	 * @returns The data
+	 */
+	async getStoricoBachecaAlunno(id: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getStoricoBachecaAlunno(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id,
 		});
 	}
 

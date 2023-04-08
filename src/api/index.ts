@@ -10,6 +10,8 @@ export * from "./getOrarioGiornaliero";
 export * from "./getPCTOData";
 export * from "./getProfilo";
 export * from "./getRicevimenti";
+export * from "./getStoricoBacheca";
+export * from "./getStoricoBachecaAlunno";
 export * from "./getTasse";
 export * from "./getToken";
 export * from "./getVotiScrutinio";

@@ -578,3 +578,9 @@ export type APICurriculum = APIResponse<{
 		ordineScuola: string;
 	}[];
 }>;
+export type APIBacheca = APIResponse<
+	Pick<APIDashboard["data"]["dati"][number], "bacheca">
+>;
+export type APIBachecaAlunno = APIResponse<
+	Pick<APIDashboard["data"]["dati"][number], "bachecaAlunno">
+>;

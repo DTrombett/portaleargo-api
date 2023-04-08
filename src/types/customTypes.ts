@@ -440,3 +440,5 @@ export type Curriculum = {
 	CV: boolean;
 	ordine: string;
 }[];
+export type Bacheca = Dashboard["bacheca"];
+export type BachecaAlunno = Dashboard["bachecaAlunno"];
