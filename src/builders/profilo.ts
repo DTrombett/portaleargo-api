@@ -1,11 +1,11 @@
-import type { APIProfile, Profile } from "../types";
+import type { APIProfilo, Profilo } from "../types";
 
 /**
- * Build the profile data.
+ * Elabora i dati del profilo.
  * @param body - The API response
  * @returns The new data
  */
-export const buildProfile = (body: APIProfile): Profile => {
+export const buildProfilo = (body: APIProfilo): Profilo => {
 	const { data } = body;
 
 	return {

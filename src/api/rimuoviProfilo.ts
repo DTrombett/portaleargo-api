@@ -3,12 +3,12 @@ import type { APIResponse, Login, RequestOptions, Token } from "../types";
 import { AuthFolder, apiRequest } from "../util";
 
 /**
- * Delete the profile.
+ * Rimuovi il profilo.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
  */
-export const deleteProfile = async (
+export const rimuoviProfilo = async (
 	token: Token,
 	login: Login,
 	options?: RequestOptions

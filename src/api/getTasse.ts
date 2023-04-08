@@ -1,21 +1,21 @@
-import { buildTaxes } from "../builders";
-import type { APITaxes, Login, RequestOptions, Token } from "../types";
+import { buildTasse } from "../builders";
+import type { APITasse, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the taxes for the student.
+ * Ottieni le tasse dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
  */
-export const getTaxes = async (
+export const getTasse = async (
 	token: Token,
 	login: Login,
 	options: RequestOptions & {
 		id: string;
 	}
 ) => {
-	const { body } = await apiRequest<APITaxes>("listatassealunni", token, {
+	const { body } = await apiRequest<APITasse>("listatassealunni", token, {
 		method: "POST",
 		body: {
 			pkScheda: options.id,
@@ -26,5 +26,5 @@ export const getTaxes = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildTaxes(body);
+	return buildTasse(body);
 };

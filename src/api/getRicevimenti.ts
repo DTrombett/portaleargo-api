@@ -3,7 +3,7 @@ import type { APIRicevimenti, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the `ricevimenti` for the student.
+ * Ottieni i dati riguardo i ricevimenti dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request

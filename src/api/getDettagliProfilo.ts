@@ -1,20 +1,24 @@
-import { buildProfileDetails } from "../builders";
-import type { APIProfileDetails, Login, RequestOptions, Token } from "../types";
+import { buildDettagliProfilo } from "../builders";
+import type {
+	APIDettagliProfilo,
+	Login,
+	RequestOptions,
+	Token,
+} from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Fetch all the profile details for the authenticated user.
+ * Ottieni i dettagli del profilo dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
- * @returns The profile details for the user
  */
-export const profileDetails = async (
+export const getDettagliProfilo = async (
 	token: Token,
 	login: Login,
 	options?: RequestOptions
 ) => {
-	const { body } = await apiRequest<APIProfileDetails>(
+	const { body } = await apiRequest<APIDettagliProfilo>(
 		"dettaglioprofilo",
 		token,
 		{
@@ -27,5 +31,5 @@ export const profileDetails = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildProfileDetails(body);
+	return buildDettagliProfilo(body);
 };

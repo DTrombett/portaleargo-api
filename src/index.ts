@@ -9,10 +9,10 @@
 //
 // await client.login();
 // const curriculum = await client.getCurriculum();
-// const taxes = await client.getTaxes(curriculum[1].id);
+// const tasse = await client.getTasse(curriculum[1].id);
 // const after = performance.now();
 //
-// console.log(taxes);
+// console.log(tasse);
 // console.log(after - now);
 
 export * from "./Client";

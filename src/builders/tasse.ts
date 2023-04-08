@@ -1,13 +1,13 @@
-import type { APITaxes, Taxes } from "../types";
+import type { APITasse, Tasse } from "../types";
 
 const resolveNumber = (n: string) => Number(n.replace(",", "."));
 
 /**
- * Build the taxes data.
+ * Elabora i dati delle tasse.
  * @param body - The API response
  * @returns The new data
  */
-export const buildTaxes = (body: APITaxes): Taxes => ({
+export const buildTasse = (body: APITasse): Tasse => ({
 	pagOnline: body.isPagOnlineAttivo,
 	tasse: body.data.map((a) => ({
 		dataCreazione: new Date(a.dataCreazione!).getTime() || null,

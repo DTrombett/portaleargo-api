@@ -1,7 +1,7 @@
 import type { APIRicevimenti, Ricevimenti } from "../types";
 
 /**
- * Build the ricevimenti data.
+ * Elabora i dati dei ricevimenti.
  * @param body - The API response
  * @returns The new data
  */

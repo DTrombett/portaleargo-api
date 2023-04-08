@@ -2,12 +2,12 @@ import type { APIResponse, Login, RequestOptions, Token } from "../types";
 import { apiRequest, formatDate } from "../util";
 
 /**
- * Update the last update date.
+ * Aggiorna la data dell'ultimo aggiornamento.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
  */
-export const updateDate = async (
+export const aggiornaData = async (
 	token: Token,
 	login: Login,
 	options?: RequestOptions

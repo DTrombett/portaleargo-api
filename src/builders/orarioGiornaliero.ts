@@ -1,13 +1,13 @@
-import type { APIDailyTimetable, DailyTimetable } from "../types";
+import type { APIOrarioGiornaliero, OrarioGiornaliero } from "../types";
 
 /**
- * Build the daily timetable data.
+ * Elabora i dati dell'orario giornaliero.
  * @param body - The API response
  * @returns The new data
  */
-export const buildDailyTimetable = (
-	body: APIDailyTimetable
-): DailyTimetable => {
+export const buildOrarioGiornaliero = (
+	body: APIOrarioGiornaliero
+): OrarioGiornaliero => {
 	const {
 		data: { dati },
 	} = body;

@@ -1,7 +1,7 @@
 import type { APIPCTO, PCTO } from "../types";
 
 /**
- * Build the PCTO data.
+ * Elabora i dati del PCTO.
  * @param body - The API response
  * @returns The new data
  */

@@ -1,7 +1,7 @@
 import type { APICurriculum, Curriculum } from "../types";
 
 /**
- * Build the curriculum data.
+ * Elabora i dati del curriculum.
  * @param body - The API response
  * @returns The new data
  */

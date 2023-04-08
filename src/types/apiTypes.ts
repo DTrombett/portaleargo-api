@@ -40,7 +40,7 @@ export type APILogin = APIResponse<
 		}
 	]
 >;
-export type APIProfile = APIResponse<{
+export type APIProfilo = APIResponse<{
 	resetPassword: boolean;
 	ultimoCambioPwd: null;
 	anno: {
@@ -306,7 +306,7 @@ export type APIDashboard = APIResponse<{
 		}
 	];
 }>;
-export type APIProfileDetails = APIResponse<{
+export type APIDettagliProfilo = APIResponse<{
 	utente: {
 		flgUtente: string;
 	};
@@ -385,7 +385,7 @@ export type APIWhat = APIResponse<{
 		}
 	];
 }>;
-export type APIDailyTimetable = APIResponse<{
+export type APIOrarioGiornaliero = APIResponse<{
 	dati: Record<
 		`${number}`,
 		{
@@ -404,7 +404,7 @@ export type APIDailyTimetable = APIResponse<{
 		}[]
 	>;
 }>;
-export type APIDownloadAttachment =
+export type APIDownloadAllegato =
 	| {
 			success: false;
 			msg: string;
@@ -505,7 +505,7 @@ export type APIRicevimenti = APIResponse<{
 		};
 	}[];
 }>;
-export type APITaxes = APIResponse<
+export type APITasse = APIResponse<
 	{
 		importoPrevisto: string;
 		dataPagamento: string | null;

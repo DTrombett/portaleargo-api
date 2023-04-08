@@ -3,7 +3,7 @@ import type { APICurriculum, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the curriculum of the student.
+ * Ottieni il curriculum dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request

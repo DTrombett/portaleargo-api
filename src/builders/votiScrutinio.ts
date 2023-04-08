@@ -1,7 +1,7 @@
 import type { APIVotiScrutinio, VotiScrutinio } from "../types";
 
 /**
- * Build the voti scrutinio data.
+ * Elabora i dati dei voti dello scrutinio.
  * @param body - The API response
  * @returns The new data
  */

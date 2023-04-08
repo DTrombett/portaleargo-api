@@ -4,28 +4,28 @@ import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
 import {
-	deleteProfile,
-	downloadAttachment,
-	downloadStudentAttachment,
+	aggiornaData,
+	downloadAllegato,
+	downloadAllegatoStudente,
 	getCode,
 	getCorsiRecupero,
 	getCurriculum,
-	getDailyTimetable,
 	getDashboard,
+	getDettagliProfilo,
+	getOrarioGiornaliero,
 	getPCTOData,
-	getProfile,
+	getProfilo,
 	getRicevimenti,
-	getTaxes,
+	getTasse,
 	getToken,
 	getVotiScrutinio,
 	logToken,
 	login,
-	profileDetails,
 	refreshToken,
-	updateDate,
+	rimuoviProfilo,
 	what,
 } from "./api";
-import type { ClientOptions, Dashboard, Login, Profile, Token } from "./types";
+import type { ClientOptions, Dashboard, Login, Profilo, Token } from "./types";
 import {
 	AuthFolder,
 	encryptCodeVerifier,
@@ -61,7 +61,7 @@ export class Client {
 	/**
 	 * The profile data
 	 */
-	profile?: Profile;
+	profile?: Profilo;
 	/**
 	 * The dashboard data
 	 */
@@ -101,7 +101,7 @@ export class Client {
 	isReady(): this is {
 		token: Token;
 		loginData: Login;
-		profile: Profile;
+		profile: Profilo;
 	} {
 		return this.ready;
 	}
@@ -114,7 +114,7 @@ export class Client {
 		await Promise.all([
 			this.token ?? importData<Token>("token"),
 			this.loginData ?? importData<Login>("login"),
-			this.profile ?? importData<Profile>("profile"),
+			this.profile ?? importData<Profilo>("profile"),
 			this.dashboard ?? importData<Dashboard>("dashboard"),
 			existsSync(AuthFolder) || mkdir(AuthFolder),
 		]).then(([token, loginData, profile, dashboard]) => {
@@ -151,7 +151,7 @@ export class Client {
 				if (whatData.profiloModificato || whatData.differenzaSchede)
 					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
-				updateDate(this.token, this.loginData, {
+				aggiornaData(this.token, this.loginData, {
 					debug: this.debug,
 					headers: this.headers,
 				}).catch(console.error);
@@ -160,7 +160,7 @@ export class Client {
 		}
 		this.profile =
 			this.profile ??
-			(await getProfile(this.token, this.loginData, {
+			(await getProfilo(this.token, this.loginData, {
 				debug: this.debug,
 				headers: this.headers,
 			}));
@@ -207,12 +207,12 @@ export class Client {
 	}
 
 	/**
-	 * Delete this profile.
+	 * Rimuovi il profilo.
 	 */
-	async deleteProfile() {
+	async rimuoviProfilo() {
 		if (!this.token || !this.loginData)
 			throw new Error("Client is not logged in!");
-		await deleteProfile(this.token, this.loginData, {
+		await rimuoviProfilo(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 		});
@@ -223,25 +223,29 @@ export class Client {
 	}
 
 	/**
-	 * Get the profile details for the authenticated user.
-	 * @returns The profile details
+	 * Ottieni i dettagli del profilo dello studente.
+	 * @returns The data
 	 */
-	async getProfileDetails() {
+	async getDettagliProfilo() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return profileDetails(this.token, this.loginData, {
+		return getDettagliProfilo(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 		});
 	}
 
 	/**
-	 * Get the timetable for a specific day.
+	 * Ottieni l'orario giornaliero.
 	 * @param date - The date of the timetable
-	 * @returns The daily timetable
+	 * @returns The data
 	 */
-	async getTimetable(date?: { year?: number; month?: number; day?: number }) {
+	async getOrarioGiornaliero(date?: {
+		year?: number;
+		month?: number;
+		day?: number;
+	}) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getDailyTimetable(this.token, this.loginData, {
+		return getOrarioGiornaliero(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 			day: date?.day,
@@ -251,13 +255,13 @@ export class Client {
 	}
 
 	/**
-	 * Get the url to download an attachment.
+	 * Ottieni il link per scaricare un allegato della bacheca.
 	 * @param uid - The uid of the attachment
-	 * @returns The download url
+	 * @returns The url
 	 */
-	async getAttachmentLink(uid: string) {
+	async getLinkAllegato(uid: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return downloadAttachment(this.token, this.loginData, {
+		return downloadAllegato(this.token, this.loginData, {
 			uid,
 			debug: this.debug,
 			headers: this.headers,
@@ -265,25 +269,25 @@ export class Client {
 	}
 
 	/**
-	 * Download an attachment.
+	 * Scarica un allegato.
 	 * @param uid - The uid of the attachment
 	 * @param file - The path where the file should be saved
 	 */
-	async downloadAttachment(uid: string, file: string) {
+	async downloadAllegato(uid: string, file: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		const { body } = await request(await this.getAttachmentLink(uid));
+		const { body } = await request(await this.getLinkAllegato(uid));
 
 		await writeFile(file, body);
 	}
 
 	/**
-	 * Get the url to download a student attachment.
+	 * Ottieni il link per scaricare un allegato della bacheca alunno.
 	 * @param uid - The uid of the attachment
-	 * @returns The download url
+	 * @returns The url
 	 */
-	async getStudentAttachmentLink(uid: string, id?: string) {
+	async getLinkAllegatoStudente(uid: string, id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return downloadStudentAttachment(this.token, this.loginData, {
+		return downloadAllegatoStudente(this.token, this.loginData, {
 			uid,
 			id: id ?? this.profile.id,
 			debug: this.debug,
@@ -292,20 +296,20 @@ export class Client {
 	}
 
 	/**
-	 * Download a student attachment.
+	 * Scarica un allegato dello studente.
 	 * @param uid - The uid of the attachment
 	 * @param file - The path where the file should be saved
 	 */
-	async downloadStudentAttachment(uid: string, file: string) {
+	async downloadAllegatoStudente(uid: string, file: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		const { body } = await request(await this.getStudentAttachmentLink(uid));
+		const { body } = await request(await this.getLinkAllegatoStudente(uid));
 
 		await writeFile(file, body);
 	}
 
 	/**
-	 * Get the final grades for the student.
-	 * @returns The final grades
+	 * Ottieni i voti dello scrutinio dello studente.
+	 * @returns The data
 	 */
 	async getVotiScrutinio() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -316,8 +320,8 @@ export class Client {
 	}
 
 	/**
-	 * Get the ricevimenti for the student.
-	 * @returns Ricevimenti for the student
+	 * Ottieni i dati riguardo i ricevimenti dello studente.
+	 * @returns The data
 	 */
 	async getRicevimenti() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -328,12 +332,12 @@ export class Client {
 	}
 
 	/**
-	 * Get the taxes of the student.
-	 * @returns The student taxes
+	 * Ottieni le tasse dello studente.
+	 * @returns The data
 	 */
-	async getTaxes(id?: string) {
+	async getTasse(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getTaxes(this.token, this.loginData, {
+		return getTasse(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 			id: id ?? this.profile.id,
@@ -341,8 +345,8 @@ export class Client {
 	}
 
 	/**
-	 * Get the PCTO data of the student.
-	 * @returns The student PCTO
+	 * Ottieni i dati del PCTO dello studente.
+	 * @returns The data
 	 */
 	async getPCTOData(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -354,8 +358,8 @@ export class Client {
 	}
 
 	/**
-	 * Get the corsi recupero of the student.
-	 * @returns The student's corsi recupero
+	 * Ottieni i dati dei corsi di recupero dello studente.
+	 * @returns The data
 	 */
 	async getCorsiRecupero(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -367,8 +371,8 @@ export class Client {
 	}
 
 	/**
-	 * Get the curriculum of the student.
-	 * @returns The student's curriculum
+	 * Ottieni il curriculum dello studente.
+	 * @returns The data
 	 */
 	async getCurriculum(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");

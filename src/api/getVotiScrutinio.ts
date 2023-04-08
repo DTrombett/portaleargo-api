@@ -3,7 +3,7 @@ import type { APIVotiScrutinio, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the final grades for the student.
+ * Ottieni i voti dello scrutinio dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request

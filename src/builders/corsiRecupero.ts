@@ -1,7 +1,7 @@
 import type { APICorsiRecupero, CorsiRecupero } from "../types";
 
 /**
- * Build the corsi recupero data.
+ * Elabora i dati dei corsi di recupero.
  * @param body - The API response
  * @returns The new data
  */

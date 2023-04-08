@@ -3,7 +3,7 @@ import type { APIPCTO, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the pcto data for the student.
+ * Ottieni i dati del PCTO dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
@@ -26,5 +26,6 @@ export const getPCTOData = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	return buildPCTO(body);
 };

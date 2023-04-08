@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { Dashboard, Login, Profile, Token } from ".";
+import type { Dashboard, Login, Profilo, Token } from ".";
 
 export type Json =
 	| Json[]
@@ -47,7 +47,7 @@ export type ClientOptions = Partial<
 		/**
 		 * The profile data
 		 */
-		profile: Profile;
+		profile: Profilo;
 		/**
 		 * The dashboard data
 		 */

@@ -3,7 +3,7 @@ import type { APICorsiRecupero, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the corsi recupero data for the student.
+ * Ottieni i dati dei corsi di recupero dello studente.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request

@@ -16,7 +16,7 @@ export type Login = {
 	token: string;
 	username: string;
 };
-export type Profile = {
+export type Profilo = {
 	ultimoCambioPassword: null;
 	anno: {
 		dataInizio: string;
@@ -235,7 +235,7 @@ export type Dashboard = {
 	}[];
 	classiExtra: boolean;
 };
-export type ProfileDetails = {
+export type DettagliProfilo = {
 	flgUtente: string;
 	genitore: {
 		sesso: string;
@@ -306,7 +306,7 @@ export type What = {
 		profiloStorico: boolean;
 	};
 };
-export type DailyTimetable = {
+export type OrarioGiornaliero = {
 	numOra: number;
 	mostra: boolean;
 	cognome: string;
@@ -388,7 +388,7 @@ export type Ricevimenti = {
 		idDocente: string;
 	}[];
 };
-export type Taxes = {
+export type Tasse = {
 	tasse: {
 		importoPrevisto: number;
 		dataPagamento: number | null;

@@ -1,5 +1,5 @@
 import type {
-	APIDownloadAttachment,
+	APIDownloadAllegato,
 	Login,
 	RequestOptions,
 	Token,
@@ -7,12 +7,12 @@ import type {
 import { apiRequest } from "../util";
 
 /**
- * Get the link to download a student attachment.
+ * Ottieni il link per scaricare un allegato della bacheca alunno.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
  */
-export const downloadStudentAttachment = async (
+export const downloadAllegatoStudente = async (
 	token: Token,
 	login: Login,
 	options: RequestOptions & {
@@ -20,7 +20,7 @@ export const downloadStudentAttachment = async (
 		id: string;
 	}
 ) => {
-	const { body } = await apiRequest<APIDownloadAttachment>(
+	const { body } = await apiRequest<APIDownloadAllegato>(
 		"downloadallegatobachecaalunno",
 		token,
 		{
