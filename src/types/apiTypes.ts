@@ -425,3 +425,81 @@ export type APIVotiScrutinio = APIResponse<{
 		}
 	];
 }>;
+export type APIRicevimenti = APIResponse<{
+	disponibilita: Record<
+		string,
+		{
+			desNota: string;
+			numMax: number;
+			docente: {
+				desCognome: string;
+				desNome: string;
+				pk: string;
+				desEmail: string | null;
+			};
+			numPrenotazioniAnnullate: null;
+			flgAttivo: string;
+			oraFine: string;
+			indisponibilita: null;
+			datInizioPrenotazione: string;
+			desUrl: string;
+			unaTantum: string;
+			oraInizioPrenotazione: string;
+			datScadenza: string;
+			desLuogoRicevimento: string;
+			oraInizio: string;
+			pk: string;
+			flgMostraEmail: string;
+			desEMailDocente: string;
+			numPrenotazioni: number;
+		}[]
+	>;
+	genitoreOAlunno: {
+		desEMail: string;
+		nominativo: string;
+		pk: string;
+		telefono: string;
+	}[];
+	tipoAccesso: string;
+	prenotazioni: {
+		operazione: string;
+		datEvento: string;
+		prenotazione: {
+			prgScuola: number;
+			datPrenotazione: string;
+			numPrenotazione: number;
+			prgAlunno: number;
+			genitore: string;
+			numMax: number;
+			orarioPrenotazione: string;
+			prgGenitore: number;
+			flgAnnullato: null;
+			flgAnnullatoDa: null;
+			desTelefonoGenitore: string;
+			flgTipo: null;
+			datAnnullamento: null;
+			desUrl: string | null;
+			pk: string;
+			genitorePK: string;
+			desEMailGenitore: string;
+			numPrenotazioni: number;
+		};
+		disponibilita: {
+			ora_Fine: string;
+			desNota: string;
+			datDisponibilita: string;
+			desUrl: string;
+			numMax: number;
+			ora_Inizio: string;
+			flgAttivo: string;
+			desLuogoRicevimento: string;
+			pk: string;
+		};
+		docente: {
+			desCognome: string;
+			desNome: string;
+			pk: string;
+			desEmail: string | null;
+		};
+	}[];
+}>;

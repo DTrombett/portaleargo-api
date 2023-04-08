@@ -5,6 +5,7 @@ export * from "./getCode";
 export * from "./getDailyTimetable";
 export * from "./getDashboard";
 export * from "./getProfile";
+export * from "./getRicevimenti";
 export * from "./getToken";
 export * from "./getVotiScrutinio";
 export * from "./logToken";

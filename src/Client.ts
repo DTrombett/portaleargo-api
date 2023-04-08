@@ -11,6 +11,7 @@ import {
 	getDailyTimetable,
 	getDashboard,
 	getProfile,
+	getRicevimenti,
 	getToken,
 	getVotiScrutinio,
 	logToken,
@@ -146,6 +147,10 @@ export class Client {
 				if (whatData.profiloModificato || whatData.differenzaSchede)
 					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
+				updateDate(this.token, this.loginData, {
+					debug: this.debug,
+					headers: this.headers,
+				}).catch(console.error);
 				return this.dashboard!;
 			}
 		}
@@ -156,7 +161,7 @@ export class Client {
 				headers: this.headers,
 			}));
 		this.ready = true;
-		return this.getDashboard(true);
+		return this.getDashboard();
 	}
 
 	/**
@@ -195,31 +200,6 @@ export class Client {
 			}),
 			codeVerifier
 		);
-	}
-
-	/**
-	 * Get the dashboard data from the API.
-	 * * **NOTE**: this will force an API call.
-	 * You can safely use `client.dashboard` which will provide data updated at login
-	 * If you want to refresh the data `client.login()` is recommended
-	 * @param suppressDateUpdate - Whether to suppress the date update
-	 * @returns The dashboard data
-	 */
-	async getDashboard(suppressDateUpdate?: boolean) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
-		this.dashboard = await getDashboard(this.token, this.loginData, {
-			lastUpdate:
-				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
-			oldDashboard: this.dashboard,
-			debug: this.debug,
-			headers: this.headers,
-		});
-		if (suppressDateUpdate !== true)
-			updateDate(this.token, this.loginData, {
-				debug: this.debug,
-				headers: this.headers,
-			}).catch(console.error);
-		return this.dashboard;
 	}
 
 	/**
@@ -329,5 +309,34 @@ export class Client {
 			debug: this.debug,
 			headers: this.headers,
 		});
+	}
+
+	/**
+	 * Get the `ricevimenti` for the student.
+	 * @returns Ricevimenti for the student
+	 */
+	async getRicevimenti() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getRicevimenti(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+		});
+	}
+
+	/**
+	 * Get the dashboard data from the API.
+	 * @private Use `client.dashboard` instead
+	 * @returns The dashboard data
+	 */
+	private async getDashboard() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.dashboard = await getDashboard(this.token, this.loginData, {
+			lastUpdate:
+				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+			oldDashboard: this.dashboard,
+			debug: this.debug,
+			headers: this.headers,
+		});
+		return this.dashboard;
 	}
 }

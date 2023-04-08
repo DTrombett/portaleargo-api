@@ -329,3 +329,62 @@ export type VotiScrutinio = {
 		scrutinioFinale: boolean;
 	}[];
 };
+export type Ricevimenti = {
+	disponibilità: {
+		nota: string;
+		max: number;
+		idDocente: string;
+		prenotazioniAnnullate: null;
+		attivo: boolean;
+		oraFine: string;
+		indisponibilità: null;
+		dataInizioPrenotazione: string;
+		url: string;
+		unaTantum: string;
+		oraInizioPrenotazione: string;
+		scadenza: string;
+		luogo: string;
+		oraInizio: string;
+		id: string;
+		mostraEmail: boolean;
+		prenotazioni: number;
+		data: string;
+	}[];
+	genitoreAlunno: {
+		id: string;
+		telefono: string;
+	}[];
+	tipoAccesso: string;
+	prenotazioni: {
+		data: string;
+		prenotazione: {
+			prgScuola: number;
+			dataPrenotazione: string;
+			prenotazione: number;
+			prgAlunno: number;
+			maxPrenotazioni: number;
+			orarioPrenotazione: string;
+			prgGenitore: number;
+			annullato: null;
+			annullatoDa: null;
+			tipo: null;
+			dataAnnullamento: null;
+			url: string | null;
+			id: string;
+			idGenitore: string;
+			prenotazioni: number;
+		};
+		disponibilita: {
+			oraFine: string;
+			nota: string;
+			dataDisponibilità: string;
+			url: string;
+			max: number;
+			oraInizio: string;
+			attivo: boolean;
+			luogo: string;
+			id: string;
+		};
+		idDocente: string;
+	}[];
+};
