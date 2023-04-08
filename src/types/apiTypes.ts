@@ -1,6 +1,8 @@
-export type APIResponse<T = any> = {
+import type { Json } from "./general";
+
+export type APIResponse<T = Json> = {
 	success: boolean;
-	msg: string | null;
+	msg?: string | null;
 	data: T;
 };
 export type APIOperation<T> = {
@@ -503,3 +505,32 @@ export type APIRicevimenti = APIResponse<{
 		};
 	}[];
 }>;
+export type APITaxes = APIResponse<
+	{
+		importoPrevisto: string;
+		dataPagamento: string;
+		listaSingoliPagamenti:
+			| {
+					importoTassa: string;
+					descrizione: string;
+					importoPrevisto: string;
+			  }[]
+			| null;
+		dataCreazione: string | null;
+		scadenza: string;
+		rptPresent: boolean;
+		rata: string;
+		iuv: string | null;
+		importoTassa: string;
+		stato: string;
+		descrizione: string;
+		debitore: string;
+		importoPagato: string | null;
+		pagabileOltreScadenza: boolean;
+		rtPresent: boolean;
+		isPagoOnLine: boolean;
+		status: string;
+	}[]
+> & {
+	isPagOnlineAttivo: boolean;
+};

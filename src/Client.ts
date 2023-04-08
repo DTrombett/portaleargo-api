@@ -12,6 +12,7 @@ import {
 	getDashboard,
 	getProfile,
 	getRicevimenti,
+	getTaxes,
 	getToken,
 	getVotiScrutinio,
 	logToken,
@@ -312,7 +313,7 @@ export class Client {
 	}
 
 	/**
-	 * Get the `ricevimenti` for the student.
+	 * Get the ricevimenti for the student.
 	 * @returns Ricevimenti for the student
 	 */
 	async getRicevimenti() {
@@ -320,6 +321,19 @@ export class Client {
 		return getRicevimenti(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
+		});
+	}
+
+	/**
+	 * Get the taxes of the student.
+	 * @returns The student taxes
+	 */
+	async getTaxes() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getTaxes(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id: this.profile.id,
 		});
 	}
 

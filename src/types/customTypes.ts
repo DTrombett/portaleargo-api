@@ -388,3 +388,28 @@ export type Ricevimenti = {
 		idDocente: string;
 	}[];
 };
+export type Taxes = {
+	tasse: {
+		importoPrevisto: number;
+		dataPagamento: number;
+		singoliPagamenti: {
+			importoTassa: number;
+			descrizione: string;
+			importoPrevisto: number;
+		}[];
+		dataCreazione: number | null;
+		scadenza: number;
+		rptPresent: boolean;
+		rata: string;
+		iuv: string | null;
+		importoTassa: number;
+		stato: string;
+		descrizione: string;
+		debitore: string;
+		importoPagato: number | null;
+		pagabileOltreScadenza: boolean;
+		rtPresent: boolean;
+		pagOnLine: boolean;
+	}[];
+	pagOnline: boolean;
+};
