@@ -508,7 +508,7 @@ export type APIRicevimenti = APIResponse<{
 export type APITaxes = APIResponse<
 	{
 		importoPrevisto: string;
-		dataPagamento: string;
+		dataPagamento: string | null;
 		listaSingoliPagamenti:
 			| {
 					importoTassa: string;
@@ -543,4 +543,38 @@ export type APIPCTO = APIResponse<{
 export type APICorsiRecupero = APIResponse<{
 	corsiRecupero: any[];
 	periodi: any[];
+}>;
+export type APICurriculum = APIResponse<{
+	curriculum: {
+		pkScheda: string;
+		classe: string;
+		anno: number;
+		esito:
+			| ""
+			| {
+					esitoPK: {
+						codMin: string;
+						codEsito: string;
+					};
+					desDescrizione: string;
+					numColore: number;
+					flgPositivo: string;
+					flgTipoParticolare: null;
+					tipoEsito: string;
+					descrizione: string;
+					icona: string;
+					codEsito: string;
+					particolarita: string;
+					positivo: string;
+					tipoEsitoParticolare: string;
+			  };
+		credito: number;
+		mostraInfo: boolean;
+		mostraCredito: boolean;
+		isSuperiore: boolean;
+		isInterruzioneFR: boolean;
+		media: number;
+		CVAbilitato: boolean;
+		ordineScuola: string;
+	}[];
 }>;

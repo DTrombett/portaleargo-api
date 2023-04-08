@@ -9,6 +9,7 @@ import {
 	downloadStudentAttachment,
 	getCode,
 	getCorsiRecupero,
+	getCurriculum,
 	getDailyTimetable,
 	getDashboard,
 	getPCTOData,
@@ -280,11 +281,11 @@ export class Client {
 	 * @param uid - The uid of the attachment
 	 * @returns The download url
 	 */
-	async getStudentAttachmentLink(uid: string) {
+	async getStudentAttachmentLink(uid: string, id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return downloadStudentAttachment(this.token, this.loginData, {
 			uid,
-			id: this.profile.id,
+			id: id ?? this.profile.id,
 			debug: this.debug,
 			headers: this.headers,
 		});
@@ -330,12 +331,12 @@ export class Client {
 	 * Get the taxes of the student.
 	 * @returns The student taxes
 	 */
-	async getTaxes() {
+	async getTaxes(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getTaxes(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
-			id: this.profile.id,
+			id: id ?? this.profile.id,
 		});
 	}
 
@@ -343,12 +344,12 @@ export class Client {
 	 * Get the PCTO data of the student.
 	 * @returns The student PCTO
 	 */
-	async getPCTOData() {
+	async getPCTOData(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getPCTOData(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
-			id: this.profile.id,
+			id: id ?? this.profile.id,
 		});
 	}
 
@@ -356,12 +357,25 @@ export class Client {
 	 * Get the corsi recupero of the student.
 	 * @returns The student's corsi recupero
 	 */
-	async getCorsiRecupero() {
+	async getCorsiRecupero(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getCorsiRecupero(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
-			id: this.profile.id,
+			id: id ?? this.profile.id,
+		});
+	}
+
+	/**
+	 * Get the curriculum of the student.
+	 * @returns The student's curriculum
+	 */
+	async getCurriculum(id?: string) {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getCurriculum(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id: id ?? this.profile.id,
 		});
 	}
 

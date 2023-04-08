@@ -1,3 +1,4 @@
+export * from "./curriculum";
 export * from "./deleteProfile";
 export * from "./downloadAttachment";
 export * from "./downloadStudentAttachment";

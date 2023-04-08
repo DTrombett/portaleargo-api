@@ -11,7 +11,7 @@ export const buildTaxes = (body: APITaxes): Taxes => ({
 	pagOnline: body.isPagOnlineAttivo,
 	tasse: body.data.map((a) => ({
 		dataCreazione: new Date(a.dataCreazione!).getTime() || null,
-		dataPagamento: new Date(a.dataPagamento).getTime(),
+		dataPagamento: new Date(a.dataPagamento!).getTime() || null,
 		debitore: a.debitore,
 		descrizione: a.descrizione,
 		importoPagato:

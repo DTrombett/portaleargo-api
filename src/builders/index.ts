@@ -1,4 +1,5 @@
 export * from "./corsiRecupero";
+export * from "./curriculum";
 export * from "./dailyTimetable";
 export * from "./dashboard";
 export * from "./login";

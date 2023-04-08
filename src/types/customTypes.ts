@@ -391,7 +391,7 @@ export type Ricevimenti = {
 export type Taxes = {
 	tasse: {
 		importoPrevisto: number;
-		dataPagamento: number;
+		dataPagamento: number | null;
 		singoliPagamenti: {
 			importoTassa: number;
 			descrizione: string;
@@ -418,3 +418,25 @@ export type CorsiRecupero = {
 	corsiRecupero: any[];
 	periodi: any[];
 };
+export type Curriculum = {
+	id: string;
+	classe: string;
+	anno: number;
+	esito: {
+		codScuola: string;
+		colore: number;
+		ammesso: boolean;
+		descrizione: string;
+		icona: string;
+		codEsito: string;
+		particolarità: string;
+	} | null;
+	credito: number;
+	mostraInfo: boolean;
+	mostraCredito: boolean;
+	superiore: boolean;
+	interruzioneFR: boolean;
+	media: number;
+	CV: boolean;
+	ordine: string;
+}[];
