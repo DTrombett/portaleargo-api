@@ -1,21 +1,21 @@
-import { buildPCTO } from "../builders";
-import type { APIPCTO, Login, RequestOptions, Token } from "../types";
+import { buildCorsiRecupero } from "../builders";
+import type { APICorsiRecupero, Login, RequestOptions, Token } from "../types";
 import { apiRequest } from "../util";
 
 /**
- * Get the pcto data for the student.
+ * Get the corsi recupero data for the student.
  * @param token - The token data
  * @param login - The login data
  * @param options - Additional options for the request
  */
-export const getPCTO = async (
+export const getCorsiRecupero = async (
 	token: Token,
 	login: Login,
 	options: RequestOptions & {
 		id: string;
 	}
 ) => {
-	const { body } = await apiRequest<APIPCTO>("pcto", token, {
+	const { body } = await apiRequest<APICorsiRecupero>("corsirecupero", token, {
 		method: "POST",
 		body: {
 			pkScheda: options.id,
@@ -26,5 +26,5 @@ export const getPCTO = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildPCTO(body);
+	return buildCorsiRecupero(body);
 };

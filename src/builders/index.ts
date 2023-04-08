@@ -1,3 +1,4 @@
+export * from "./corsiRecupero";
 export * from "./dailyTimetable";
 export * from "./dashboard";
 export * from "./login";

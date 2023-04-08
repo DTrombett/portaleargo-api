@@ -540,3 +540,7 @@ export type APIPCTO = APIResponse<{
 		pk: string;
 	}[];
 }>;
+export type APICorsiRecupero = APIResponse<{
+	corsiRecupero: any[];
+	periodi: any[];
+}>;

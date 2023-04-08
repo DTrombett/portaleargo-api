@@ -414,3 +414,7 @@ export type Taxes = {
 	pagOnline: boolean;
 };
 export type PCTO = { percorsi: any[] }[];
+export type CorsiRecupero = {
+	corsiRecupero: any[];
+	periodi: any[];
+};

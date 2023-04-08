@@ -8,9 +8,10 @@ import {
 	downloadAttachment,
 	downloadStudentAttachment,
 	getCode,
+	getCorsiRecupero,
 	getDailyTimetable,
 	getDashboard,
-	getPCTO,
+	getPCTOData,
 	getProfile,
 	getRicevimenti,
 	getTaxes,
@@ -344,7 +345,20 @@ export class Client {
 	 */
 	async getPCTOData() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getPCTO(this.token, this.loginData, {
+		return getPCTOData(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id: this.profile.id,
+		});
+	}
+
+	/**
+	 * Get the corsi recupero of the student.
+	 * @returns The student's corsi recupero
+	 */
+	async getCorsiRecupero() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getCorsiRecupero(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 			id: this.profile.id,
