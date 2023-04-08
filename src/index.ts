@@ -1,12 +1,13 @@
-// import { config } from "dotenv";
-// import { Client } from "./Client";
-//
-// config();
-// const client = new Client({
-// 	debug: true,
-// });
-//
-// await client.login();
+import { config } from "dotenv";
+import { Client } from "./Client";
+
+config();
+const client = new Client({
+	debug: true,
+});
+
+await client.login();
+console.log(await client.getPCTOData());
 
 export * from "./Client";
 export * from "./api";

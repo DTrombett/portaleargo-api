@@ -413,3 +413,4 @@ export type Taxes = {
 	}[];
 	pagOnline: boolean;
 };
+export type PCTO = { percorsi: any[] }[];

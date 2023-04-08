@@ -11,6 +11,7 @@ export * from "./getToken";
 export * from "./getVotiScrutinio";
 export * from "./logToken";
 export * from "./login";
+export * from "./pcto";
 export * from "./profileDetails";
 export * from "./refreshToken";
 export * from "./updateDate";

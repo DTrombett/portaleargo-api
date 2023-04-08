@@ -1,6 +1,7 @@
 export * from "./dailyTimetable";
 export * from "./dashboard";
 export * from "./login";
+export * from "./pcto";
 export * from "./profile";
 export * from "./profileDetails";
 export * from "./ricevimenti";

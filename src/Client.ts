@@ -10,6 +10,7 @@ import {
 	getCode,
 	getDailyTimetable,
 	getDashboard,
+	getPCTO,
 	getProfile,
 	getRicevimenti,
 	getTaxes,
@@ -331,6 +332,19 @@ export class Client {
 	async getTaxes() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getTaxes(this.token, this.loginData, {
+			debug: this.debug,
+			headers: this.headers,
+			id: this.profile.id,
+		});
+	}
+
+	/**
+	 * Get the PCTO data of the student.
+	 * @returns The student PCTO
+	 */
+	async getPCTOData() {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
+		return getPCTO(this.token, this.loginData, {
 			debug: this.debug,
 			headers: this.headers,
 			id: this.profile.id,

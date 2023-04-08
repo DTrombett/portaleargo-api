@@ -534,3 +534,9 @@ export type APITaxes = APIResponse<
 > & {
 	isPagOnlineAttivo: boolean;
 };
+export type APIPCTO = APIResponse<{
+	pcto: {
+		percorsi: any[];
+		pk: string;
+	}[];
+}>;
