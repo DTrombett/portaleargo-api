@@ -10,7 +10,5 @@ export const buildPCTO = (body: APIPCTO): PCTO => {
 		data: { pcto },
 	} = body;
 
-	return pcto.map((a) => ({
-		percorsi: a.percorsi,
-	}));
+	return pcto.flatMap((a) => a.percorsi as unknown[]);
 };
