@@ -1,5 +1,5 @@
 import type { APIResponse, Login, RequestOptions, Token } from "..";
-import { apiRequest, formatDate } from "../util";
+import { apiRequest, formatDate } from "..";
 
 /**
  * Aggiorna la data dell'ultimo aggiornamento.

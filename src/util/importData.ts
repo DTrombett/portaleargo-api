@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Jsonify } from "../types";
-import { AuthFolder } from "./Constants";
+import { AuthFolder } from ".";
+import type { Jsonify } from "..";
 
 /**
  * Import a data file.

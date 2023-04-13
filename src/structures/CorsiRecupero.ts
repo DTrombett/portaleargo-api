@@ -1,5 +1,5 @@
+import { Base } from ".";
 import type { APICorsiRecupero, Jsonify } from "..";
-import { Base } from "./Base";
 
 type CorsiRecuperoData = APICorsiRecupero["data"];
 type Data = CorsiRecuperoData | Jsonify<CorsiRecupero>;

@@ -1,6 +1,5 @@
 import type { APIToken, Login, RequestOptions } from "..";
-import { Token } from "..";
-import { apiRequest, clientId, formatDate, writeToFile } from "../util";
+import { Token, apiRequest, clientId, formatDate, writeToFile } from "..";
 
 /**
  * Refresh the token.

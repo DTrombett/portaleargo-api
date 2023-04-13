@@ -1,7 +1,7 @@
 import type { IncomingHttpHeaders } from "node:http";
 import { request } from "undici";
+import { formatDate } from ".";
 import type { HttpMethod, Json, Login, Token } from "..";
-import { formatDate } from "./formatDate";
 
 /**
  * Perform an API request.

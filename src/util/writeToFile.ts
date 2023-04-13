@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { AuthFolder } from "./Constants";
+import { AuthFolder } from ".";
 
 /**
  * Write the response of a request to a json file.

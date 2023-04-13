@@ -1,6 +1,5 @@
 import type { APILogin, RequestOptions, Token } from "..";
-import { Login } from "../structures";
-import { apiRequest, randomString, writeToFile } from "../util";
+import { Login, apiRequest, randomString, writeToFile } from "..";
 
 /**
  * Login to the API.

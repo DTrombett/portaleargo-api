@@ -1,5 +1,5 @@
 import type { APIDownloadAllegato, Login, RequestOptions, Token } from "..";
-import { apiRequest } from "../util";
+import { apiRequest } from "..";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca.

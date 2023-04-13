@@ -1,6 +1,5 @@
 import type { APIWhat, Login, RequestOptions, Token } from "..";
-import { What } from "../structures";
-import { apiRequest, formatDate } from "../util";
+import { What, apiRequest, formatDate } from "..";
 
 /**
  * Get the what data.

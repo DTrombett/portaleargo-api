@@ -1,6 +1,5 @@
 import type { APITasse, Login, RequestOptions, Token } from "..";
-import { Tasse } from "../structures";
-import { apiRequest } from "../util";
+import { Tasse, apiRequest } from "..";
 
 /**
  * Ottieni le tasse dello studente.

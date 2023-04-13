@@ -1,5 +1,5 @@
 import type { APIPCTO, Login, RequestOptions, Token } from "..";
-import { apiRequest } from "../util";
+import { apiRequest } from "..";
 
 /**
  * Ottieni i dati del PCTO dello studente.

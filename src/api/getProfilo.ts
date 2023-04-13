@@ -1,6 +1,5 @@
 import type { APIProfilo, Login, RequestOptions, Token } from "..";
-import { Profilo } from "../structures";
-import { apiRequest, writeToFile } from "../util";
+import { Profilo, apiRequest, writeToFile } from "..";
 
 /**
  * Ottieni i dati riguardo il profilo dell'utente.

@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { Client } from "./Client";
+import { Client } from ".";
 
 export * from "./Client";
 export * from "./api";

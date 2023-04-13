@@ -1,6 +1,5 @@
 import type { APIVotiScrutinio, Login, RequestOptions, Token } from "..";
-import { Scrutinio } from "../structures";
-import { apiRequest } from "../util";
+import { Scrutinio, apiRequest } from "..";
 
 /**
  * Ottieni i voti dello scrutinio dello studente.

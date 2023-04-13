@@ -1,6 +1,5 @@
 import type { APIBachecaAlunno, Login, RequestOptions, Token } from "..";
-import { EventoBachecaAlunno } from "../structures";
-import { apiRequest, handleOperation } from "../util";
+import { EventoBachecaAlunno, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca alunno.

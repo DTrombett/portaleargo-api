@@ -1,6 +1,5 @@
 import type { APIOrarioGiornaliero, Login, RequestOptions, Token } from "..";
-import { Orario } from "../structures";
-import { apiRequest, formatDate } from "../util";
+import { Orario, apiRequest, formatDate } from "..";
 
 /**
  * Ottieni l'orario giornaliero.

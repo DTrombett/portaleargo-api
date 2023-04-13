@@ -1,5 +1,5 @@
+import { Base } from ".";
 import type { APICurriculum, Jsonify } from "..";
-import { Base } from "./Base";
 
 type CurriculumData = APICurriculum["data"]["curriculum"][number];
 type Data = CurriculumData | Jsonify<Curriculum>;

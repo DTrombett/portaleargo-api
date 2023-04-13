@@ -1,6 +1,5 @@
 import type { APIDettagliProfilo, Login, RequestOptions, Token } from "..";
-import { DettagliProfilo } from "../structures";
-import { apiRequest } from "../util";
+import { DettagliProfilo, apiRequest } from "..";
 
 /**
  * Ottieni i dettagli del profilo dello studente.

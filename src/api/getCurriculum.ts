@@ -1,6 +1,5 @@
 import type { APICurriculum, Login, RequestOptions, Token } from "..";
-import { Curriculum } from "../structures";
-import { apiRequest } from "../util";
+import { Curriculum, apiRequest } from "..";
 
 /**
  * Ottieni il curriculum dello studente.

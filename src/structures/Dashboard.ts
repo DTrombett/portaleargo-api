@@ -1,6 +1,5 @@
 import type { APIDashboard, Jsonify } from "..";
-import { Base, EventoBacheca, EventoBachecaAlunno } from "..";
-import { handleOperation } from "../util";
+import { Base, EventoBacheca, EventoBachecaAlunno, handleOperation } from "..";
 
 type DashboardData = APIDashboard["data"]["dati"][0];
 type Data = DashboardData | Jsonify<Dashboard>;

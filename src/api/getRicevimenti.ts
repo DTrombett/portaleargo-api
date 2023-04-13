@@ -1,6 +1,5 @@
 import type { APIRicevimenti, Login, RequestOptions, Token } from "..";
-import { Ricevimenti } from "../structures";
-import { apiRequest } from "../util";
+import { Ricevimenti, apiRequest } from "..";
 
 /**
  * Ottieni i dati riguardo i ricevimenti dello studente.

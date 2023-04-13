@@ -1,6 +1,5 @@
 import type { APIBacheca, Login, RequestOptions, Token } from "..";
-import { EventoBacheca } from "../structures";
-import { apiRequest, handleOperation } from "../util";
+import { EventoBacheca, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca.

@@ -1,6 +1,5 @@
 import type { APICorsiRecupero, Login, RequestOptions, Token } from "..";
-import { CorsiRecupero } from "../structures";
-import { apiRequest } from "../util";
+import { CorsiRecupero, apiRequest } from "..";
 
 /**
  * Ottieni i dati dei corsi di recupero dello studente.

@@ -1,5 +1,5 @@
+import { Base } from ".";
 import type { APIBacheca, Jsonify } from "..";
-import { Base } from "./Base";
 
 type EventoBachecaData = Extract<
 	APIBacheca["data"]["bacheca"][number],

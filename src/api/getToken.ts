@@ -1,8 +1,7 @@
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
-import { Token } from "../structures";
-import type { APIToken } from "../types";
-import { clientId, writeToFile } from "../util";
+import type { APIToken } from "..";
+import { Token, clientId, writeToFile } from "..";
 
 /**
  * Get the token from the API.

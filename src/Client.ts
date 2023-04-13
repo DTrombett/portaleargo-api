@@ -5,6 +5,7 @@ import { env } from "node:process";
 import { request } from "undici";
 import type { ClientOptions } from ".";
 import {
+	AuthFolder,
 	Dashboard,
 	Login,
 	Profilo,
@@ -12,6 +13,7 @@ import {
 	aggiornaData,
 	downloadAllegato,
 	downloadAllegatoStudente,
+	encryptCodeVerifier,
 	getCode,
 	getCorsiRecupero,
 	getCurriculum,
@@ -26,19 +28,15 @@ import {
 	getTasse,
 	getToken,
 	getVotiScrutinio,
+	importData,
 	logToken,
 	login,
+	randomString,
 	refreshToken,
 	rimuoviProfilo,
 	what,
-} from ".";
-import {
-	AuthFolder,
-	encryptCodeVerifier,
-	importData,
-	randomString,
 	writeToFile,
-} from "./util";
+} from ".";
 
 /**
  * A client to interact with the API

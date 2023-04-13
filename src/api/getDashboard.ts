@@ -1,6 +1,5 @@
 import type { APIDashboard, Login, RequestOptions, Token } from "..";
-import { Dashboard } from "..";
-import { apiRequest, formatDate, writeToFile } from "../util";
+import { Dashboard, apiRequest, formatDate, writeToFile } from "..";
 
 /**
  * Fetch all the data for the authenticated user.

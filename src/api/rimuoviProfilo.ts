@@ -1,6 +1,6 @@
 import { rm } from "node:fs/promises";
 import type { APIResponse, Login, RequestOptions, Token } from "..";
-import { AuthFolder, apiRequest } from "../util";
+import { AuthFolder, apiRequest } from "..";
 
 /**
  * Rimuovi il profilo.
