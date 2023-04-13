@@ -1,6 +1,6 @@
-import { buildBachecaAlunno } from "../builders";
-import type { APIBachecaAlunno, Login, RequestOptions, Token } from "../types";
-import { apiRequest } from "../util";
+import type { APIBachecaAlunno, Login, RequestOptions, Token } from "..";
+import { EventoBachecaAlunno } from "../structures";
+import { apiRequest, handleOperation } from "../util";
 
 /**
  * Ottieni lo storico della bacheca alunno.
@@ -30,5 +30,9 @@ export const getStoricoBachecaAlunno = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildBachecaAlunno(body);
+	return handleOperation(
+		body.data.bachecaAlunno,
+		undefined,
+		(a) => new EventoBachecaAlunno(a)
+	);
 };

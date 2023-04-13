@@ -1,4 +1,4 @@
-import type { APIResponse, Login, RequestOptions, Token } from "../types";
+import type { APIResponse, Login, RequestOptions, Token } from "..";
 import { apiRequest, formatDate } from "../util";
 
 /**

@@ -1,5 +1,5 @@
-import { buildCorsiRecupero } from "../builders";
-import type { APICorsiRecupero, Login, RequestOptions, Token } from "../types";
+import type { APICorsiRecupero, Login, RequestOptions, Token } from "..";
+import { CorsiRecupero } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -26,5 +26,5 @@ export const getCorsiRecupero = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildCorsiRecupero(body);
+	return new CorsiRecupero(body.data);
 };

@@ -1,9 +1,4 @@
-import type {
-	APIDownloadAllegato,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
+import type { APIDownloadAllegato, Login, RequestOptions, Token } from "..";
 import { apiRequest } from "../util";
 
 /**

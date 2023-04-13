@@ -1,5 +1,5 @@
-import { buildCurriculum } from "../builders";
-import type { APICurriculum, Login, RequestOptions, Token } from "../types";
+import type { APICurriculum, Login, RequestOptions, Token } from "..";
+import { Curriculum } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -26,5 +26,5 @@ export const getCurriculum = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildCurriculum(body);
+	return body.data.curriculum.map((c) => new Curriculum(c));
 };

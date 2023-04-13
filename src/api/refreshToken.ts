@@ -1,5 +1,5 @@
-import { buildToken } from "../builders";
-import type { APIToken, Login, RequestOptions, Token } from "../types";
+import type { APIToken, Login, RequestOptions } from "..";
+import { Token } from "..";
 import { apiRequest, clientId, formatDate, writeToFile } from "../util";
 
 /**
@@ -36,7 +36,7 @@ export const refreshToken = async (
 			headers: options?.headers,
 		}
 	);
-	const value = buildToken(body, new Date(res.headers.date as string));
+	const value = new Token(body, new Date(res.headers.date as string));
 
 	void writeToFile("token", value);
 	return value;

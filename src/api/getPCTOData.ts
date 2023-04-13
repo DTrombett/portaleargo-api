@@ -1,5 +1,4 @@
-import { buildPCTO } from "../builders";
-import type { APIPCTO, Login, RequestOptions, Token } from "../types";
+import type { APIPCTO, Login, RequestOptions, Token } from "..";
 import { apiRequest } from "../util";
 
 /**
@@ -27,5 +26,5 @@ export const getPCTOData = async (
 
 	if (!body.success) throw new Error(body.msg!);
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-	return buildPCTO(body);
+	return body.data.pcto;
 };

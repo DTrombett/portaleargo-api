@@ -1,5 +1,5 @@
-import { buildVotiScrutinio } from "../builders";
-import type { APIVotiScrutinio, Login, RequestOptions, Token } from "../types";
+import type { APIVotiScrutinio, Login, RequestOptions, Token } from "..";
+import { Scrutinio } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -22,5 +22,5 @@ export const getVotiScrutinio = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildVotiScrutinio(body);
+	return body.data.votiScrutinio[0].periodi.map((a) => new Scrutinio(a));
 };

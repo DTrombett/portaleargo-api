@@ -1,5 +1,5 @@
-import { buildLogin } from "../builders";
-import type { APILogin, RequestOptions, Token } from "../types";
+import type { APILogin, RequestOptions, Token } from "..";
+import { Login } from "../structures";
 import { apiRequest, randomString, writeToFile } from "../util";
 
 /**
@@ -21,7 +21,7 @@ export const login = async (token: Token, options?: RequestOptions) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	const value = buildLogin(body);
+	const value = new Login(body.data[0]);
 
 	void writeToFile("login", value);
 	return value;

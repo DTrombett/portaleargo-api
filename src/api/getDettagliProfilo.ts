@@ -1,10 +1,5 @@
-import { buildDettagliProfilo } from "../builders";
-import type {
-	APIDettagliProfilo,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
+import type { APIDettagliProfilo, Login, RequestOptions, Token } from "..";
+import { DettagliProfilo } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -31,5 +26,5 @@ export const getDettagliProfilo = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildDettagliProfilo(body);
+	return new DettagliProfilo(body.data);
 };

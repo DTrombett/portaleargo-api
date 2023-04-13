@@ -1,5 +1,5 @@
-import { buildProfilo } from "../builders";
-import type { APIProfilo, Login, RequestOptions, Token } from "../types";
+import type { APIProfilo, Login, RequestOptions, Token } from "..";
+import { Profilo } from "../structures";
 import { apiRequest, writeToFile } from "../util";
 
 /**
@@ -20,7 +20,7 @@ export const getProfilo = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	const value = buildProfilo(body);
+	const value = new Profilo(body.data);
 
 	void writeToFile("profile", value);
 	return value;

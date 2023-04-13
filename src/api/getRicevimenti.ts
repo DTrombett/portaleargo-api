@@ -1,5 +1,5 @@
-import { buildRicevimenti } from "../builders";
-import type { APIRicevimenti, Login, RequestOptions, Token } from "../types";
+import type { APIRicevimenti, Login, RequestOptions, Token } from "..";
+import { Ricevimenti } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -22,5 +22,5 @@ export const getRicevimenti = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildRicevimenti(body);
+	return new Ricevimenti(body.data);
 };

@@ -1,11 +1,5 @@
-import { buildDashboard } from "../builders";
-import type {
-	APIDashboard,
-	Dashboard,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
+import type { APIDashboard, Login, RequestOptions, Token } from "..";
+import { Dashboard } from "..";
 import { apiRequest, formatDate, writeToFile } from "../util";
 
 /**
@@ -39,7 +33,9 @@ export const getDashboard = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	const value = buildDashboard(body, options.oldDashboard);
+	const value =
+		options.oldDashboard?.patch(body.data.dati[0]) ??
+		new Dashboard(body.data.dati[0]);
 
 	void writeToFile("dashboard", value);
 	return value;

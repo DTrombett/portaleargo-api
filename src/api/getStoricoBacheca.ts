@@ -1,6 +1,6 @@
-import { buildBacheca } from "../builders";
-import type { APIBacheca, Login, RequestOptions, Token } from "../types";
-import { apiRequest } from "../util";
+import type { APIBacheca, Login, RequestOptions, Token } from "..";
+import { EventoBacheca } from "../structures";
+import { apiRequest, handleOperation } from "../util";
 
 /**
  * Ottieni lo storico della bacheca.
@@ -26,5 +26,9 @@ export const getStoricoBacheca = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildBacheca(body);
+	return handleOperation(
+		body.data.bacheca,
+		undefined,
+		(a) => new EventoBacheca(a)
+	);
 };

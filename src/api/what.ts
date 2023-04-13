@@ -1,5 +1,5 @@
-import { buildWhat } from "../builders";
-import type { APIWhat, Login, RequestOptions, Token } from "../types";
+import type { APIWhat, Login, RequestOptions, Token } from "..";
+import { What } from "../structures";
 import { apiRequest, formatDate } from "../util";
 
 /**
@@ -30,5 +30,5 @@ export const what = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildWhat(body);
+	return new What(body.data.dati[0]);
 };

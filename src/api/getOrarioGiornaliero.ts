@@ -1,10 +1,5 @@
-import { buildOrarioGiornaliero } from "../builders";
-import type {
-	APIOrarioGiornaliero,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
+import type { APIOrarioGiornaliero, Login, RequestOptions, Token } from "..";
+import { Orario } from "../structures";
 import { apiRequest, formatDate } from "../util";
 
 /**
@@ -42,5 +37,7 @@ export const getOrarioGiornaliero = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildOrarioGiornaliero(body);
+	return Object.values(body.data.dati)
+		.flat()
+		.map((d) => new Orario(d));
 };

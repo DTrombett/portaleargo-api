@@ -1,5 +1,5 @@
 import { rm } from "node:fs/promises";
-import type { APIResponse, Login, RequestOptions, Token } from "../types";
+import type { APIResponse, Login, RequestOptions, Token } from "..";
 import { AuthFolder, apiRequest } from "../util";
 
 /**

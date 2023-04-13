@@ -1,6 +1,6 @@
 import { URL } from "node:url";
 import { request } from "undici";
-import type { BasicCredentials } from "../types";
+import type { BasicCredentials } from "..";
 import { clientId, randomString } from "../util";
 
 const baseHeaders = {

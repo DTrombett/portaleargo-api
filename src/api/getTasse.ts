@@ -1,5 +1,5 @@
-import { buildTasse } from "../builders";
-import type { APITasse, Login, RequestOptions, Token } from "../types";
+import type { APITasse, Login, RequestOptions, Token } from "..";
+import { Tasse } from "../structures";
 import { apiRequest } from "../util";
 
 /**
@@ -26,5 +26,5 @@ export const getTasse = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildTasse(body);
+	return new Tasse(body);
 };

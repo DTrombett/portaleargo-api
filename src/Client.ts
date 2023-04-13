@@ -3,7 +3,12 @@ import { mkdir, writeFile } from "node:fs/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
+import type { ClientOptions } from ".";
 import {
+	Dashboard,
+	Login,
+	Profilo,
+	Token,
 	aggiornaData,
 	downloadAllegato,
 	downloadAllegatoStudente,
@@ -26,8 +31,7 @@ import {
 	refreshToken,
 	rimuoviProfilo,
 	what,
-} from "./api";
-import type { ClientOptions, Dashboard, Login, Profilo, Token } from "./types";
+} from ".";
 import {
 	AuthFolder,
 	encryptCodeVerifier,
@@ -114,16 +118,16 @@ export class Client {
 	 */
 	async login() {
 		await Promise.all([
-			this.token ?? importData<Token>("token"),
-			this.loginData ?? importData<Login>("login"),
-			this.profile ?? importData<Profilo>("profile"),
-			this.dashboard ?? importData<Dashboard>("dashboard"),
+			this.token ? null : importData<Token>("token"),
+			this.loginData ? null : importData<Login>("login"),
+			this.profile ? null : importData<Profilo>("profile"),
+			this.dashboard ? null : importData<Dashboard>("dashboard"),
 			existsSync(AuthFolder) || mkdir(AuthFolder),
 		]).then(([token, loginData, profile, dashboard]) => {
-			this.token = token;
-			this.loginData = loginData;
-			this.profile = profile;
-			this.dashboard = dashboard;
+			if (token) this.token = new Token(token);
+			if (loginData) this.loginData = new Login(loginData);
+			if (profile) this.profile = new Profilo(profile);
+			if (dashboard) this.dashboard = new Dashboard(dashboard);
 		});
 		const oldToken = this.token;
 
