@@ -9,14 +9,14 @@ type Data = APITasse | Jsonify<Tasse>;
 export class Tasse extends Base<APITasse> {
 	tasse!: {
 		importoPrevisto: number;
-		dataPagamento: number | null;
+		dataPagamento: Date | null;
 		singoliPagamenti: {
 			importoTassa: number;
 			descrizione: string;
 			importoPrevisto: number;
 		}[];
-		dataCreazione: number | null;
-		scadenza: number;
+		dataCreazione: Date | null;
+		scadenza: Date;
 		rptPresent: boolean;
 		rata: string;
 		iuv: string | null;
@@ -44,12 +44,23 @@ export class Tasse extends Base<APITasse> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) this.handleJson(data);
-		else {
+		if (this.isJson(data)) {
+			this.handleJson(data);
+			this.tasse = data.tasse.map((a) => ({
+				...a,
+				dataCreazione:
+					a.dataCreazione == null ? null : new Date(a.dataCreazione),
+				dataPagamento:
+					a.dataPagamento == null ? null : new Date(a.dataPagamento),
+				scadenza: new Date(a.scadenza),
+			}));
+		} else {
 			this.pagOnline = data.isPagOnlineAttivo;
 			this.tasse = data.data.map((a) => ({
-				dataCreazione: new Date(a.dataCreazione!).getTime() || null,
-				dataPagamento: new Date(a.dataPagamento!).getTime() || null,
+				dataCreazione:
+					a.dataCreazione == null ? null : new Date(a.dataCreazione),
+				dataPagamento:
+					a.dataPagamento == null ? null : new Date(a.dataPagamento),
 				debitore: a.debitore,
 				descrizione: a.descrizione,
 				importoPagato:
@@ -62,7 +73,7 @@ export class Tasse extends Base<APITasse> {
 				rata: a.rata,
 				rtPresent: a.rtPresent,
 				rptPresent: a.rptPresent,
-				scadenza: new Date(a.scadenza).getTime(),
+				scadenza: new Date(a.scadenza),
 				singoliPagamenti:
 					a.listaSingoliPagamenti?.map((p) => ({
 						importoTassa: Tasse.resolveNumber(p.importoTassa),

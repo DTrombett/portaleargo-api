@@ -6,7 +6,7 @@ const identifierName = "class name";
  * Rappresenta una struttura base
  */
 export class Base<T extends ObjectJson = ObjectJson> {
-	[identifierName] = this.constructor.name;
+	protected [identifierName] = this.constructor.name;
 
 	// constructor() {}
 

@@ -12,10 +12,7 @@ const options: Options = {
 	target: "esnext",
 	minify: true,
 	keepNames: true,
+	sourcemap: true,
 };
-
-if (env.NODE_ENV !== "production") {
-	options.sourcemap = true;
-}
 
 export default defineConfig(options);

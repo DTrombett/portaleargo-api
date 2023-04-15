@@ -8,7 +8,7 @@ type Data = DashboardData | Jsonify<Dashboard>;
  * Rappresenta la dashboard dello studente
  */
 export class Dashboard extends Base<DashboardData> {
-	dataAggiornamento!: number;
+	dataAggiornamento!: Date;
 	fuoriClasse: {
 		data: string;
 		descrizione: string;
@@ -168,9 +168,15 @@ export class Dashboard extends Base<DashboardData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) this.handleJson(data);
-		else {
-			this.dataAggiornamento = Date.now();
+		if (this.isJson(data)) {
+			this.handleJson(data);
+			this.dataAggiornamento = new Date(data.dataAggiornamento);
+			this.bacheca = data.bacheca.map((b) => new EventoBacheca(b));
+			this.bachecaAlunno = data.bachecaAlunno.map(
+				(b) => new EventoBachecaAlunno(b)
+			);
+		} else {
+			this.dataAggiornamento = new Date();
 			this.fuoriClasse = handleOperation(
 				data.fuoriClasse,
 				this.fuoriClasse,
