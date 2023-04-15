@@ -8,7 +8,13 @@ const identifierName = "class name";
 export class Base<T extends ObjectJson = ObjectJson> {
 	protected [identifierName] = this.constructor.name;
 
-	// constructor() {}
+	constructor() {
+		Object.defineProperty(this, identifierName, {
+			enumerable: false,
+			writable: false,
+			configurable: false,
+		});
+	}
 
 	protected static isKey<O extends object>(
 		key: PropertyKey,
@@ -22,6 +28,8 @@ export class Base<T extends ObjectJson = ObjectJson> {
 	}
 
 	protected handleJson(data: Jsonify<Base>) {
-		for (const key in data) if (Base.isKey(key, data)) this[key] = data[key];
+		for (const key in data)
+			if (key !== identifierName && Base.isKey(key, data))
+				this[key] = data[key];
 	}
 }

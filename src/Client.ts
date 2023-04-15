@@ -179,7 +179,7 @@ export class Client {
 	 */
 	async refreshToken(token?: Token) {
 		if (!this.loginData || !token) return this.getToken();
-		if (token.expireDate <= Date.now())
+		if (token.expireDate.getTime() <= Date.now())
 			return refreshToken(token, this.loginData, {
 				debug: this.debug,
 				headers: this.headers,
