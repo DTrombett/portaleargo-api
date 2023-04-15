@@ -1,14 +1,15 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { Dashboard, Login, Profilo, Token } from "..";
 
+export type ObjectJson = {
+	[key: string]: Json;
+};
 export type Json =
 	| Json[]
+	| ObjectJson
 	| boolean
 	| number
 	| string
-	| {
-			[key: string]: Json;
-	  }
 	| null
 	| undefined;
 export type HttpMethod =

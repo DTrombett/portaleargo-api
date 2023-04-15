@@ -46,7 +46,7 @@ export class DettagliProfilo extends Base<DettagliProfiloData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.flgUtente = data.utente.flgUtente;
 			this.genitore = {

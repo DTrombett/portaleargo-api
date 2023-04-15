@@ -11,6 +11,7 @@ const options: Options = {
 	platform: "node",
 	target: "esnext",
 	minify: true,
+	keepNames: true,
 };
 
 if (env.NODE_ENV !== "production") {

@@ -24,7 +24,7 @@ export class Scrutinio extends Base<ScrutinioData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.descrizione = data.desDescrizione;
 			this.materie = data.materie;

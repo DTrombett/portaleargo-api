@@ -30,7 +30,7 @@ export class Orario extends Base<OrarioData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.numOra = data.numOra;
 			this.mostra = data.mostra;

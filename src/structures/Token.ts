@@ -25,7 +25,7 @@ export class Token extends Base<APIToken> {
 	}
 
 	patch(data: Data, date?: Date) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			if (date) date.setSeconds(date.getSeconds() + data.expires_in);
 			this.accessToken = data.access_token;

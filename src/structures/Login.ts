@@ -26,7 +26,7 @@ export class Login extends Base<LoginData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.schoolCode = data.codMin;
 			this.options = Object.fromEntries(

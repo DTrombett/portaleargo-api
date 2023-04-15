@@ -57,7 +57,7 @@ export class What extends Base<WhatData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.aggiornato = data.mostraPallino;
 			this.differenzaSchede = data.differenzaSchede;

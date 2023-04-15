@@ -27,9 +27,9 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
 		{
 			headers: {
-				"accept": "application/json",
+				accept: "application/json",
 				"argo-client-version": "1.15.1",
-				"authorization": `Bearer ${token.accessToken}`,
+				authorization: `Bearer ${token.accessToken}`,
 				"content-type": "application/json; charset=utf-8",
 				"x-auth-token": options?.login?.token,
 				"x-cod-min": options?.login?.schoolCode,

@@ -75,7 +75,7 @@ export class Ricevimenti extends Base<RicevimentiData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.tipoAccesso = data.tipoAccesso;
 			this.genitoreAlunno = data.genitoreOAlunno.map((a) => ({

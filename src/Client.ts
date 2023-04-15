@@ -116,10 +116,10 @@ export class Client {
 	 */
 	async login() {
 		await Promise.all([
-			this.token ? null : importData<Token>("token"),
-			this.loginData ? null : importData<Login>("login"),
-			this.profile ? null : importData<Profilo>("profile"),
-			this.dashboard ? null : importData<Dashboard>("dashboard"),
+			this.token ? undefined : importData<Token>("token"),
+			this.loginData ? undefined : importData<Login>("login"),
+			this.profile ? undefined : importData<Profilo>("profile"),
+			this.dashboard ? undefined : importData<Dashboard>("dashboard"),
 			existsSync(AuthFolder) || mkdir(AuthFolder),
 		]).then(([token, loginData, profile, dashboard]) => {
 			if (token) this.token = new Token(token);

@@ -168,7 +168,7 @@ export class Dashboard extends Base<DashboardData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.dataAggiornamento = Date.now();
 			this.fuoriClasse = handleOperation(

@@ -27,7 +27,7 @@ export class EventoBachecaAlunno extends Base<EventoBachecaAlunnoData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.id = data.pk;
 			this.nomeFile = data.nomeFile;

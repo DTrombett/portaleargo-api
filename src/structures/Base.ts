@@ -1,9 +1,15 @@
-import type { Json, Jsonify } from "..";
+import type { Jsonify, ObjectJson } from "..";
+
+const identifierName = "class name";
 
 /**
  * Rappresenta una struttura base
  */
-export class Base<T extends Json = Json> {
+export class Base<T extends ObjectJson = ObjectJson> {
+	[identifierName] = this.constructor.name;
+
+	// constructor() {}
+
 	protected static isKey<O extends object>(
 		key: PropertyKey,
 		object: O
@@ -11,16 +17,11 @@ export class Base<T extends Json = Json> {
 		return Object.hasOwn(object, key);
 	}
 
-	/**
-	 * Patch the structure with new data.
-	 * @param data - The API data
-	 */
-	protected patch(data: Jsonify<Base> | T) {
-		if (this.isJson(data))
-			for (const key in data) if (Base.isKey(key, data)) this[key] = data[key];
+	protected isJson<O extends ObjectJson>(data: O | T): data is O {
+		return data[identifierName] === this.constructor.name;
 	}
 
-	protected isJson<O extends Json>(data: O | T): data is O {
-		return !(data == null || "pk" in data);
+	protected handleJson(data: Jsonify<Base>) {
+		for (const key in data) if (Base.isKey(key, data)) this[key] = data[key];
 	}
 }

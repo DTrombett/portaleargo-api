@@ -1,6 +1,5 @@
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
-import type { APIToken } from "..";
 import { Token, clientId, writeToFile } from "..";
 
 /**
@@ -24,7 +23,7 @@ export const getToken = async (code: string, codeVerifier: string) => {
 		method: "POST",
 	});
 	const value = new Token(
-		(await res.body.json()) as APIToken,
+		await res.body.json(),
 		new Date(res.headers.date as string)
 	);
 

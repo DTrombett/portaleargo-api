@@ -44,7 +44,7 @@ export class Tasse extends Base<APITasse> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.pagOnline = data.isPagOnlineAttivo;
 			this.tasse = data.data.map((a) => ({

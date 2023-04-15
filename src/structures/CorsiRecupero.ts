@@ -20,7 +20,7 @@ export class CorsiRecupero extends Base<CorsiRecuperoData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.corsiRecupero = data.corsiRecupero;
 			this.periodi = data.periodi;

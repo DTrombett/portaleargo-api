@@ -38,7 +38,7 @@ export class Curriculum extends Base<CurriculumData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) super.patch(data);
+		if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.anno = data.anno;
 			this.classe = data.classe;
