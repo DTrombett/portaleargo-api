@@ -1,4 +1,4 @@
-import type { APIToken, Jsonify } from "..";
+import type { APIToken, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type Data = APIToken | Jsonify<Token>;
@@ -17,10 +17,10 @@ export class Token extends Base<APIToken> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: APIToken, date: Date);
-	constructor(data: Jsonify<Token>);
-	constructor(data: Data, date?: Date) {
-		super();
+	constructor(data: APIToken, client: Client, date: Date);
+	constructor(data: Jsonify<Token>, client: Client);
+	constructor(data: Data, client: Client, date?: Date) {
+		super(client);
 		this.patch(data, date);
 	}
 

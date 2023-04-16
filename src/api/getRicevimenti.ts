@@ -1,25 +1,16 @@
-import type { APIRicevimenti, Login, RequestOptions, Token } from "..";
+import type { APIRicevimenti, Client } from "..";
 import { Ricevimenti, apiRequest } from "..";
 
 /**
  * Ottieni i dati riguardo i ricevimenti dello studente.
- * @param token - The token data
- * @param login - The login data
- * @param options - Additional options for the request
+ * @param client - The client
  */
-export const getRicevimenti = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions
-) => {
-	const { body } = await apiRequest<APIRicevimenti>("ricevimento", token, {
+export const getRicevimenti = async (client: Client) => {
+	const { body } = await apiRequest<APIRicevimenti>("ricevimento", client, {
 		method: "POST",
 		body: {},
-		login,
-		debug: options?.debug,
-		headers: options?.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return new Ricevimenti(body.data);
+	return new Ricevimenti(body.data, client);
 };

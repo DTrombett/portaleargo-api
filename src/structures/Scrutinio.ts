@@ -1,4 +1,4 @@
-import type { APIVotiScrutinio, Jsonify } from "..";
+import type { APIVotiScrutinio, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type ScrutinioData =
@@ -18,8 +18,8 @@ export class Scrutinio extends Base<ScrutinioData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

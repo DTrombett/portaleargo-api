@@ -1,33 +1,28 @@
-import type { APIBacheca, Login, RequestOptions, Token } from "..";
+import type { APIBacheca, Client } from "..";
 import { EventoBacheca, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const getStoricoBacheca = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+	client: Client,
+	options: {
 		id: string;
 	}
 ) => {
-	const { body } = await apiRequest<APIBacheca>("storicobacheca", token, {
+	const { body } = await apiRequest<APIBacheca>("storicobacheca", client, {
 		method: "POST",
 		body: {
 			pkScheda: options.id,
 		},
-		login,
-		debug: options.debug,
-		headers: options.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);
 	return handleOperation(
 		body.data.bacheca,
 		undefined,
-		(a) => new EventoBacheca(a)
+		(a) => new EventoBacheca(a, client)
 	);
 };

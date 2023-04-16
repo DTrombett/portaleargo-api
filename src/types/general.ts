@@ -64,14 +64,16 @@ export type ClientOptions = Partial<
 		headers: IncomingHttpHeaders;
 	}
 >;
-export type RequestOptions = Partial<{
-	headers: IncomingHttpHeaders;
-	debug: boolean;
-}>;
-export type Jsonify<T, N extends boolean = false> = T extends {
-	toJSON(): infer J;
-}
-	? J
+export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [
+	T,
+	D
+] extends [
+	{
+		toJSON(): infer J;
+	},
+	true
+]
+	? Jsonify<J, false, false>
 	: T extends boolean | number | string | null
 	? T
 	: T extends bigint

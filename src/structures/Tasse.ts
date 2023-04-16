@@ -1,4 +1,4 @@
-import type { APITasse, Jsonify } from "..";
+import type { APITasse, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type Data = APITasse | Jsonify<Tasse>;
@@ -34,8 +34,8 @@ export class Tasse extends Base<APITasse> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

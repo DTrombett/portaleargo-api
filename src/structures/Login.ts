@@ -1,4 +1,4 @@
-import type { APILogin, Jsonify } from "..";
+import type { APILogin, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type LoginData = APILogin["data"][number];
@@ -20,8 +20,8 @@ export class Login extends Base<LoginData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

@@ -1,26 +1,21 @@
-import type { IncomingHttpHeaders } from "node:http";
 import { request } from "undici";
 import { formatDate } from ".";
-import type { HttpMethod, Json, Login, Token } from "..";
+import type { Client, HttpMethod, Json } from "..";
 
 /**
  * Perform an API request.
- * @param url - The url for the request
- * @param token - The token data
- * @param login - The login data
+ * @param path - The path for the request
+ * @param client - The client
  * @param options - Other options
- * @returns The json response
+ * @returns The JSON response
  */
 export const apiRequest = async <T extends Json, R extends boolean = false>(
 	path: string,
-	token: Token,
+	client: Client,
 	options?: Partial<{
-		login: Login;
 		body: Json;
 		method: HttpMethod;
 		noWaitAfter: R;
-		headers: IncomingHttpHeaders;
-		debug: boolean;
 	}>
 ) => {
 	const res = await request(
@@ -29,20 +24,21 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 			headers: {
 				accept: "application/json",
 				"argo-client-version": "1.15.1",
-				authorization: `Bearer ${token.accessToken}`,
+				authorization: `Bearer ${client.token?.accessToken ?? ""}`,
 				"content-type": "application/json; charset=utf-8",
-				"x-auth-token": options?.login?.token,
-				"x-cod-min": options?.login?.schoolCode,
-				"x-date-exp-auth": formatDate(token.expireDate),
-				...options?.headers,
+				"x-auth-token": client.loginData?.token,
+				"x-cod-min": client.loginData?.schoolCode,
+				"x-date-exp-auth":
+					client.token?.expireDate && formatDate(client.token.expireDate),
+				...client.headers,
 			},
 			method: options?.method,
 			body:
 				options?.method === "POST" ? JSON.stringify(options.body) : undefined,
 		}
 	);
-	if (options?.debug === true)
-		console.log(`${options.method ?? "GET"} /${path} ${res.statusCode}`);
+	if (client.debug)
+		console.log(`${options?.method ?? "GET"} /${path} ${res.statusCode}`);
 	const result = {
 		res,
 	} as {

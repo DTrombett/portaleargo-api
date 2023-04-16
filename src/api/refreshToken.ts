@@ -1,41 +1,33 @@
-import type { APIToken, Login, RequestOptions } from "..";
+import type { APIToken, Client } from "..";
 import { Token, apiRequest, clientId, formatDate, writeToFile } from "..";
 
 /**
  * Refresh the token.
- * @param token - The token data
- * @param login - The login data
- * @param options - Additional options for the request
+ * @param client - The client
  * @returns The token data
  */
-export const refreshToken = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions
-) => {
+export const refreshToken = async (client: Client) => {
 	const { res, body } = await apiRequest<APIToken>(
 		"auth/refresh-token",
-		token,
+		client,
 		{
 			method: "POST",
 			body: {
-				"r-token": token.refreshToken,
+				"r-token": client.token?.refreshToken,
 				"client-id": clientId,
-				"scopes": `[${token.scopes.join(", ")}]`,
-				"old-bearer": token.accessToken,
+				scopes: `[${client.token?.scopes.join(", ") ?? ""}]`,
+				"old-bearer": client.token?.accessToken,
 				"primo-accesso": "false",
 				"ripeti-login": "false",
-				"exp-bearer": formatDate(token.expireDate),
+				"exp-bearer":
+					client.token?.expireDate && formatDate(client.token.expireDate),
 				"ts-app": formatDate(new Date()),
-				"proc": "initState_global_random_12345",
-				"username": login.username,
+				proc: "initState_global_random_12345",
+				username: client.loginData?.username,
 			},
-			login,
-			debug: options?.debug,
-			headers: options?.headers,
 		}
 	);
-	const value = new Token(body, new Date(res.headers.date as string));
+	const value = new Token(body, client, new Date(res.headers.date as string));
 
 	void writeToFile("token", value);
 	return value;

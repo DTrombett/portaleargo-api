@@ -1,30 +1,25 @@
-import type { APIBachecaAlunno, Login, RequestOptions, Token } from "..";
+import type { APIBachecaAlunno, Client } from "..";
 import { EventoBachecaAlunno, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca alunno.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const getStoricoBachecaAlunno = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+	client: Client,
+	options: {
 		id: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIBachecaAlunno>(
 		"storicobachecaalunno",
-		token,
+		client,
 		{
 			method: "POST",
 			body: {
 				pkScheda: options.id,
 			},
-			login,
-			debug: options.debug,
-			headers: options.headers,
 		}
 	);
 
@@ -32,6 +27,6 @@ export const getStoricoBachecaAlunno = async (
 	return handleOperation(
 		body.data.bachecaAlunno,
 		undefined,
-		(a) => new EventoBachecaAlunno(a)
+		(a) => new EventoBachecaAlunno(a, client)
 	);
 };

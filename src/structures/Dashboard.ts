@@ -1,4 +1,4 @@
-import type { APIDashboard, Jsonify } from "..";
+import type { APIDashboard, Client, Jsonify } from "..";
 import { Base, EventoBacheca, EventoBachecaAlunno, handleOperation } from "..";
 
 type DashboardData = APIDashboard["data"]["dati"][0];
@@ -162,8 +162,8 @@ export class Dashboard extends Base<DashboardData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 
@@ -171,9 +171,9 @@ export class Dashboard extends Base<DashboardData> {
 		if (this.isJson(data)) {
 			this.handleJson(data);
 			this.dataAggiornamento = new Date(data.dataAggiornamento);
-			this.bacheca = data.bacheca.map((b) => new EventoBacheca(b));
+			this.bacheca = data.bacheca.map((b) => new EventoBacheca(b, this.client));
 			this.bachecaAlunno = data.bachecaAlunno.map(
-				(b) => new EventoBachecaAlunno(b)
+				(b) => new EventoBachecaAlunno(b, this.client)
 			);
 		} else {
 			this.dataAggiornamento = new Date();
@@ -232,7 +232,7 @@ export class Dashboard extends Base<DashboardData> {
 			this.bacheca = handleOperation(
 				data.bacheca,
 				this.bacheca,
-				(a) => new EventoBacheca(a)
+				(a) => new EventoBacheca(a, this.client)
 			);
 			this.fileCondivisi = data.fileCondivisi;
 			this.voti = handleOperation(data.voti, this.voti, (a) => ({
@@ -289,7 +289,7 @@ export class Dashboard extends Base<DashboardData> {
 			this.bachecaAlunno = handleOperation(
 				data.bachecaAlunno,
 				this.bachecaAlunno,
-				(a) => new EventoBachecaAlunno(a)
+				(a) => new EventoBachecaAlunno(a, this.client)
 			);
 			this.profiloDisabilitato = data.profiloDisabilitato;
 			this.mediaPeriodo = {};

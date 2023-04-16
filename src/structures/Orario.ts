@@ -1,4 +1,4 @@
-import type { APIOrarioGiornaliero, Jsonify } from "..";
+import type { APIOrarioGiornaliero, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type OrarioData = APIOrarioGiornaliero["data"]["dati"][`${number}`][number];
@@ -24,8 +24,8 @@ export class Orario extends Base<OrarioData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

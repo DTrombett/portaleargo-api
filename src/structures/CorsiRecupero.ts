@@ -1,5 +1,5 @@
 import { Base } from ".";
-import type { APICorsiRecupero, Jsonify } from "..";
+import type { APICorsiRecupero, Client, Jsonify } from "..";
 
 type CorsiRecuperoData = APICorsiRecupero["data"];
 type Data = CorsiRecuperoData | Jsonify<CorsiRecupero>;
@@ -14,8 +14,8 @@ export class CorsiRecupero extends Base<CorsiRecuperoData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

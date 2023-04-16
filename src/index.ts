@@ -16,3 +16,5 @@ await client.login();
 console.log(await client.getDettagliProfilo());
 // TODO: Convert every structure.object to a new structure
 // TODO: Add option to not save local data
+// TODO: Add refresh method to Dashboard
+// TODO: Add rest with client option

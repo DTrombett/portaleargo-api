@@ -1,4 +1,4 @@
-import type { APIDettagliProfilo, Jsonify } from "..";
+import type { APIDettagliProfilo, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type DettagliProfiloData = APIDettagliProfilo["data"];
@@ -40,8 +40,8 @@ export class DettagliProfilo extends Base<DettagliProfiloData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

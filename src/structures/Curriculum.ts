@@ -1,5 +1,5 @@
 import { Base } from ".";
-import type { APICurriculum, Jsonify } from "..";
+import type { APICurriculum, Client, Jsonify } from "..";
 
 type CurriculumData = APICurriculum["data"]["curriculum"][number];
 type Data = CurriculumData | Jsonify<Curriculum>;
@@ -32,8 +32,8 @@ export class Curriculum extends Base<CurriculumData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

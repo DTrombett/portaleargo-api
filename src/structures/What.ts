@@ -1,4 +1,4 @@
-import type { APIWhat, Jsonify } from "..";
+import type { APIWhat, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type WhatData = APIWhat["data"]["dati"][0];
@@ -51,8 +51,8 @@ export class What extends Base<WhatData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

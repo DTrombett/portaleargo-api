@@ -1,5 +1,5 @@
 import { Base } from ".";
-import type { APIBacheca, Jsonify } from "..";
+import type { APIBacheca, Client, Jsonify } from "..";
 
 type EventoBachecaData = Extract<
 	APIBacheca["data"]["bacheca"][number],
@@ -34,8 +34,8 @@ export class EventoBacheca extends Base<EventoBachecaData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 

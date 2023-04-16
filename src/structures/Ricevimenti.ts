@@ -1,4 +1,4 @@
-import type { APIRicevimenti, Jsonify } from "..";
+import type { APIRicevimenti, Client, Jsonify } from "..";
 import { Base } from "..";
 
 type RicevimentiData = APIRicevimenti["data"];
@@ -69,8 +69,8 @@ export class Ricevimenti extends Base<RicevimentiData> {
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data) {
-		super();
+	constructor(data: Data, client: Client) {
+		super(client);
 		this.patch(data);
 	}
 
