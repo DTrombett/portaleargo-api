@@ -11,28 +11,29 @@ import { Token, clientId, writeToFile } from "..";
  * @returns The data for the login
  */
 export const getToken = async (
-	code: string,
-	codeVerifier: string,
-	client: Client
+	client: Client,
+	options: {
+		code: string;
+		codeVerifier: string;
+	}
 ) => {
 	const res = await request("https://auth.portaleargo.it/oauth2/token", {
 		headers: {
 			"content-type": "application/x-www-form-urlencoded",
 		},
 		body: new URLSearchParams({
-			code,
+			code: options.code,
 			grant_type: "authorization_code",
 			redirect_uri: "it.argosoft.didup.famiglia.new://login-callback",
-			code_verifier: codeVerifier,
+			code_verifier: options.codeVerifier,
 			client_id: clientId,
 		}).toString(),
 		method: "POST",
 	});
-	const value = new Token(
-		await res.body.json(),
-		client,
-		new Date(res.headers.date as string)
-	);
+	const data = await res.body.json();
+	const date = new Date(res.headers.date as string);
+	const value =
+		client.token?.patch(data, date) ?? new Token(data, client, date);
 
 	void writeToFile("token", value);
 	return value;

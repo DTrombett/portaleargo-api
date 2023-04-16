@@ -27,7 +27,9 @@ export const refreshToken = async (client: Client) => {
 			},
 		}
 	);
-	const value = new Token(body, client, new Date(res.headers.date as string));
+	const date = new Date(res.headers.date as string);
+	const value =
+		client.token?.patch(body, date) ?? new Token(body, client, date);
 
 	void writeToFile("token", value);
 	return value;

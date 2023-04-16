@@ -32,5 +32,6 @@ export class Scrutinio extends Base<ScrutinioData> {
 			this.suddivisione = data.suddivisione;
 			this.voti = data.votiGiudizi;
 		}
+		return this;
 	}
 }

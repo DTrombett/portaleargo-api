@@ -1,22 +1,16 @@
-import type { APIProfilo, Client, Jsonify } from "..";
+import type { APIWhat, Client, Jsonify } from "..";
 import { Base } from "..";
 
-type ProfiloData = APIProfilo["data"];
-type Data = Jsonify<Profilo> | ProfiloData;
+type WhatData = APIWhat["data"]["dati"][0];
+type Data = Jsonify<BaseProfilo> | WhatData;
 
 /**
- * Rappresenta il profilo dello studente
+ * Rappresenta il profilo base dello studente
  */
-export class Profilo extends Base<ProfiloData> {
-	ultimoCambioPassword!: null;
+export class BaseProfilo extends Base<WhatData> {
 	anno!: {
 		dataInizio: string;
 		dataFine: string;
-	};
-	genitore!: {
-		email: string;
-		nomeCompleto: string;
-		id: string;
 	};
 	alunno!: {
 		ultimoAnno: boolean;
@@ -58,15 +52,9 @@ export class Profilo extends Base<ProfiloData> {
 	patch(data: Data) {
 		if (this.isJson(data)) this.handleJson(data);
 		else {
-			this.ultimoCambioPassword = data.ultimoCambioPwd;
 			this.anno = {
-				dataInizio: data.anno.dataInizio,
-				dataFine: data.anno.dataFine,
-			};
-			this.genitore = {
-				email: data.genitore.desEMail,
-				nomeCompleto: data.genitore.nominativo,
-				id: data.genitore.pk,
+				dataInizio: data.scheda.dataInizio,
+				dataFine: data.scheda.dataFine,
 			};
 			this.alunno = {
 				ultimoAnno: data.alunno.isUltimaClasse,

@@ -1,6 +1,6 @@
 import { request } from "undici";
-import { formatDate } from ".";
 import type { Client, HttpMethod, Json } from "..";
+import { formatDate } from "..";
 
 /**
  * Perform an API request.

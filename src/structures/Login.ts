@@ -39,5 +39,6 @@ export class Login extends Base<LoginData> {
 			this.token = data.token;
 			this.username = data.username;
 		}
+		return this;
 	}
 }

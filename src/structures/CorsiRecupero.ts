@@ -1,5 +1,5 @@
-import { Base } from ".";
 import type { APICorsiRecupero, Client, Jsonify } from "..";
+import { Base } from "..";
 
 type CorsiRecuperoData = APICorsiRecupero["data"];
 type Data = CorsiRecuperoData | Jsonify<CorsiRecupero>;
@@ -10,12 +10,14 @@ type Data = CorsiRecuperoData | Jsonify<CorsiRecupero>;
 export class CorsiRecupero extends Base<CorsiRecuperoData> {
 	corsiRecupero: any[] = [];
 	periodi: any[] = [];
+	id: string;
 
 	/**
 	 * @param data - The API data
 	 */
-	constructor(data: Data, client: Client) {
+	constructor(data: Data, client: Client, id: string) {
 		super(client);
+		this.id = id;
 		this.patch(data);
 	}
 
@@ -25,5 +27,14 @@ export class CorsiRecupero extends Base<CorsiRecuperoData> {
 			this.corsiRecupero = data.corsiRecupero;
 			this.periodi = data.periodi;
 		}
+		return this;
+	}
+
+	/**
+	 * Aggiorna questi dati.
+	 * @returns The updated data
+	 */
+	refresh() {
+		return this.client.getCorsiRecupero(this.id, this);
 	}
 }

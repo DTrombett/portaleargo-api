@@ -11,7 +11,6 @@ export const getDashboard = async (
 	client: Client,
 	options: {
 		lastUpdate: Date | number | string;
-		oldDashboard?: Dashboard;
 	}
 ) => {
 	const { body } = await apiRequest<APIDashboard>(
@@ -28,7 +27,7 @@ export const getDashboard = async (
 
 	if (!body.success) throw new Error(body.msg!);
 	const value =
-		options.oldDashboard?.patch(body.data.dati[0]) ??
+		client.dashboard?.patch(body.data.dati[0]) ??
 		new Dashboard(body.data.dati[0], client);
 
 	void writeToFile("dashboard", value);

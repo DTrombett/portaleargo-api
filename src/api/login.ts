@@ -17,7 +17,8 @@ export const login = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	const value = new Login(body.data[0], client);
+	const value =
+		client.loginData?.patch(body.data[0]) ?? new Login(body.data[0], client);
 
 	void writeToFile("login", value);
 	return value;

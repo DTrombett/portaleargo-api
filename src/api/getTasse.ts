@@ -1,5 +1,5 @@
 import type { APITasse, Client } from "..";
-import { Tasse, apiRequest } from "..";
+import { Tassa, apiRequest } from "..";
 
 /**
  * Ottieni le tasse dello studente.
@@ -20,5 +20,8 @@ export const getTasse = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return new Tasse(body, client);
+	return {
+		pagOnline: body.isPagOnlineAttivo,
+		tasse: body.data.map((a) => new Tassa(a, client)),
+	};
 };

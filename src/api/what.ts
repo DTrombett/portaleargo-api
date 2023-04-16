@@ -10,6 +10,7 @@ export const what = async (
 	client: Client,
 	options: {
 		lastUpdate: Date | number | string;
+		old?: What;
 	}
 ) => {
 	const authToken = JSON.stringify([client.loginData?.token]);
@@ -24,5 +25,7 @@ export const what = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return new What(body.data.dati[0], client);
+	return (
+		options.old?.patch(body.data.dati[0]) ?? new What(body.data.dati[0], client)
+	);
 };

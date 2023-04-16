@@ -1,5 +1,5 @@
-import { Base } from ".";
 import type { APICurriculum, Client, Jsonify } from "..";
+import { Base, EsitoAnno } from "..";
 
 type CurriculumData = APICurriculum["data"]["curriculum"][number];
 type Data = CurriculumData | Jsonify<Curriculum>;
@@ -11,15 +11,7 @@ export class Curriculum extends Base<CurriculumData> {
 	id!: string;
 	classe!: string;
 	anno!: number;
-	esito?: {
-		codScuola: string;
-		colore: number;
-		ammesso: boolean;
-		descrizione: string;
-		icona: string;
-		codEsito: string;
-		particolarità: string;
-	};
+	esito?: EsitoAnno;
 	credito!: number;
 	mostraInfo!: boolean;
 	mostraCredito!: boolean;
@@ -38,8 +30,10 @@ export class Curriculum extends Base<CurriculumData> {
 	}
 
 	patch(data: Data) {
-		if (this.isJson(data)) this.handleJson(data);
-		else {
+		if (this.isJson(data)) {
+			this.handleJson(data);
+			if (data.esito) this.esito = new EsitoAnno(data.esito, this.client);
+		} else {
 			this.anno = data.anno;
 			this.classe = data.classe;
 			this.credito = data.credito;
@@ -52,15 +46,8 @@ export class Curriculum extends Base<CurriculumData> {
 			this.ordine = data.ordineScuola;
 			this.superiore = data.isSuperiore;
 			if (typeof data.esito === "object")
-				this.esito = {
-					ammesso: data.esito.flgPositivo === "S",
-					codEsito: data.esito.codEsito,
-					codScuola: data.esito.esitoPK.codMin,
-					colore: data.esito.numColore,
-					descrizione: data.esito.descrizione,
-					icona: data.esito.icona,
-					particolarità: data.esito.particolarita,
-				};
+				this.esito = new EsitoAnno(data.esito, this.client);
 		}
+		return this;
 	}
 }

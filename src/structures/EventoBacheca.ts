@@ -1,5 +1,5 @@
-import { Base } from ".";
 import type { APIBacheca, Client, Jsonify } from "..";
+import { Allegato, Base } from "..";
 
 type EventoBachecaData = Extract<
 	APIBacheca["data"]["bacheca"][number],
@@ -22,13 +22,7 @@ export class EventoBacheca extends Base<EventoBachecaData> {
 	adRichiesta!: boolean;
 	dataConfermaAdesione!: string;
 	id!: string;
-	allegati: {
-		nome: string;
-		percorso: string;
-		descrizione: string | null;
-		id: string;
-		url: string;
-	}[] = [];
+	allegati: Allegato[] = [];
 	dataScadenzaAdesione?: string;
 
 	/**
@@ -53,15 +47,12 @@ export class EventoBacheca extends Base<EventoBachecaData> {
 			if (data.dataScadenza != null) this.dataScadenza = data.dataScadenza;
 			this.adRichiesta = data.adRichiesta;
 			this.dataConfermaAdesione = data.dataConfermaAdesione;
-			this.allegati = data.listaAllegati.map((b) => ({
-				nome: b.nomeFile,
-				percorso: b.path,
-				descrizione: b.descrizioneFile,
-				url: b.url,
-				id: b.pk,
-			}));
+			this.allegati = data.listaAllegati.map(
+				(a) => new Allegato(a, this.client)
+			);
 			if (data.dataScadAdesione != null)
 				this.dataScadenzaAdesione = data.dataScadAdesione;
 		}
+		return this;
 	}
 }

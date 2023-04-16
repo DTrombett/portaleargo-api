@@ -37,5 +37,6 @@ export class Token extends Base<APIToken> {
 			this.scopes = data.scope.split(" ");
 			this.tokenType = data.token_type;
 		}
+		return this;
 	}
 }

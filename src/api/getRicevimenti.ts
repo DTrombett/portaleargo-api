@@ -5,12 +5,17 @@ import { Ricevimenti, apiRequest } from "..";
  * Ottieni i dati riguardo i ricevimenti dello studente.
  * @param client - The client
  */
-export const getRicevimenti = async (client: Client) => {
+export const getRicevimenti = async <T extends Ricevimenti>(
+	client: Client,
+	options?: { old?: T }
+) => {
 	const { body } = await apiRequest<APIRicevimenti>("ricevimento", client, {
 		method: "POST",
 		body: {},
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return new Ricevimenti(body.data, client);
+	return (
+		options?.old?.patch(body.data) ?? (new Ricevimenti(body.data, client) as T)
+	);
 };

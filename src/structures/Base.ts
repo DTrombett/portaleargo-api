@@ -1,3 +1,4 @@
+import { inspect } from "node:util";
 import type { Client, Jsonify, ObjectJson } from "..";
 
 const identifierName = "class name";
@@ -10,11 +11,10 @@ export class Base<T extends ObjectJson = ObjectJson> {
 	 * The client that instantiated this
 	 */
 	client: Client;
-	protected [identifierName] = this.constructor.name;
+	protected readonly [identifierName] = this.constructor.name;
 
 	constructor(client: Client) {
 		Object.defineProperty(this, identifierName, {
-			enumerable: false,
 			writable: false,
 			configurable: false,
 		});
@@ -31,6 +31,18 @@ export class Base<T extends ObjectJson = ObjectJson> {
 	toJSON() {
 		const self: Omit<this, "client"> = { ...this, client: undefined };
 
+		return self;
+	}
+
+	[inspect.custom]() {
+		const self = {
+			...this,
+		} as {
+			[K in typeof identifierName | "client"]: unknown;
+		};
+
+		delete self.client;
+		delete self[identifierName];
 		return self;
 	}
 

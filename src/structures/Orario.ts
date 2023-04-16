@@ -45,5 +45,6 @@ export class Orario extends Base<OrarioData> {
 			this.sezione = data.desSezione;
 			this.ora = data.ora;
 		}
+		return this;
 	}
 }

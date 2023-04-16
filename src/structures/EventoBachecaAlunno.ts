@@ -36,5 +36,6 @@ export class EventoBachecaAlunno extends Base<EventoBachecaAlunnoData> {
 			this.downloadGenitore = data.flgDownloadGenitore;
 			this.presaVisione = data.isPresaVisione;
 		}
+		return this;
 	}
 }

@@ -5,7 +5,12 @@ import { DettagliProfilo, apiRequest } from "..";
  * Ottieni i dettagli del profilo dello studente.
  * @param client - The client
  */
-export const getDettagliProfilo = async (client: Client) => {
+export const getDettagliProfilo = async <T extends DettagliProfilo>(
+	client: Client,
+	options?: {
+		old?: T;
+	}
+) => {
 	const { body } = await apiRequest<APIDettagliProfilo>(
 		"dettaglioprofilo",
 		client,
@@ -16,5 +21,6 @@ export const getDettagliProfilo = async (client: Client) => {
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return new DettagliProfilo(body.data, client);
+	return (options?.old?.patch(body.data) ??
+		new DettagliProfilo(body.data, client)) as T;
 };

@@ -3,7 +3,12 @@ import { mkdir, writeFile } from "node:fs/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
-import type { ClientOptions } from ".";
+import type {
+	ClientOptions,
+	CorsiRecupero,
+	DettagliProfilo,
+	Ricevimenti,
+} from ".";
 import {
 	AuthFolder,
 	Dashboard,
@@ -180,15 +185,14 @@ export class Client {
 			throw new TypeError("School code, username or password are missing!");
 		const codeVerifier = randomString(43);
 
-		return getToken(
-			await getCode(encryptCodeVerifier(codeVerifier), {
+		return getToken(this, {
+			code: await getCode(encryptCodeVerifier(codeVerifier), {
 				password: this.password,
 				schoolCode: this.schoolCode,
 				username: this.username,
 			}),
 			codeVerifier,
-			this
-		);
+		});
 	}
 
 	/**
@@ -208,9 +212,11 @@ export class Client {
 	 * Ottieni i dettagli del profilo dello studente.
 	 * @returns The data
 	 */
-	async getDettagliProfilo() {
+	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getDettagliProfilo(this);
+		return getDettagliProfilo(this, {
+			old,
+		});
 	}
 
 	/**
@@ -295,9 +301,9 @@ export class Client {
 	 * Ottieni i dati riguardo i ricevimenti dello studente.
 	 * @returns The data
 	 */
-	async getRicevimenti() {
+	async getRicevimenti<T extends Ricevimenti>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getRicevimenti(this);
+		return getRicevimenti(this, { old });
 	}
 
 	/**
@@ -329,10 +335,11 @@ export class Client {
 	 * @param id - The profile id
 	 * @returns The data
 	 */
-	async getCorsiRecupero(id?: string) {
+	async getCorsiRecupero<T extends CorsiRecupero>(id?: string, old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getCorsiRecupero(this, {
 			id: id ?? this.profile.id,
+			old,
 		});
 	}
 
@@ -379,11 +386,9 @@ export class Client {
 	 */
 	private async getDashboard() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		this.dashboard = await getDashboard(this, {
+		return getDashboard(this, {
 			lastUpdate:
 				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
-			oldDashboard: this.dashboard,
 		});
-		return this.dashboard;
 	}
 }

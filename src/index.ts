@@ -7,14 +7,14 @@ export * from "./structures";
 export * from "./types";
 export * from "./util";
 
+const now = performance.now();
 config();
 const client = new Client({
 	debug: true,
 });
 
 await client.login();
-console.log(await client.getDettagliProfilo());
-// TODO: Convert every structure.object to a new structure
-// TODO: Add option to not save local data
-// TODO: Add refresh method to Dashboard
+console.log(await client.getDettagliProfilo(), performance.now() - now);
 // TODO: Add rest with client option
+
+// TODO: Add option to not save local data
