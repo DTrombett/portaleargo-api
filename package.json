@@ -29,7 +29,7 @@
 	"dependencies": {
 		"crypto-js": "^4.1.1",
 		"dotenv": "^16.0.3",
-		"undici": "^5.21.0"
+		"undici": "^5.21.2"
 	},
 	"devDependencies": {
 		"@tsconfig/node18": "^1.0.1",
