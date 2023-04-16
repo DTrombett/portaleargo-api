@@ -12,6 +12,8 @@ npm install portaleargo-api
 
 **Nota: Node.js v18 è raccomandato. Non garantiamo stabilità per le versioni inferiori.**
 
+**Nota: Al momento non abbiamo ancora pubblicato il progetto su npm. Se volete già provarlo potete installarlo tramite `npm i dtrombett/portaleargo-api`**
+
 ## Utilizzo
 
 Per utilizzare il pacchetto, importare la classe `Client` e istanziarla passando i seguenti parametri:
