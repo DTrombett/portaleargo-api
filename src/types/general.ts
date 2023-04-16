@@ -1,14 +1,15 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { Dashboard, Login, Profilo, Token } from ".";
+import type { Dashboard, Login, Profilo, Token } from "..";
 
+export type ObjectJson = {
+	[key: string]: Json;
+};
 export type Json =
 	| Json[]
+	| ObjectJson
 	| boolean
 	| number
 	| string
-	| {
-			[key: string]: Json;
-	  }
 	| null
 	| undefined;
 export type HttpMethod =
@@ -63,7 +64,24 @@ export type ClientOptions = Partial<
 		headers: IncomingHttpHeaders;
 	}
 >;
-export type RequestOptions = Partial<{
-	headers: IncomingHttpHeaders;
-	debug: boolean;
-}>;
+export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [
+	T,
+	D
+] extends [
+	{
+		toJSON(): infer J;
+	},
+	true
+]
+	? Jsonify<J, false, false>
+	: T extends boolean | number | string | null
+	? T
+	: T extends bigint
+	? never
+	: T extends symbol | ((...args: any[]) => any) | undefined
+	? N extends true
+		? never
+		: undefined
+	: {
+			[K in keyof T]: Jsonify<T[K], true>;
+	  };

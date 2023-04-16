@@ -1,35 +1,31 @@
-import type { APIResponse, Login, RequestOptions, Token } from "../types";
-import { apiRequest, formatDate } from "../util";
+import type { APIResponse, Client, Token } from "..";
+import { apiRequest, formatDate } from "..";
 
 /**
  * Log the token.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const logToken = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & { oldToken: Token; isWhat?: boolean }
+	client: Client,
+	options: { oldToken: Token; isWhat?: boolean }
 ) => {
-	const { body } = await apiRequest<APIResponse>("logtoken", token, {
+	const { body } = await apiRequest<APIResponse>("logtoken", client, {
 		method: "POST",
 		body: {
 			bearerOld: options.oldToken.accessToken,
 			dateExpOld: formatDate(options.oldToken.expireDate),
 			refreshOld: options.oldToken.refreshToken,
-			bearerNew: token.accessToken,
-			dateExpNew: formatDate(token.expireDate),
-			refreshNew: token.refreshToken,
+			bearerNew: client.token?.accessToken,
+			dateExpNew:
+				client.token?.expireDate && formatDate(client.token.expireDate),
+			refreshNew: client.token?.refreshToken,
 			isWhat: (options.isWhat ?? false).toString(),
 			isRefreshed: (
-				token.accessToken === options.oldToken.accessToken
+				client.token?.accessToken === options.oldToken.accessToken
 			).toString(),
 			proc: "initState_global_random_12345",
 		},
-		login,
-		debug: options.debug,
-		headers: options.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);

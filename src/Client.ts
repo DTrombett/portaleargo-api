@@ -3,10 +3,22 @@ import { mkdir, writeFile } from "node:fs/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
+import type {
+	ClientOptions,
+	CorsiRecupero,
+	DettagliProfilo,
+	Ricevimenti,
+} from ".";
 import {
+	AuthFolder,
+	Dashboard,
+	Login,
+	Profilo,
+	Token,
 	aggiornaData,
 	downloadAllegato,
 	downloadAllegatoStudente,
+	encryptCodeVerifier,
 	getCode,
 	getCorsiRecupero,
 	getCurriculum,
@@ -21,20 +33,15 @@ import {
 	getTasse,
 	getToken,
 	getVotiScrutinio,
+	importData,
 	logToken,
 	login,
+	randomString,
 	refreshToken,
 	rimuoviProfilo,
 	what,
-} from "./api";
-import type { ClientOptions, Dashboard, Login, Profilo, Token } from "./types";
-import {
-	AuthFolder,
-	encryptCodeVerifier,
-	importData,
-	randomString,
 	writeToFile,
-} from "./util";
+} from ".";
 
 /**
  * A client to interact with the API
@@ -114,38 +121,29 @@ export class Client {
 	 */
 	async login() {
 		await Promise.all([
-			this.token ?? importData<Token>("token"),
-			this.loginData ?? importData<Login>("login"),
-			this.profile ?? importData<Profilo>("profile"),
-			this.dashboard ?? importData<Dashboard>("dashboard"),
+			this.token ? undefined : importData<Token>("token"),
+			this.loginData ? undefined : importData<Login>("login"),
+			this.profile ? undefined : importData<Profilo>("profile"),
+			this.dashboard ? undefined : importData<Dashboard>("dashboard"),
 			existsSync(AuthFolder) || mkdir(AuthFolder),
 		]).then(([token, loginData, profile, dashboard]) => {
-			this.token = token;
-			this.loginData = loginData;
-			this.profile = profile;
-			this.dashboard = dashboard;
+			if (token) this.token = new Token(token, this);
+			if (loginData) this.loginData = new Login(loginData, this);
+			if (profile) this.profile = new Profilo(profile, this);
+			if (dashboard) this.dashboard = new Dashboard(dashboard, this);
 		});
 		const oldToken = this.token;
 
-		this.token = await this.refreshToken(oldToken);
-		this.loginData =
-			this.loginData ??
-			(await login(this.token, {
-				headers: this.headers,
-				debug: this.debug,
-			}));
+		this.token = await this.refreshToken();
+		this.loginData = this.loginData ?? (await login(this));
 		if (oldToken) {
-			await logToken(this.token, this.loginData, {
+			await logToken(this, {
 				oldToken,
-				debug: this.debug,
-				headers: this.headers,
 				isWhat: this.profile !== undefined,
 			});
 			if (this.profile) {
 				this.ready = true;
-				const whatData = await what(this.token, this.loginData, {
-					debug: this.debug,
-					headers: this.headers,
+				const whatData = await what(this, {
 					lastUpdate:
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 				});
@@ -153,19 +151,11 @@ export class Client {
 				if (whatData.profiloModificato || whatData.differenzaSchede)
 					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
-				aggiornaData(this.token, this.loginData, {
-					debug: this.debug,
-					headers: this.headers,
-				}).catch(console.error);
+				aggiornaData(this).catch(console.error);
 				return this.dashboard!;
 			}
 		}
-		this.profile =
-			this.profile ??
-			(await getProfilo(this.token, this.loginData, {
-				debug: this.debug,
-				headers: this.headers,
-			}));
+		this.profile = this.profile ?? (await getProfilo(this));
 		this.ready = true;
 		return this.getDashboard();
 	}
@@ -175,14 +165,11 @@ export class Client {
 	 * @param token - The token to check
 	 * @returns The new token
 	 */
-	async refreshToken(token?: Token) {
-		if (!this.loginData || !token) return this.getToken();
-		if (token.expireDate <= Date.now())
-			return refreshToken(token, this.loginData, {
-				debug: this.debug,
-				headers: this.headers,
-			});
-		return token;
+	async refreshToken() {
+		if (!this.loginData || !this.token) return this.getToken();
+		if (this.token.expireDate.getTime() <= Date.now())
+			return refreshToken(this);
+		return this.token;
 	}
 
 	/**
@@ -198,14 +185,14 @@ export class Client {
 			throw new TypeError("School code, username or password are missing!");
 		const codeVerifier = randomString(43);
 
-		return getToken(
-			await getCode(encryptCodeVerifier(codeVerifier), {
+		return getToken(this, {
+			code: await getCode(encryptCodeVerifier(codeVerifier), {
 				password: this.password,
 				schoolCode: this.schoolCode,
 				username: this.username,
 			}),
-			codeVerifier
-		);
+			codeVerifier,
+		});
 	}
 
 	/**
@@ -214,10 +201,7 @@ export class Client {
 	async rimuoviProfilo() {
 		if (!this.token || !this.loginData)
 			throw new Error("Client is not logged in!");
-		await rimuoviProfilo(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
-		});
+		await rimuoviProfilo(this);
 		delete this.token;
 		delete this.loginData;
 		delete this.profile;
@@ -228,11 +212,10 @@ export class Client {
 	 * Ottieni i dettagli del profilo dello studente.
 	 * @returns The data
 	 */
-	async getDettagliProfilo() {
+	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getDettagliProfilo(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getDettagliProfilo(this, {
+			old,
 		});
 	}
 
@@ -247,9 +230,7 @@ export class Client {
 		day?: number;
 	}) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getOrarioGiornaliero(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getOrarioGiornaliero(this, {
 			day: date?.day,
 			month: date?.month,
 			year: date?.year,
@@ -263,10 +244,8 @@ export class Client {
 	 */
 	async getLinkAllegato(uid: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return downloadAllegato(this.token, this.loginData, {
+		return downloadAllegato(this, {
 			uid,
-			debug: this.debug,
-			headers: this.headers,
 		});
 	}
 
@@ -290,11 +269,9 @@ export class Client {
 	 */
 	async getLinkAllegatoStudente(uid: string, id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return downloadAllegatoStudente(this.token, this.loginData, {
+		return downloadAllegatoStudente(this, {
 			uid,
 			id: id ?? this.profile.id,
-			debug: this.debug,
-			headers: this.headers,
 		});
 	}
 
@@ -317,22 +294,16 @@ export class Client {
 	 */
 	async getVotiScrutinio() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getVotiScrutinio(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
-		});
+		return getVotiScrutinio(this);
 	}
 
 	/**
 	 * Ottieni i dati riguardo i ricevimenti dello studente.
 	 * @returns The data
 	 */
-	async getRicevimenti() {
+	async getRicevimenti<T extends Ricevimenti>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getRicevimenti(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
-		});
+		return getRicevimenti(this, { old });
 	}
 
 	/**
@@ -342,9 +313,7 @@ export class Client {
 	 */
 	async getTasse(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getTasse(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getTasse(this, {
 			id: id ?? this.profile.id,
 		});
 	}
@@ -356,9 +325,7 @@ export class Client {
 	 */
 	async getPCTOData(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getPCTOData(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getPCTOData(this, {
 			id: id ?? this.profile.id,
 		});
 	}
@@ -368,12 +335,11 @@ export class Client {
 	 * @param id - The profile id
 	 * @returns The data
 	 */
-	async getCorsiRecupero(id?: string) {
+	async getCorsiRecupero<T extends CorsiRecupero>(id?: string, old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getCorsiRecupero(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getCorsiRecupero(this, {
 			id: id ?? this.profile.id,
+			old,
 		});
 	}
 
@@ -384,9 +350,7 @@ export class Client {
 	 */
 	async getCurriculum(id?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getCurriculum(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getCurriculum(this, {
 			id: id ?? this.profile.id,
 		});
 	}
@@ -398,9 +362,7 @@ export class Client {
 	 */
 	async getStoricoBacheca(id: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getStoricoBacheca(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getStoricoBacheca(this, {
 			id,
 		});
 	}
@@ -412,9 +374,7 @@ export class Client {
 	 */
 	async getStoricoBachecaAlunno(id: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		return getStoricoBachecaAlunno(this.token, this.loginData, {
-			debug: this.debug,
-			headers: this.headers,
+		return getStoricoBachecaAlunno(this, {
 			id,
 		});
 	}
@@ -426,13 +386,9 @@ export class Client {
 	 */
 	private async getDashboard() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		this.dashboard = await getDashboard(this.token, this.loginData, {
+		return getDashboard(this, {
 			lastUpdate:
 				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
-			oldDashboard: this.dashboard,
-			debug: this.debug,
-			headers: this.headers,
 		});
-		return this.dashboard;
 	}
 }

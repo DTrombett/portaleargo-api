@@ -1,35 +1,26 @@
-import { buildDettagliProfilo } from "../builders";
-import type {
-	APIDettagliProfilo,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
-import { apiRequest } from "../util";
+import type { APIDettagliProfilo, Client } from "..";
+import { DettagliProfilo, apiRequest } from "..";
 
 /**
  * Ottieni i dettagli del profilo dello studente.
- * @param token - The token data
- * @param login - The login data
- * @param options - Additional options for the request
+ * @param client - The client
  */
-export const getDettagliProfilo = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions
+export const getDettagliProfilo = async <T extends DettagliProfilo>(
+	client: Client,
+	options?: {
+		old?: T;
+	}
 ) => {
 	const { body } = await apiRequest<APIDettagliProfilo>(
 		"dettaglioprofilo",
-		token,
+		client,
 		{
 			body: null,
 			method: "POST",
-			login,
-			debug: options?.debug,
-			headers: options?.headers,
 		}
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildDettagliProfilo(body);
+	return (options?.old?.patch(body.data) ??
+		new DettagliProfilo(body.data, client)) as T;
 };

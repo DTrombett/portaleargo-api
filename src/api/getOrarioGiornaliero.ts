@@ -1,22 +1,14 @@
-import { buildOrarioGiornaliero } from "../builders";
-import type {
-	APIOrarioGiornaliero,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
-import { apiRequest, formatDate } from "../util";
+import type { APIOrarioGiornaliero, Client } from "..";
+import { Orario, apiRequest, formatDate } from "..";
 
 /**
  * Ottieni l'orario giornaliero.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const getOrarioGiornaliero = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions & {
+	client: Client,
+	options?: {
 		year?: number;
 		month?: number;
 		day?: number;
@@ -25,7 +17,7 @@ export const getOrarioGiornaliero = async (
 	const now = new Date();
 	const { body } = await apiRequest<APIOrarioGiornaliero>(
 		"orario-giorno",
-		token,
+		client,
 		{
 			method: "POST",
 			body: {
@@ -35,12 +27,11 @@ export const getOrarioGiornaliero = async (
 					}-${options?.day ?? now.getDate() + 1}`
 				),
 			},
-			login,
-			debug: options?.debug,
-			headers: options?.headers,
 		}
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildOrarioGiornaliero(body);
+	return Object.values(body.data.dati)
+		.flat()
+		.map((d) => new Orario(d, client));
 };

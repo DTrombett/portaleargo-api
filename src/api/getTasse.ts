@@ -1,30 +1,27 @@
-import { buildTasse } from "../builders";
-import type { APITasse, Login, RequestOptions, Token } from "../types";
-import { apiRequest } from "../util";
+import type { APITasse, Client } from "..";
+import { Tassa, apiRequest } from "..";
 
 /**
  * Ottieni le tasse dello studente.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const getTasse = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+	client: Client,
+	options: {
 		id: string;
 	}
 ) => {
-	const { body } = await apiRequest<APITasse>("listatassealunni", token, {
+	const { body } = await apiRequest<APITasse>("listatassealunni", client, {
 		method: "POST",
 		body: {
 			pkScheda: options.id,
 		},
-		login,
-		debug: options.debug,
-		headers: options.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildTasse(body);
+	return {
+		pagOnline: body.isPagOnlineAttivo,
+		tasse: body.data.map((a) => new Tassa(a, client)),
+	};
 };

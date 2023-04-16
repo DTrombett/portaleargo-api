@@ -1,45 +1,34 @@
-import { buildDashboard } from "../builders";
-import type {
-	APIDashboard,
-	Dashboard,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
-import { apiRequest, formatDate, writeToFile } from "../util";
+import type { APIDashboard, Client } from "..";
+import { Dashboard, apiRequest, formatDate, writeToFile } from "..";
 
 /**
  * Fetch all the data for the authenticated user.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  * @returns All the data for the user
  */
 export const getDashboard = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+	client: Client,
+	options: {
 		lastUpdate: Date | number | string;
-		oldDashboard?: Dashboard;
 	}
 ) => {
 	const { body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
-		token,
+		client,
 		{
 			body: {
 				dataultimoaggiornamento: formatDate(options.lastUpdate),
-				opzioni: JSON.stringify(login.options),
+				opzioni: JSON.stringify(client.loginData?.options),
 			},
 			method: "POST",
-			login,
-			debug: options.debug,
-			headers: options.headers,
 		}
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	const value = buildDashboard(body, options.oldDashboard);
+	const value =
+		client.dashboard?.patch(body.data.dati[0]) ??
+		new Dashboard(body.data.dati[0], client);
 
 	void writeToFile("dashboard", value);
 	return value;

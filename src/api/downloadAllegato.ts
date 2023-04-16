@@ -1,35 +1,25 @@
-import type {
-	APIDownloadAllegato,
-	Login,
-	RequestOptions,
-	Token,
-} from "../types";
-import { apiRequest } from "../util";
+import type { APIDownloadAllegato, Client } from "..";
+import { apiRequest } from "..";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
 export const downloadAllegato = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+	client: Client,
+	options: {
 		uid: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
 		"downloadallegatobacheca",
-		token,
+		client,
 		{
 			method: "POST",
 			body: {
 				uid: options.uid,
 			},
-			login,
-			debug: options.debug,
-			headers: options.headers,
 		}
 	);
 

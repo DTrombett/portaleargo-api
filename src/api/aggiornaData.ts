@@ -1,28 +1,19 @@
-import type { APIResponse, Login, RequestOptions, Token } from "../types";
-import { apiRequest, formatDate } from "../util";
+import type { APIResponse, Client } from "..";
+import { apiRequest, formatDate } from "..";
 
 /**
  * Aggiorna la data dell'ultimo aggiornamento.
- * @param token - The token data
- * @param login - The login data
- * @param options - Additional options for the request
+ * @param client - The client
  */
-export const aggiornaData = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions
-) => {
+export const aggiornaData = async (client: Client) => {
 	const { body } = await apiRequest<APIResponse>(
 		"dashboard/aggiornadata",
-		token,
+		client,
 		{
 			method: "POST",
 			body: {
 				dataultimoaggiornamento: formatDate(new Date()),
 			},
-			login,
-			debug: options?.debug,
-			headers: options?.headers,
 		}
 	);
 

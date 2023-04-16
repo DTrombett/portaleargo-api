@@ -1,30 +1,26 @@
-import { buildCorsiRecupero } from "../builders";
-import type { APICorsiRecupero, Login, RequestOptions, Token } from "../types";
-import { apiRequest } from "../util";
+import type { APICorsiRecupero, Client } from "..";
+import { CorsiRecupero, apiRequest } from "..";
 
 /**
  * Ottieni i dati dei corsi di recupero dello studente.
- * @param token - The token data
- * @param login - The login data
+ * @param client - The client
  * @param options - Additional options for the request
  */
-export const getCorsiRecupero = async (
-	token: Token,
-	login: Login,
-	options: RequestOptions & {
+export const getCorsiRecupero = async <T extends CorsiRecupero>(
+	client: Client,
+	options: {
 		id: string;
+		old?: T;
 	}
 ) => {
-	const { body } = await apiRequest<APICorsiRecupero>("corsirecupero", token, {
+	const { body } = await apiRequest<APICorsiRecupero>("corsirecupero", client, {
 		method: "POST",
 		body: {
 			pkScheda: options.id,
 		},
-		login,
-		debug: options.debug,
-		headers: options.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return buildCorsiRecupero(body);
+	return (options.old?.patch(body.data) ??
+		new CorsiRecupero(body.data, client, options.id)) as T;
 };

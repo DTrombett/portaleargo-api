@@ -1,24 +1,15 @@
 import { rm } from "node:fs/promises";
-import type { APIResponse, Login, RequestOptions, Token } from "../types";
-import { AuthFolder, apiRequest } from "../util";
+import type { APIResponse, Client } from "..";
+import { AuthFolder, apiRequest } from "..";
 
 /**
  * Rimuovi il profilo.
- * @param token - The token data
- * @param login - The login data
- * @param options - Additional options for the request
+ * @param client - The client
  */
-export const rimuoviProfilo = async (
-	token: Token,
-	login: Login,
-	options?: RequestOptions
-) => {
-	const { body } = await apiRequest<APIResponse>("rimuoviprofilo", token, {
+export const rimuoviProfilo = async (client: Client) => {
+	const { body } = await apiRequest<APIResponse>("rimuoviprofilo", client, {
 		method: "POST",
 		body: {},
-		login,
-		debug: options?.debug,
-		headers: options?.headers,
 	});
 
 	if (!body.success) throw new Error(body.msg!);

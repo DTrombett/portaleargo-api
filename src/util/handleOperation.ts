@@ -1,4 +1,4 @@
-import type { APIOperation, Json } from "../types";
+import type { APIOperation, Json } from "..";
 
 /**
  * Handle an array of operations from the API.
@@ -14,12 +14,12 @@ export const handleOperation = <
 >(
 	array: APIOperation<T>[],
 	old: P[] = [],
-	map: (a: T) => Omit<P, "id">
+	map: (a: Extract<APIOperation<T>, { operazione: "I" }>) => P
 ) => {
 	const toDelete: string[] = [];
 
 	for (const a of array)
 		if (a.operazione === "D") toDelete.push(a.pk);
-		else old.push({ id: a.pk, ...map(a) } as P);
+		else old.push(map(a));
 	return old.filter((a) => !toDelete.includes(a.id));
 };
