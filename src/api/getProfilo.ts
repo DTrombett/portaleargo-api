@@ -3,7 +3,8 @@ import { Profilo, apiRequest, writeToFile } from "..";
 
 /**
  * Ottieni i dati riguardo il profilo dell'utente.
- * @param client - The client
+ * @param client - Il client
+ * @returns I dati
  */
 export const getProfilo = async (client: Client) => {
 	const { body } = await apiRequest<APIProfilo>("profilo", client, {});
@@ -12,6 +13,7 @@ export const getProfilo = async (client: Client) => {
 	const value =
 		client.profile?.patch(body.data) ?? new Profilo(body.data, client);
 
-	void writeToFile("profile", value);
+	if (client.dataPath !== undefined)
+		void writeToFile("profile", value, client.dataPath);
 	return value;
 };

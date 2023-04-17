@@ -1,9 +1,9 @@
 import CryptoJS from "crypto-js";
 
 /**
- * Encrypt a code verifier.
- * @param codeVerifier - The code to encrypt
- * @returns The encrypted code
+ * Crittografa un codice.
+ * @param codeVerifier - Il codice
+ * @returns Il codice crittografato
  */
 export const encryptCodeVerifier = (codeVerifier: string) =>
 	CryptoJS.SHA256(codeVerifier).toString(CryptoJS.enc.Base64url);

@@ -3,19 +3,20 @@ import { apiRequest } from "..";
 
 /**
  * Ottieni i dati del PCTO dello studente.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getPCTOData = async (
 	client: Client,
 	options: {
-		id: string;
+		profileId: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIPCTO>("pcto", client, {
 		method: "POST",
 		body: {
-			pkScheda: options.id,
+			pkScheda: options.profileId,
 		},
 	});
 

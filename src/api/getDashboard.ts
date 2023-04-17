@@ -2,10 +2,10 @@ import type { APIDashboard, Client } from "..";
 import { Dashboard, apiRequest, formatDate, writeToFile } from "..";
 
 /**
- * Fetch all the data for the authenticated user.
- * @param client - The client
- * @param options - Additional options for the request
- * @returns All the data for the user
+ * Ottieni la dashboard dello studente.
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getDashboard = async (
 	client: Client,
@@ -30,6 +30,7 @@ export const getDashboard = async (
 		client.dashboard?.patch(body.data.dati[0]) ??
 		new Dashboard(body.data.dati[0], client);
 
-	void writeToFile("dashboard", value);
+	if (client.dataPath !== undefined)
+		void writeToFile("dashboard", value, client.dataPath);
 	return value;
 };

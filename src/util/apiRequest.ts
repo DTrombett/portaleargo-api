@@ -3,11 +3,11 @@ import type { Client, HttpMethod, Json } from "..";
 import { formatDate } from "..";
 
 /**
- * Perform an API request.
- * @param path - The path for the request
- * @param client - The client
- * @param options - Other options
- * @returns The JSON response
+ * Effettua una richiesta API.
+ * @param path - Il percorso della richiesta
+ * @param client - Il client
+ * @param options - Altre opzioni
+ * @returns La risposta
  */
 export const apiRequest = async <T extends Json, R extends boolean = false>(
 	path: string,

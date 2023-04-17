@@ -13,7 +13,7 @@ export class DettagliProfilo extends Base<DettagliProfiloData> {
 	alunno!: Alunno;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);
@@ -32,7 +32,7 @@ export class DettagliProfilo extends Base<DettagliProfiloData> {
 
 	/**
 	 * Aggiorna questi dati.
-	 * @returns The updated data
+	 * @returns I dati aggiornati
 	 */
 	refresh() {
 		return this.client.getDettagliProfilo(this);

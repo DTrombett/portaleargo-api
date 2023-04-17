@@ -2,9 +2,9 @@ import type { APIResponse, Client, Token } from "..";
 import { apiRequest, formatDate } from "..";
 
 /**
- * Log the token.
- * @param client - The client
- * @param options - Additional options for the request
+ * Registra il token
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
  */
 export const logToken = async (
 	client: Client,

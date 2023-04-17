@@ -31,7 +31,7 @@ export class Tassa extends Base<TassaData> {
 	pagOnLine!: boolean;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);

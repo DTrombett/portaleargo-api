@@ -4,14 +4,15 @@ import type { Jsonify } from "..";
 import { AuthFolder } from "..";
 
 /**
- * Import a data file.
- * @param name - The file name without the extension
- * @returns The imported json
+ * Importa dei dati salvati in un file.
+ * @param name - Il nome del file, escludendo l'estensione
+ * @returns I dati importati
  */
 export const importData = async <T>(
-	name: string
+	name: string,
+	path = AuthFolder
 ): Promise<Jsonify<T> | undefined> =>
-	readFile(join(AuthFolder, `${name}.json`), {
+	readFile(join(path, `${name}.json`), {
 		encoding: "utf8",
 	})
 		.then(async (content) => JSON.parse(content) as Jsonify<T>)

@@ -17,7 +17,7 @@ export class Ricevimenti extends Base<RicevimentiData> {
 	prenotazioni: Prenotazione[] = [];
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);
@@ -52,7 +52,7 @@ export class Ricevimenti extends Base<RicevimentiData> {
 
 	/**
 	 * Aggiorna questi dati.
-	 * @returns The updated data
+	 * @returns I dati aggiornati
 	 */
 	refresh() {
 		return this.client.getRicevimenti(this);

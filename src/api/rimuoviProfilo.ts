@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 import type { APIResponse, Client } from "..";
-import { AuthFolder, apiRequest } from "..";
+import { apiRequest } from "..";
 
 /**
  * Rimuovi il profilo.
- * @param client - The client
+ * @param client - Il client
  */
 export const rimuoviProfilo = async (client: Client) => {
 	const { body } = await apiRequest<APIResponse>("rimuoviprofilo", client, {
@@ -13,5 +13,6 @@ export const rimuoviProfilo = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	await rm(AuthFolder, { recursive: true, force: true });
+	if (client.dataPath !== undefined)
+		await rm(client.dataPath, { recursive: true, force: true });
 };

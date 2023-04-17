@@ -2,9 +2,9 @@ import type { APIToken, Client } from "..";
 import { Token, apiRequest, clientId, formatDate, writeToFile } from "..";
 
 /**
- * Refresh the token.
- * @param client - The client
- * @returns The token data
+ * Aggiorna il token.
+ * @param client - Il client
+ * @returns I dati
  */
 export const refreshToken = async (client: Client) => {
 	const { res, body } = await apiRequest<APIToken>(
@@ -31,6 +31,7 @@ export const refreshToken = async (client: Client) => {
 	const value =
 		client.token?.patch(body, date) ?? new Token(body, client, date);
 
-	void writeToFile("token", value);
+	if (client.dataPath !== undefined)
+		void writeToFile("token", value, client.dataPath);
 	return value;
 };

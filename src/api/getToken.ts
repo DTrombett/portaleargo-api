@@ -4,11 +4,11 @@ import type { Client } from "..";
 import { Token, clientId, writeToFile } from "..";
 
 /**
- * Get the token from the API.
- * @param code - The code to use
- * @param codeVerifier - The code verifier to use
- * @param client - The client
- * @returns The data for the login
+ * Ottieni il token tramite l'API.
+ * @param code - Il codice da usare
+ * @param codeVerifier - Il code verifier
+ * @param client - Il client
+ * @returns I dati
  */
 export const getToken = async (
 	client: Client,
@@ -35,6 +35,7 @@ export const getToken = async (
 	const value =
 		client.token?.patch(data, date) ?? new Token(data, client, date);
 
-	void writeToFile("token", value);
+	if (client.dataPath !== undefined)
+		void writeToFile("token", value, client.dataPath);
 	return value;
 };

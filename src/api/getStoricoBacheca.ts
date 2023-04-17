@@ -3,19 +3,20 @@ import { EventoBacheca, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getStoricoBacheca = async (
 	client: Client,
 	options: {
-		id: string;
+		profileId: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIBacheca>("storicobacheca", client, {
 		method: "POST",
 		body: {
-			pkScheda: options.id,
+			pkScheda: options.profileId,
 		},
 	});
 

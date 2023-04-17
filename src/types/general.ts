@@ -22,46 +22,58 @@ export type HttpMethod =
 	| "POST"
 	| "PUT"
 	| "TRACE";
-export type BasicCredentials = {
+export type Credentials = {
 	/**
-	 * The school code
+	 * Il codice scuola
 	 */
 	schoolCode: string;
+
 	/**
-	 * The username
+	 * L'username
 	 */
 	username: string;
+
 	/**
-	 * The password
+	 * La password
 	 */
 	password: string;
 };
 export type ClientOptions = Partial<
-	BasicCredentials & {
+	Credentials & {
 		/**
-		 * The token data
+		 * I dati del token
 		 */
 		token: Token;
+
 		/**
-		 * The login data
+		 * I dati del login
 		 */
 		loginData: Login;
+
 		/**
-		 * The profile data
+		 * I dati del profilo
 		 */
 		profile: Profilo;
+
 		/**
-		 * The dashboard data
+		 * I dati della dashboard
 		 */
 		dashboard: Dashboard;
+
 		/**
-		 * Whether to log some useful data
+		 * Se scrivere nella console alcuni dati utili per il debug
 		 */
 		debug: boolean;
+
 		/**
-		 * Additional http headers for the requests
+		 * Headers aggiuntivi per ogni richiesta API
 		 */
 		headers: IncomingHttpHeaders;
+
+		/**
+		 * Il percorso della cartella dove salvare i dati
+		 */
+		dataPath: string | null;
 	}
 >;
 export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [

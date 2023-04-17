@@ -29,7 +29,7 @@ export class Disponibilità extends Base<DisponibilitàData> {
 	data!: string;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: DisponibilitàData, client: Client, date: string);
 	constructor(data: Jsonify<Disponibilità>, client: Client);

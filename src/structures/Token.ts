@@ -15,7 +15,7 @@ export class Token extends Base<APIToken> {
 	tokenType!: string;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: APIToken, client: Client, date: Date);
 	constructor(data: Jsonify<Token>, client: Client);

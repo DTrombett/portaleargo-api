@@ -2,20 +2,21 @@ import type { APITasse, Client } from "..";
 import { Tassa, apiRequest } from "..";
 
 /**
- * Ottieni le tasse dello studente.
- * @param client - The client
- * @param options - Additional options for the request
+ * Ottieni i dati delle tasse dello studente.
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getTasse = async (
 	client: Client,
 	options: {
-		id: string;
+		profileId: string;
 	}
 ) => {
 	const { body } = await apiRequest<APITasse>("listatassealunni", client, {
 		method: "POST",
 		body: {
-			pkScheda: options.id,
+			pkScheda: options.profileId,
 		},
 	});
 

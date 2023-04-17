@@ -1,7 +1,7 @@
 /**
- * Format a date for the API.
- * @param date - The date to format
- * @returns The formatted date
+ * Formatta una data dell'API
+ * @param date - La data
+ * @returns La data formattata
  */
 export const formatDate = (date: Date | number | string) => {
 	date = new Date(date);

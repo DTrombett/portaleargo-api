@@ -3,8 +3,9 @@ import { Orario, apiRequest, formatDate } from "..";
 
 /**
  * Ottieni l'orario giornaliero.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getOrarioGiornaliero = async (
 	client: Client,

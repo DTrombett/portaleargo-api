@@ -48,7 +48,7 @@ export class Profilo extends Base<ProfiloData> {
 	profiloStorico!: boolean;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);

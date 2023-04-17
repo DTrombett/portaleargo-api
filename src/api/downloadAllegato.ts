@@ -3,13 +3,14 @@ import { apiRequest } from "..";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns Il link
  */
 export const downloadAllegato = async (
 	client: Client,
 	options: {
-		uid: string;
+		id: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
@@ -18,7 +19,7 @@ export const downloadAllegato = async (
 		{
 			method: "POST",
 			body: {
-				uid: options.uid,
+				uid: options.id,
 			},
 		}
 	);

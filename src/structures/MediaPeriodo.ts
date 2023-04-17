@@ -14,7 +14,7 @@ export class MediaPeriodo extends Base<MediaPeriodoData> {
 	mediaMensile!: Record<`${number}`, number>;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);

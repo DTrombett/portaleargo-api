@@ -3,7 +3,8 @@ import { Scrutinio, apiRequest } from "..";
 
 /**
  * Ottieni i voti dello scrutinio dello studente.
- * @param client - The client
+ * @param client - Il client
+ * @returns I dati
  */
 export const getVotiScrutinio = async (client: Client) => {
 	const { body } = await apiRequest<APIVotiScrutinio>("votiscrutinio", client, {

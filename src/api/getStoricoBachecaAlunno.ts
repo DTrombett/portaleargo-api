@@ -3,13 +3,14 @@ import { EventoBachecaAlunno, apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca alunno.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getStoricoBachecaAlunno = async (
 	client: Client,
 	options: {
-		id: string;
+		profileId: string;
 	}
 ) => {
 	const { body } = await apiRequest<APIBachecaAlunno>(
@@ -18,7 +19,7 @@ export const getStoricoBachecaAlunno = async (
 		{
 			method: "POST",
 			body: {
-				pkScheda: options.id,
+				pkScheda: options.profileId,
 			},
 		}
 	);

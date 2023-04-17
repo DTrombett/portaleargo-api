@@ -3,19 +3,20 @@ import { Curriculum, apiRequest } from "..";
 
 /**
  * Ottieni il curriculum dello studente.
- * @param client - The client
- * @param options - Additional options for the request
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getCurriculum = async (
 	client: Client,
 	options: {
-		id: string;
+		profileId: string;
 	}
 ) => {
 	const { body } = await apiRequest<APICurriculum>("curriculumalunno", client, {
 		method: "POST",
 		body: {
-			pkScheda: options.id,
+			pkScheda: options.profileId,
 		},
 	});
 

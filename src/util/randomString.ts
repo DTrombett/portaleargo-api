@@ -2,9 +2,9 @@ const characters =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 /**
- * Generate a random string of `length` characters.
- * @param length - The length of the string to generate
- * @returns The generated random string
+ * Genera una stringa casuale.
+ * @param length - La lunghezza della stringa
+ * @returns La stringa generata
  */
 export const randomString = (length: number) => {
 	let result = "";

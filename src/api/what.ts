@@ -2,9 +2,10 @@ import type { APIWhat, Client } from "..";
 import { What, apiRequest, formatDate } from "..";
 
 /**
- * Get the what data.
- * @param client - The client
- * @param options - Additional options for the request
+ * Richiedi i dati generali.
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const what = async (
 	client: Client,

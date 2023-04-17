@@ -8,11 +8,15 @@ const identifierName = "class name";
  */
 export class Base<T extends ObjectJson = ObjectJson> {
 	/**
-	 * The client that instantiated this
+	 * Il client
 	 */
 	client: Client;
+
 	protected readonly [identifierName] = this.constructor.name;
 
+	/**
+	 * @param client - Il client
+	 */
 	constructor(client: Client) {
 		Object.defineProperty(this, identifierName, {
 			writable: false,
@@ -28,6 +32,10 @@ export class Base<T extends ObjectJson = ObjectJson> {
 		return Object.hasOwn(object, key);
 	}
 
+	/**
+	 * Converti questa struttura in JSON.
+	 * @returns La rappresentazione JSON di questa struttura
+	 */
 	toJSON() {
 		const self: Omit<this, "client"> = { ...this, client: undefined };
 
@@ -44,6 +52,10 @@ export class Base<T extends ObjectJson = ObjectJson> {
 		delete self.client;
 		delete self[identifierName];
 		return self;
+	}
+
+	protected patch(_data: T) {
+		return this;
 	}
 
 	protected isJson<O extends ObjectJson>(data: O | T): data is O {

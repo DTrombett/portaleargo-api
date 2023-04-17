@@ -15,7 +15,7 @@ export class MediaMateria extends Base<MediaMateriaData> {
 	idMateria: string;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Jsonify<MediaMateria>, client: Client);
 	constructor(data: MediaMateriaData, client: Client, idMateria: string);
@@ -23,6 +23,26 @@ export class MediaMateria extends Base<MediaMateriaData> {
 		super(client);
 		this.idMateria = idMateria!;
 		this.patch(data);
+	}
+
+	get mediaOrale() {
+		return this.sommaVotiOrali / this.votiOrali;
+	}
+
+	get mediaScritto() {
+		return this.sommaVotiScritti / this.votiScritti;
+	}
+
+	get sommaVoti() {
+		return this.sommaVotiScritti + this.sommaVotiOrali;
+	}
+
+	get voti() {
+		return this.votiOrali + this.votiScritti;
+	}
+
+	get media() {
+		return this.sommaVoti / this.voti;
 	}
 
 	patch(data: Data) {

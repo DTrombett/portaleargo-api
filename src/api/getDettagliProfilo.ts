@@ -3,7 +3,8 @@ import { DettagliProfilo, apiRequest } from "..";
 
 /**
  * Ottieni i dettagli del profilo dello studente.
- * @param client - The client
+ * @param client - Il client
+ * @returns I dati
  */
 export const getDettagliProfilo = async <T extends DettagliProfilo>(
 	client: Client,

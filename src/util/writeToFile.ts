@@ -3,11 +3,11 @@ import { join } from "node:path";
 import { AuthFolder } from "..";
 
 /**
- * Write the response of a request to a json file.
- * @param name - The file name without the extension
- * @param value - The content to write
+ * Salva dei dati in un file JSON.
+ * @param name - Il nome del file, escludendo l'estensione
+ * @param value - I dati da scrivere
  */
-export const writeToFile = (name: string, value: unknown) =>
-	writeFile(`${join(AuthFolder, name)}.json`, JSON.stringify(value)).catch(
+export const writeToFile = (name: string, value: unknown, path = AuthFolder) =>
+	writeFile(`${join(path, name)}.json`, JSON.stringify(value)).catch(
 		console.error
 	);

@@ -18,7 +18,7 @@ export class Allegato extends Base<AllegatoData> {
 	url!: string;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);
@@ -39,7 +39,7 @@ export class Allegato extends Base<AllegatoData> {
 
 	/**
 	 * Scarica questo allegato.
-	 * @param file - The path where the file should be saved
+	 * @param file - Il percorso dove salvare il file
 	 */
 	download(file: string) {
 		return this.client.downloadAllegato(this.id, file);
@@ -47,7 +47,7 @@ export class Allegato extends Base<AllegatoData> {
 
 	/**
 	 * Ottieni il link per scaricare questo allegato.
-	 * @returns The url
+	 * @returns L'url
 	 */
 	getLink() {
 		return this.client.getLinkAllegato(this.id);

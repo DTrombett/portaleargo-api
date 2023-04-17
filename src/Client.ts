@@ -6,6 +6,7 @@ import { request } from "undici";
 import type {
 	ClientOptions,
 	CorsiRecupero,
+	Credentials,
 	DettagliProfilo,
 	Ricevimenti,
 } from ".";
@@ -18,7 +19,6 @@ import {
 	aggiornaData,
 	downloadAllegato,
 	downloadAllegatoStudente,
-	encryptCodeVerifier,
 	getCode,
 	getCorsiRecupero,
 	getCurriculum,
@@ -36,7 +36,6 @@ import {
 	importData,
 	logToken,
 	login,
-	randomString,
 	refreshToken,
 	rimuoviProfilo,
 	what,
@@ -44,94 +43,99 @@ import {
 } from ".";
 
 /**
- * A client to interact with the API
+ * Un client per interagire con l'API
  */
 export class Client {
 	/**
-	 * The school code
-	 */
-	schoolCode?: string;
-	/**
-	 * The username
-	 */
-	username?: string;
-	/**
-	 * The password
-	 */
-	password?: string;
-	/**
-	 * The token data
+	 * I dati del token
 	 */
 	token?: Token;
-	/**
-	 * The login data
-	 */
-	loginData?: Login;
-	/**
-	 * The profile data
-	 */
-	profile?: Profilo;
-	/**
-	 * The dashboard data
-	 */
-	dashboard?: Dashboard;
-	/**
-	 * Whether to log some useful data
-	 */
-	debug: boolean;
-	/**
-	 * Additional HTTP headers for the request
-	 */
-	headers?: IncomingHttpHeaders;
-	/**
-	 * Whether the client is ready
-	 */
-	private ready = false;
 
 	/**
-	 * @param options - The options for the client
+	 * I dati del login
+	 */
+	loginData?: Login;
+
+	/**
+	 * I dati del profilo
+	 */
+	profile?: Profilo;
+
+	/**
+	 * I dati della dashboard
+	 */
+	dashboard?: Dashboard;
+
+	/**
+	 * Se scrivere nella console alcuni dati utili per il debug
+	 */
+	debug: boolean;
+
+	/**
+	 * Headers aggiuntivi per ogni richiesta API
+	 */
+	headers?: IncomingHttpHeaders;
+
+	/**
+	 * Il percorso della cartella dove salvare i dati
+	 */
+	dataPath?: string;
+
+	#credentials?: Partial<Credentials>;
+	#ready = false;
+
+	/**
+	 * @param options - Le opzioni per il client
 	 */
 	constructor(options?: ClientOptions) {
-		this.schoolCode = options?.schoolCode ?? env.CODICE_SCUOLA;
-		this.password = options?.password ?? env.PASSWORD;
-		this.username = options?.username ?? env.NOME_UTENTE;
+		this.#credentials = {
+			schoolCode: options?.schoolCode ?? env.CODICE_SCUOLA,
+			password: options?.password ?? env.PASSWORD,
+			username: options?.username ?? env.NOME_UTENTE,
+		};
 		this.token = options?.token;
 		this.loginData = options?.loginData;
 		this.profile = options?.profile;
 		this.dashboard = options?.dashboard;
 		this.debug = options?.debug ?? false;
 		this.headers = options?.headers;
+		if (options?.dataPath !== null)
+			this.dataPath = options?.dataPath ?? AuthFolder;
 	}
 
 	/**
-	 * Check if the client is ready.
-	 * @returns Whether the client is ready
+	 * Controlla se il client è pronto
 	 */
 	isReady(): this is {
 		token: Token;
 		loginData: Login;
 		profile: Profilo;
 	} {
-		return this.ready;
+		return this.#ready;
 	}
 
 	/**
-	 * Login to the API.
-	 * @returns The dashboard data
+	 * Effettua il login.
+	 * @returns I dati della dashboard
 	 */
 	async login() {
-		await Promise.all([
-			this.token ? undefined : importData<Token>("token"),
-			this.loginData ? undefined : importData<Login>("login"),
-			this.profile ? undefined : importData<Profilo>("profile"),
-			this.dashboard ? undefined : importData<Dashboard>("dashboard"),
-			existsSync(AuthFolder) || mkdir(AuthFolder),
-		]).then(([token, loginData, profile, dashboard]) => {
-			if (token) this.token = new Token(token, this);
-			if (loginData) this.loginData = new Login(loginData, this);
-			if (profile) this.profile = new Profilo(profile, this);
-			if (dashboard) this.dashboard = new Dashboard(dashboard, this);
-		});
+		if (this.dataPath !== undefined)
+			await Promise.all([
+				this.token ? undefined : importData<Token>("token", this.dataPath),
+				this.loginData ? undefined : importData<Login>("login", this.dataPath),
+				this.profile
+					? undefined
+					: importData<Profilo>("profile", this.dataPath),
+				this.dashboard
+					? undefined
+					: importData<Dashboard>("dashboard", this.dataPath),
+				existsSync(this.dataPath) || mkdir(this.dataPath),
+			]).then(([token, loginData, profile, dashboard]) => {
+				if (token) this.token = new Token(token, this);
+				if (loginData) this.loginData = new Login(loginData, this);
+				if (profile) this.profile = new Profilo(profile, this);
+				if (dashboard) this.dashboard = new Dashboard(dashboard, this);
+			});
 		const oldToken = this.token;
 
 		this.token = await this.refreshToken();
@@ -142,28 +146,34 @@ export class Client {
 				isWhat: this.profile !== undefined,
 			});
 			if (this.profile) {
-				this.ready = true;
+				this.#ready = true;
 				const whatData = await what(this, {
 					lastUpdate:
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 				});
 
-				if (whatData.profiloModificato || whatData.differenzaSchede)
-					void writeToFile("profile", { ...this.profile, ...whatData.profilo });
+				if (
+					(whatData.profiloModificato || whatData.differenzaSchede) &&
+					this.dataPath !== undefined
+				)
+					void writeToFile(
+						"profile",
+						{ ...this.profile, ...whatData.profilo },
+						this.dataPath
+					);
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
 				aggiornaData(this).catch(console.error);
 				return this.dashboard!;
 			}
 		}
 		this.profile = this.profile ?? (await getProfilo(this));
-		this.ready = true;
+		this.#ready = true;
 		return this.getDashboard();
 	}
 
 	/**
-	 * Refresh a token if needed.
-	 * @param token - The token to check
-	 * @returns The new token
+	 * Aggiorna il client, se necessario.
+	 * @returns Il nuovo token
 	 */
 	async refreshToken() {
 		if (!this.loginData || !this.token) return this.getToken();
@@ -173,25 +183,23 @@ export class Client {
 	}
 
 	/**
-	 * Get a token from the API.
-	 * @returns The token
+	 * Ottieni il token tramite l'API.
+	 * @returns I dati del token
 	 */
 	async getToken() {
 		if (
-			this.password === undefined ||
-			this.schoolCode === undefined ||
-			this.username === undefined
+			[
+				this.#credentials?.password,
+				this.#credentials?.schoolCode,
+				this.#credentials?.username,
+			].includes(undefined)
 		)
-			throw new TypeError("School code, username or password are missing!");
-		const codeVerifier = randomString(43);
+			throw new TypeError("Password, school code, or username missing");
+		const code = await getCode(this.#credentials as Credentials);
 
 		return getToken(this, {
-			code: await getCode(encryptCodeVerifier(codeVerifier), {
-				password: this.password,
-				schoolCode: this.schoolCode,
-				username: this.username,
-			}),
-			codeVerifier,
+			code: code.code,
+			codeVerifier: code.codeVerifier,
 		});
 	}
 
@@ -210,7 +218,7 @@ export class Client {
 
 	/**
 	 * Ottieni i dettagli del profilo dello studente.
-	 * @returns The data
+	 * @returns I dati
 	 */
 	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -221,8 +229,8 @@ export class Client {
 
 	/**
 	 * Ottieni l'orario giornaliero.
-	 * @param date - The date of the timetable
-	 * @returns The data
+	 * @param date - Il giorno dell'orario
+	 * @returns I dati
 	 */
 	async getOrarioGiornaliero(date?: {
 		year?: number;
@@ -239,58 +247,60 @@ export class Client {
 
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca.
-	 * @param uid - The uid of the attachment
-	 * @returns The url
+	 * @param id - L'id dell'allegato
+	 * @returns L'url
 	 */
-	async getLinkAllegato(uid: string) {
+	async getLinkAllegato(id: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return downloadAllegato(this, {
-			uid,
+			id,
 		});
 	}
 
 	/**
 	 * Scarica un allegato.
-	 * @param uid - The uid of the attachment
-	 * @param file - The path where the file should be saved
+	 * @param id - L'id dell'allegato
+	 * @param file - Il percorso dove salvare il file
 	 */
-	async downloadAllegato(uid: string, file: string) {
+	async downloadAllegato(id: string, file: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		const { body } = await request(await this.getLinkAllegato(uid));
+		const { body } = await request(await this.getLinkAllegato(id));
 
 		await writeFile(file, body);
 	}
 
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca alunno.
-	 * @param uid - The uid of the attachment
-	 * @param id - The profile id
-	 * @returns The url
+	 * @param id - l'id dell'allegato
+	 * @param profileId - L'id del profilo
+	 * @returns L'url
 	 */
-	async getLinkAllegatoStudente(uid: string, id?: string) {
+	async getLinkAllegatoStudente(id: string, profileId?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return downloadAllegatoStudente(this, {
-			uid,
-			id: id ?? this.profile.id,
+			id,
+			profileId: profileId ?? this.profile.id,
 		});
 	}
 
 	/**
 	 * Scarica un allegato dello studente.
-	 * @param uid - The uid of the attachment
-	 * @param file - The path where the file should be saved
-	 * @param id - The profile id
+	 * @param id - L'id dell'allegato
+	 * @param file - Il percorso dove salvare il file
+	 * @param profileId - L'id del profilo
 	 */
-	async downloadAllegatoStudente(uid: string, file: string, id?: string) {
+	async downloadAllegatoStudente(id: string, file: string, profileId?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
-		const { body } = await request(await this.getLinkAllegatoStudente(uid, id));
+		const { body } = await request(
+			await this.getLinkAllegatoStudente(id, profileId)
+		);
 
 		await writeFile(file, body);
 	}
 
 	/**
 	 * Ottieni i voti dello scrutinio dello studente.
-	 * @returns The data
+	 * @returns I dati
 	 */
 	async getVotiScrutinio() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -299,7 +309,7 @@ export class Client {
 
 	/**
 	 * Ottieni i dati riguardo i ricevimenti dello studente.
-	 * @returns The data
+	 * @returns I dati
 	 */
 	async getRicevimenti<T extends Ricevimenti>(old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
@@ -308,81 +318,80 @@ export class Client {
 
 	/**
 	 * Ottieni le tasse dello studente.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getTasse(id?: string) {
+	async getTasse(profileId?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getTasse(this, {
-			id: id ?? this.profile.id,
+			profileId: profileId ?? this.profile.id,
 		});
 	}
 
 	/**
 	 * Ottieni i dati del PCTO dello studente.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getPCTOData(id?: string) {
+	async getPCTOData(profileId?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getPCTOData(this, {
-			id: id ?? this.profile.id,
+			profileId: profileId ?? this.profile.id,
 		});
 	}
 
 	/**
 	 * Ottieni i dati dei corsi di recupero dello studente.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getCorsiRecupero<T extends CorsiRecupero>(id?: string, old?: T) {
+	async getCorsiRecupero<T extends CorsiRecupero>(profileId?: string, old?: T) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getCorsiRecupero(this, {
-			id: id ?? this.profile.id,
+			profileId: profileId ?? this.profile.id,
 			old,
 		});
 	}
 
 	/**
 	 * Ottieni il curriculum dello studente.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getCurriculum(id?: string) {
+	async getCurriculum(profileId?: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getCurriculum(this, {
-			id: id ?? this.profile.id,
+			profileId: profileId ?? this.profile.id,
 		});
 	}
 
 	/**
 	 * Ottieni lo storico della bacheca.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getStoricoBacheca(id: string) {
+	async getStoricoBacheca(profileId: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getStoricoBacheca(this, {
-			id,
+			profileId,
 		});
 	}
 
 	/**
 	 * Ottieni lo storico della bacheca alunno.
-	 * @param id - The profile id
-	 * @returns The data
+	 * @param profileId - L'id del profilo
+	 * @returns I dati
 	 */
-	async getStoricoBachecaAlunno(id: string) {
+	async getStoricoBachecaAlunno(profileId: string) {
 		if (!this.isReady()) throw new Error("Client is not logged in!");
 		return getStoricoBachecaAlunno(this, {
-			id,
+			profileId,
 		});
 	}
 
 	/**
-	 * Get the dashboard data from the API.
-	 * @private Use `client.dashboard` instead
-	 * @returns The dashboard data
+	 * Ottieni i dati della dashboard.
+	 * @returns La dashboard
 	 */
 	private async getDashboard() {
 		if (!this.isReady()) throw new Error("Client is not logged in!");

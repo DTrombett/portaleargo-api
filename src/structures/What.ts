@@ -16,7 +16,7 @@ export class What extends Base<WhatData> {
 	profilo!: BaseProfilo;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);

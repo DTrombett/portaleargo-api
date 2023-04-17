@@ -13,7 +13,7 @@ export class CorsiRecupero extends Base<CorsiRecuperoData> {
 	id: string;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client, id: string) {
 		super(client);
@@ -32,7 +32,7 @@ export class CorsiRecupero extends Base<CorsiRecuperoData> {
 
 	/**
 	 * Aggiorna questi dati.
-	 * @returns The updated data
+	 * @returns I dati aggiornati
 	 */
 	refresh() {
 		return this.client.getCorsiRecupero(this.id, this);

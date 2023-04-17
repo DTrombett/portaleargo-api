@@ -2,9 +2,9 @@ import type { APILogin, Client } from "..";
 import { Login, apiRequest, randomString, writeToFile } from "..";
 
 /**
- * Login to the API.
- * @param client - The client
- * @returns The login data
+ * Effettua il login tramite l'API.
+ * @param client - Il client
+ * @returns I dati
  */
 export const login = async (client: Client) => {
 	const { body } = await apiRequest<APILogin>("login", client, {
@@ -20,6 +20,7 @@ export const login = async (client: Client) => {
 	const value =
 		client.loginData?.patch(body.data[0]) ?? new Login(body.data[0], client);
 
-	void writeToFile("login", value);
+	if (client.dataPath !== undefined)
+		void writeToFile("login", value, client.dataPath);
 	return value;
 };

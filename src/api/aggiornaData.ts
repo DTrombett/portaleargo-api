@@ -2,8 +2,8 @@ import type { APIResponse, Client } from "..";
 import { apiRequest, formatDate } from "..";
 
 /**
- * Aggiorna la data dell'ultimo aggiornamento.
- * @param client - The client
+ * Aggiorna la data per la dashboard.
+ * @param client - Il client
  */
 export const aggiornaData = async (client: Client) => {
 	const { body } = await apiRequest<APIResponse>(

@@ -3,7 +3,9 @@ import { Ricevimenti, apiRequest } from "..";
 
 /**
  * Ottieni i dati riguardo i ricevimenti dello studente.
- * @param client - The client
+ * @param client - Il client
+ * @param options - Altre opzioni della richiesta
+ * @returns I dati
  */
 export const getRicevimenti = async <T extends Ricevimenti>(
 	client: Client,

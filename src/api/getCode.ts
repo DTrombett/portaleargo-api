@@ -1,10 +1,10 @@
 import { URL } from "node:url";
 import { request } from "undici";
-import type { BasicCredentials } from "..";
-import { clientId, randomString } from "..";
+import type { Credentials } from "..";
+import { clientId, generateLoginLink } from "..";
 
 const baseHeaders = {
-	"accept":
+	accept:
 		"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 	"accept-encoding": "gzip, deflate, br",
 	"sec-fetch-dest": "document",
@@ -14,45 +14,32 @@ const baseHeaders = {
 	"user-agent":
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.29 Safari/537.36",
 } as const;
-const redirectUri = encodeURIComponent(
-	"it.argosoft.didup.famiglia.new://login-callback"
-);
-const scopes = encodeURIComponent("openid offline profile user.roles argo");
 
 /**
- * Get the code for the login.
- * @param codeChallenge - The code challenge to use
- * @returns The code to use for the login
+ * Ottieni il codice per il login.
+ * @param credentials - Le credenziali per l'accesso
+ * @returns I dati del codice da usare
  */
-export const getCode = async (
-	codeChallenge: string,
-	credentials: BasicCredentials
-) => {
-	const { headers, statusCode } = await request(
-		`https://auth.portaleargo.it/oauth2/auth?redirect_uri=${redirectUri}&client_id=${clientId}&response_type=code&prompt=login&state=${randomString(
-			22
-		)}&nonce=${randomString(
-			22
-		)}&scope=${scopes}&code_challenge=${codeChallenge}&code_challenge_method=S256`,
-		{
-			headers: {
-				...baseHeaders,
-				"sec-fetch-site": "none",
-			},
-			method: "GET",
-		}
-	);
-	const url = headers.location;
+export const getCode = async (credentials: Credentials) => {
+	const url = generateLoginLink();
+	const { headers, statusCode } = await request(url.url, {
+		headers: {
+			...baseHeaders,
+			"sec-fetch-site": "none",
+		},
+		method: "GET",
+	});
+	const link = headers.location;
 	const cookies: string[] = [];
 	let cookieHeaders = headers["set-cookie"];
 
-	if (typeof url !== "string")
+	if (typeof link !== "string")
 		throw new TypeError(
 			`Auth request returned an invalid redirect url with status code ${statusCode}`
 		);
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
 	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
-	const challenge = new URL(url).searchParams.get("login_challenge")!;
+	const challenge = new URL(link).searchParams.get("login_challenge")!;
 	const {
 		headers: { location },
 		statusCode: status,
@@ -61,11 +48,11 @@ export const getCode = async (
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
-			"connection": "keep-alive",
+			connection: "keep-alive",
 			"content-type": "application/x-www-form-urlencoded",
-			"host": "www.portaleargo.it",
-			"origin": "https://www.portaleargo.it",
-			"referer": url,
+			host: "www.portaleargo.it",
+			origin: "https://www.portaleargo.it",
+			referer: link,
 			"sec-fetch-site": "same-origin",
 		},
 		method: "POST",
@@ -81,8 +68,8 @@ export const getCode = async (
 			headers: {
 				...baseHeaders,
 				"cache-control": "max-age=0",
-				"cookie": cookies.join("; "),
-				"referer": "https://www.portaleargo.it/",
+				cookie: cookies.join("; "),
+				referer: "https://www.portaleargo.it/",
 				"sec-fetch-site": "same-site",
 			},
 			method: "GET",
@@ -103,9 +90,9 @@ export const getCode = async (
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
-			"connection": "keep-alive",
-			"host": "www.portaleargo.it",
-			"referer": "https://www.portaleargo.it/",
+			connection: "keep-alive",
+			host: "www.portaleargo.it",
+			referer: "https://www.portaleargo.it/",
 			"sec-fetch-site": "same-site",
 		},
 		method: "GET",
@@ -122,8 +109,8 @@ export const getCode = async (
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
-			"cookie": cookies.join("; "),
-			"referer": "https://www.portaleargo.it/",
+			cookie: cookies.join("; "),
+			referer: "https://www.portaleargo.it/",
 			"sec-fetch-site": "same-site",
 		},
 		method: "GET",
@@ -137,5 +124,5 @@ export const getCode = async (
 
 	if (code == null)
 		throw new TypeError(`Invalid code returned by API: ${finalRedirect}`);
-	return code;
+	return { ...url, code };
 };

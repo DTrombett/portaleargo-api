@@ -1,10 +1,11 @@
 import type { APIOperation, Json } from "..";
 
 /**
- * Handle an array of operations from the API.
- * @param array - The array from the API
- * @param old - The array to modify
- * @param map - A function to convert the API type
+ * Gestisci dei dati dell'API contenenti un'operazione.
+ * @param array - L'array ricevuto
+ * @param old - L'eventuale array da modificare
+ * @param map - Una funzione per convertire l'array
+ * @returns Il nuovo array
  */
 export const handleOperation = <
 	P extends {

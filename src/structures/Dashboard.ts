@@ -52,7 +52,7 @@ export class Dashboard extends Base<DashboardData> {
 	classiExtra!: boolean;
 
 	/**
-	 * @param data - The API data
+	 * @param data - I dati ricevuti tramite l'API
 	 */
 	constructor(data: Data, client: Client) {
 		super(client);
@@ -166,7 +166,7 @@ export class Dashboard extends Base<DashboardData> {
 
 	/**
 	 * Aggiorna questi dati.
-	 * @returns The updated data
+	 * @returns I dati aggiornati
 	 */
 	refresh() {
 		return this.client.login() as Promise<this>;
