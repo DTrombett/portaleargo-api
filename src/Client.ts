@@ -119,27 +119,11 @@ export class Client {
 	 * @returns I dati della dashboard
 	 */
 	async login() {
-		if (this.dataPath !== undefined)
-			await Promise.all([
-				this.token ? undefined : importData<Token>("token", this.dataPath),
-				this.loginData ? undefined : importData<Login>("login", this.dataPath),
-				this.profile
-					? undefined
-					: importData<Profilo>("profile", this.dataPath),
-				this.dashboard
-					? undefined
-					: importData<Dashboard>("dashboard", this.dataPath),
-				existsSync(this.dataPath) || mkdir(this.dataPath),
-			]).then(([token, loginData, profile, dashboard]) => {
-				if (token) this.token = new Token(token, this);
-				if (loginData) this.loginData = new Login(loginData, this);
-				if (profile) this.profile = new Profilo(profile, this);
-				if (dashboard) this.dashboard = new Dashboard(dashboard, this);
-			});
+		await this.loadData();
 		const oldToken = this.token;
 
-		this.token = await this.refreshToken();
-		this.loginData = this.loginData ?? (await login(this));
+		await this.refreshToken();
+		if (!this.loginData) await login(this);
 		if (oldToken) {
 			await logToken(this, {
 				oldToken,
@@ -166,9 +150,30 @@ export class Client {
 				return this.dashboard!;
 			}
 		}
-		this.profile = this.profile ?? (await getProfilo(this));
+		if (!this.profile) await getProfilo(this);
 		this.#ready = true;
 		return this.getDashboard();
+	}
+
+	/**
+	 * Carica i dati salvati localmente.
+	 */
+	async loadData() {
+		if (this.dataPath === undefined) return;
+		const [token, loginData, profile, dashboard] = await Promise.all([
+			this.token ? undefined : importData<Token>("token", this.dataPath),
+			this.loginData ? undefined : importData<Login>("login", this.dataPath),
+			this.profile ? undefined : importData<Profilo>("profile", this.dataPath),
+			this.dashboard
+				? undefined
+				: importData<Dashboard>("dashboard", this.dataPath),
+			existsSync(this.dataPath) || mkdir(this.dataPath),
+		]);
+
+		if (token) this.token = new Token(token, this);
+		if (loginData) this.loginData = new Login(loginData, this);
+		if (profile) this.profile = new Profilo(profile, this);
+		if (dashboard) this.dashboard = new Dashboard(dashboard, this);
 	}
 
 	/**

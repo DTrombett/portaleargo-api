@@ -1,3 +1,4 @@
+import type { LoginLink } from "..";
 import { clientId, encryptCodeVerifier, randomString } from "..";
 
 /**
@@ -21,7 +22,7 @@ export const generateLoginLink = ({
 	id?: string;
 	state?: string;
 	nonce?: string;
-} = {}) => ({
+} = {}): LoginLink => ({
 	url: `https://auth.portaleargo.it/oauth2/auth?redirect_uri=${encodeURIComponent(
 		redirectUri
 	)}&client_id=${id}&response_type=code&prompt=login&state=${state}&nonce=${nonce}&scope=${encodeURIComponent(

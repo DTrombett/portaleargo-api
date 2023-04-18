@@ -6,7 +6,7 @@ if (!("NODE_ENV" in env)) config();
 const options: Options = {
 	clean: true,
 	entry: ["src/index.ts"],
-	format: ["esm"],
+	// format: ["esm"],
 	external: ["tsup"],
 	platform: "node",
 	target: "esnext",

@@ -10,10 +10,9 @@ export const getProfilo = async (client: Client) => {
 	const { body } = await apiRequest<APIProfilo>("profilo", client, {});
 
 	if (!body.success) throw new Error(body.msg!);
-	const value =
-		client.profile?.patch(body.data) ?? new Profilo(body.data, client);
-
+	if (!client.profile?.patch(body.data))
+		client.profile = new Profilo(body.data, client);
 	if (client.dataPath !== undefined)
-		void writeToFile("profile", value, client.dataPath);
-	return value;
+		void writeToFile("profile", client.profile, client.dataPath);
+	return client.profile;
 };

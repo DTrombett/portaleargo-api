@@ -17,10 +17,9 @@ export const login = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	const value =
-		client.loginData?.patch(body.data[0]) ?? new Login(body.data[0], client);
-
+	if (!client.loginData?.patch(body.data[0]))
+		client.loginData = new Login(body.data[0], client);
 	if (client.dataPath !== undefined)
-		void writeToFile("login", value, client.dataPath);
-	return value;
+		void writeToFile("login", client.loginData, client.dataPath);
+	return client.loginData;
 };

@@ -28,10 +28,10 @@ export const refreshToken = async (client: Client) => {
 		}
 	);
 	const date = new Date(res.headers.date as string);
-	const value =
-		client.token?.patch(body, date) ?? new Token(body, client, date);
+	if (!client.token?.patch(body, date))
+		client.token = new Token(body, client, date);
 
 	if (client.dataPath !== undefined)
-		void writeToFile("token", value, client.dataPath);
-	return value;
+		void writeToFile("token", client.token, client.dataPath);
+	return client.token;
 };

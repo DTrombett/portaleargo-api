@@ -7,8 +7,12 @@
 // 	debug: true,
 // });
 //
-// await client.login();
-// console.log(await client.getDettagliProfilo(), performance.now() - now);
+// client
+// 	.login()
+// 	.then(async () => {
+// 		console.log(await client.getDettagliProfilo(), performance.now() - now);
+// 	})
+// 	.catch(console.error);
 
 export * from "./Client";
 export * from "./api";

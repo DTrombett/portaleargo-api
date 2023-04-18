@@ -97,3 +97,13 @@ export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [
 	: {
 			[K in keyof T]: Jsonify<T[K], true>;
 	  };
+export type LoginLink = {
+	url: string;
+	redirectUri: string;
+	scopes: string[];
+	codeVerifier: string;
+	challenge: string;
+	clientId: string;
+	state: string;
+	nonce: string;
+};

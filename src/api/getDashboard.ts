@@ -26,11 +26,9 @@ export const getDashboard = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	const value =
-		client.dashboard?.patch(body.data.dati[0]) ??
-		new Dashboard(body.data.dati[0], client);
-
+	if (!client.dashboard?.patch(body.data.dati[0]))
+		client.dashboard = new Dashboard(body.data.dati[0], client);
 	if (client.dataPath !== undefined)
-		void writeToFile("dashboard", value, client.dataPath);
-	return value;
+		void writeToFile("dashboard", client.dashboard, client.dataPath);
+	return client.dashboard;
 };

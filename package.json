@@ -4,6 +4,7 @@
 	"description": "A library to interact with the api of Argoscuolanext",
 	"exports": "./dist/index.js",
 	"main": "./dist/index.js",
+	"types": "./src/index.ts",
 	"scripts": {
 		"build": "tsup",
 		"lint": "eslint src --fix",
@@ -22,7 +23,6 @@
 		"url": "https://github.com/DTrombett/portaleargo-api/issues"
 	},
 	"homepage": "https://github.com/DTrombett/portaleargo-api#readme",
-	"type": "module",
 	"engines": {
 		"node": ">=18"
 	},
