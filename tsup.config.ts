@@ -1,8 +1,5 @@
-import { config } from "dotenv";
-import { env } from "process";
 import { defineConfig, Options } from "tsup";
 
-if (!("NODE_ENV" in env)) config();
 const options: Options = {
 	clean: true,
 	entry: ["src/index.ts"],
