@@ -4,14 +4,15 @@
 	"description": "A library to interact with the api of Argoscuolanext",
 	"exports": "./dist/index.js",
 	"main": "./dist/index.js",
-	"types": "./src/index.ts",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "tsup",
 		"lint": "eslint src --fix",
 		"prepare": "npm test",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
-		"test": "eslint src && tsc --noEmit"
+		"test": "eslint src && tsc --noEmit",
+		"postinstall": "npm run build"
 	},
 	"repository": {
 		"type": "git",
