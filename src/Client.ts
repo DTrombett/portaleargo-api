@@ -181,7 +181,7 @@ export class Client {
 	 * @returns Il nuovo token
 	 */
 	async refreshToken() {
-		if (!this.loginData || !this.token) return this.getToken();
+		if (!this.token) return this.getToken();
 		if (this.token.expireDate.getTime() <= Date.now())
 			return refreshToken(this);
 		return this.token;
