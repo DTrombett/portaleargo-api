@@ -139,12 +139,10 @@ export class Client {
 				if (
 					(whatData.profiloModificato || whatData.differenzaSchede) &&
 					this.dataPath !== undefined
-				)
-					void writeToFile(
-						"profile",
-						{ ...this.profile, ...whatData.profilo },
-						this.dataPath
-					);
+				) {
+					this.profile.patch(whatData.profilo);
+					void writeToFile("profile", this.profile, this.dataPath);
+				}
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
 				aggiornaData(this).catch(console.error);
 				return this.dashboard!;

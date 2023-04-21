@@ -1,5 +1,5 @@
 import type { APIProfilo, Client, Jsonify } from "..";
-import { Base } from "..";
+import { Base, BaseProfilo } from "..";
 
 type ProfiloData = APIProfilo["data"];
 type Data = Jsonify<Profilo> | ProfiloData;
@@ -55,8 +55,17 @@ export class Profilo extends Base<ProfiloData> {
 		this.patch(data);
 	}
 
-	patch(data: Data) {
-		if (this.isJson(data)) this.handleJson(data);
+	patch(data: BaseProfilo | Data) {
+		if (data instanceof BaseProfilo) {
+			this.anno = data.anno;
+			this.alunno = data.alunno;
+			this.classe = data.classe;
+			this.corso = data.corso;
+			this.plesso = data.plesso;
+			this.scuola = data.scuola;
+			this.id = data.id;
+			this.profiloStorico = data.profiloStorico;
+		} else if (this.isJson(data)) this.handleJson(data);
 		else {
 			this.ultimoCambioPassword = data.ultimoCambioPwd;
 			this.anno = {
