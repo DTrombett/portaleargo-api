@@ -130,7 +130,6 @@ export class Client {
 				isWhat: this.profile !== undefined,
 			});
 			if (this.profile) {
-				this.#ready = true;
 				const whatData = await what(this, {
 					lastUpdate:
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
@@ -143,6 +142,7 @@ export class Client {
 					this.profile.patch(whatData.profilo);
 					void writeToFile("profile", this.profile, this.dataPath);
 				}
+				this.#ready = true;
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
 				aggiornaData(this).catch(console.error);
 				return this.dashboard!;
