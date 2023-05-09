@@ -34,7 +34,7 @@
 		"crypto-js": "^4.1.1",
 		"tsup": "^6.7.0",
 		"typescript": "^5.0.4",
-		"undici": "^5.21.2"
+		"undici": "^5.22.0"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.58.0",
