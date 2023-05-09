@@ -28,7 +28,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"@tsconfig/node18": "^1.0.1",
+		"@tsconfig/node18": "^2.0.0",
 		"@types/crypto-js": "^4.1.1",
 		"@types/node": "^18.15.10",
 		"crypto-js": "^4.1.1",
