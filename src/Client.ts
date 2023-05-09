@@ -29,6 +29,7 @@ import {
 	getPCTOData,
 	getProfilo,
 	getRicevimenti,
+	getRicevutaTelematica,
 	getStoricoBacheca,
 	getStoricoBachecaAlunno,
 	getTasse,
@@ -222,7 +223,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getDettagliProfilo(this, {
 			old,
 		});
@@ -238,7 +239,7 @@ export class Client {
 		month?: number;
 		day?: number;
 	}) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getOrarioGiornaliero(this, {
 			day: date?.day,
 			month: date?.month,
@@ -252,7 +253,7 @@ export class Client {
 	 * @returns L'url
 	 */
 	async getLinkAllegato(id: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return downloadAllegato(this, {
 			id,
 		});
@@ -264,7 +265,7 @@ export class Client {
 	 * @param file - Il percorso dove salvare il file
 	 */
 	async downloadAllegato(id: string, file: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		const { body } = await request(await this.getLinkAllegato(id));
 
 		await writeFile(file, body);
@@ -277,7 +278,7 @@ export class Client {
 	 * @returns L'url
 	 */
 	async getLinkAllegatoStudente(id: string, profileId?: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return downloadAllegatoStudente(this, {
 			id,
 			profileId: profileId ?? this.profile.id,
@@ -291,10 +292,33 @@ export class Client {
 	 * @param profileId - L'id del profilo
 	 */
 	async downloadAllegatoStudente(id: string, file: string, profileId?: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		const { body } = await request(
 			await this.getLinkAllegatoStudente(id, profileId)
 		);
+
+		await writeFile(file, body);
+	}
+
+	/**
+	 * Ottieni i dati di una ricevuta telematica.
+	 * @param iuv - L'iuv del pagamento
+	 * @returns La ricevuta
+	 */
+	async getRicevuta(iuv: string) {
+		this.checkReady();
+		return getRicevutaTelematica(this, { iuv });
+	}
+
+	/**
+	 * Scarica la ricevuta di un pagamento.
+	 * @param iuv - L'iuv del pagamento
+	 * @param file - Il percorso dove salvare il file
+	 */
+	async downloadRicevuta(iuv: string, file: string) {
+		this.checkReady();
+		const ricevuta = await this.getRicevuta(iuv);
+		const { body } = await request(ricevuta.url);
 
 		await writeFile(file, body);
 	}
@@ -304,7 +328,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getVotiScrutinio() {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getVotiScrutinio(this);
 	}
 
@@ -313,7 +337,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getRicevimenti<T extends Ricevimenti>(old?: T) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getRicevimenti(this, { old });
 	}
 
@@ -323,7 +347,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getTasse(profileId?: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getTasse(this, {
 			profileId: profileId ?? this.profile.id,
 		});
@@ -335,7 +359,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getPCTOData(profileId?: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getPCTOData(this, {
 			profileId: profileId ?? this.profile.id,
 		});
@@ -347,7 +371,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getCorsiRecupero<T extends CorsiRecupero>(profileId?: string, old?: T) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getCorsiRecupero(this, {
 			profileId: profileId ?? this.profile.id,
 			old,
@@ -360,7 +384,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getCurriculum(profileId?: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getCurriculum(this, {
 			profileId: profileId ?? this.profile.id,
 		});
@@ -372,7 +396,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getStoricoBacheca(profileId: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getStoricoBacheca(this, {
 			profileId,
 		});
@@ -384,7 +408,7 @@ export class Client {
 	 * @returns I dati
 	 */
 	async getStoricoBachecaAlunno(profileId: string) {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getStoricoBachecaAlunno(this, {
 			profileId,
 		});
@@ -395,10 +419,14 @@ export class Client {
 	 * @returns La dashboard
 	 */
 	private async getDashboard() {
-		if (!this.isReady()) throw new Error("Client is not logged in!");
+		this.checkReady();
 		return getDashboard(this, {
 			lastUpdate:
 				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 		});
+	}
+
+	private checkReady(): asserts this is ReadyClient {
+		if (!this.isReady()) throw new Error("Client is not logged in!");
 	}
 }

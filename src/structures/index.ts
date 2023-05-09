@@ -1,6 +1,7 @@
 export * from "./Allegato";
 export * from "./Alunno";
 export * from "./Base";
+export * from "./BaseProfilo";
 export * from "./CorsiRecupero";
 export * from "./Curriculum";
 export * from "./Dashboard";
@@ -25,8 +26,8 @@ export * from "./Prenotazione";
 export * from "./Profilo";
 export * from "./Promemoria";
 export * from "./Ricevimenti";
+export * from "./Ricevuta";
 export * from "./Scrutinio";
-export * from "./BaseProfilo";
 export * from "./Tassa";
 export * from "./Token";
 export * from "./Voto";

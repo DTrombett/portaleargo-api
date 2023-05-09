@@ -38,6 +38,10 @@ export class Tassa extends Base<TassaData> {
 		this.patch(data);
 	}
 
+	get pagato() {
+		return this.stato.toLowerCase() === "pagato";
+	}
+
 	private static resolveNumber(n: string) {
 		return Number(n.replace(",", "."));
 	}
@@ -75,5 +79,31 @@ export class Tassa extends Base<TassaData> {
 			this.stato = data.stato;
 		}
 		return this;
+	}
+
+	/**
+	 * Scarica la ricevuta telematica del pagamento.
+	 * @param file - Il percorso dove salvare il file
+	 */
+	async download(file: string) {
+		if (typeof this.iuv === "undefined")
+			throw new TypeError("Cannot download receipt without an iuv");
+		if (!this.pagato)
+			throw new TypeError(
+				"Cannot download receipt for a tax that was not payed"
+			);
+		return this.client.downloadRicevuta(this.iuv, file);
+	}
+
+	/**
+	 * Ottieni la ricevuta telematica del pagamento.
+	 * @returns La ricevuta
+	 */
+	async getRicevuta() {
+		if (typeof this.iuv === "undefined")
+			throw new TypeError("Cannot get receipt without an iuv");
+		if (!this.pagato)
+			throw new TypeError("Cannot get receipt for a tax that was not payed");
+		return this.client.getRicevuta(this.iuv);
 	}
 }

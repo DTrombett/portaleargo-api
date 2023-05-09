@@ -1,7 +1,7 @@
 const { builtinModules } = require("node:module");
 
 module.exports = {
-	ignorePatterns: ["dist/", "*.cjs", "_test.ts"],
+	ignorePatterns: ["dist/", "*.cjs", "_test.ts", "tsup.config.ts"],
 	env: {
 		node: true,
 	},

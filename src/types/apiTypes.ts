@@ -578,6 +578,12 @@ export type APICurriculum = APIResponse<{
 		ordineScuola: string;
 	}[];
 }>;
+export type APIRicevutaTelematica = {
+	success: boolean;
+	fileName: string;
+	msg?: string;
+	url: string;
+};
 export type APIBacheca = APIResponse<
 	Pick<APIDashboard["data"]["dati"][number], "bacheca">
 >;
