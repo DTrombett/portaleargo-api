@@ -168,7 +168,8 @@ export class Dashboard extends Base<DashboardData> {
 	 * Aggiorna questi dati.
 	 * @returns I dati aggiornati
 	 */
-	refresh() {
-		return this.client.login() as Promise<this>;
+	async refresh() {
+		await this.client.login();
+		return this;
 	}
 }

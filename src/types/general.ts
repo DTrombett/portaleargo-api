@@ -107,3 +107,8 @@ export type LoginLink = {
 	state: string;
 	nonce: string;
 };
+export type ReadyClient = {
+	token: Token;
+	loginData: Login;
+	profile: Profilo;
+};

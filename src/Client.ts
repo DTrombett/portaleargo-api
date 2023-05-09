@@ -8,6 +8,7 @@ import type {
 	CorsiRecupero,
 	Credentials,
 	DettagliProfilo,
+	ReadyClient,
 	Ricevimenti,
 } from ".";
 import {
@@ -106,17 +107,13 @@ export class Client {
 	/**
 	 * Controlla se il client è pronto
 	 */
-	isReady(): this is {
-		token: Token;
-		loginData: Login;
-		profile: Profilo;
-	} {
+	isReady(): this is ReadyClient {
 		return this.#ready;
 	}
 
 	/**
 	 * Effettua il login.
-	 * @returns I dati della dashboard
+	 * @returns Il client aggiornato
 	 */
 	async login() {
 		await this.loadData();
@@ -145,12 +142,13 @@ export class Client {
 				this.#ready = true;
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
 				aggiornaData(this).catch(console.error);
-				return this.dashboard!;
+				return this as ReadyClient & this & { dashboard: Dashboard };
 			}
 		}
 		if (!this.profile) await getProfilo(this);
 		this.#ready = true;
-		return this.getDashboard();
+		await this.getDashboard();
+		return this as ReadyClient & this & { dashboard: Dashboard };
 	}
 
 	/**

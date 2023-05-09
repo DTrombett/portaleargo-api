@@ -1,18 +1,17 @@
-// import { config } from "dotenv";
-// import { Client } from ".";
+import { config } from "dotenv";
+import { Client } from ".";
 
-// config();
-// const now = performance.now();
-// const client = new Client({
-// 	debug: true,
-// });
+config();
+const client = new Client({
+	debug: true,
+});
 
-// client
-// 	.login()
-// 	.then(async () => {
-// 		console.log(await client.getDettagliProfilo(), performance.now() - now);
-// 	})
-// 	.catch(console.error);
+client
+	.login()
+	.then(async (newClient) => {
+		console.log(newClient);
+	})
+	.catch(console.error);
 
 export * from "./Client";
 export * from "./api";
