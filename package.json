@@ -11,7 +11,7 @@
 		"prepare": "npm test",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
-		"test": "eslint src && tsc --noEmit",
+		"test": "eslint src && tsc --noEmit && tsup _test.ts && node dist/_test",
 		"postinstall": "npm run build"
 	},
 	"repository": {

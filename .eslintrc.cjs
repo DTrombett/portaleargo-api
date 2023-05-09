@@ -1,7 +1,7 @@
 const { builtinModules } = require("node:module");
 
 module.exports = {
-	ignorePatterns: ["dist/", "*.cjs"],
+	ignorePatterns: ["dist/", "*.cjs", "_test.ts"],
 	env: {
 		node: true,
 	},
@@ -24,9 +24,9 @@ module.exports = {
 		"no-lone-blocks": "warn",
 		"no-return-assign": "warn",
 		"no-useless-computed-key": "warn",
-		"curly": ["warn", "multi"],
+		curly: ["warn", "multi"],
 		"dot-location": ["warn", "property"],
-		"eqeqeq": ["warn", "smart"],
+		eqeqeq: ["warn", "smart"],
 		"no-else-return": [
 			"warn",
 			{
@@ -46,7 +46,7 @@ module.exports = {
 		],
 		"no-useless-return": "warn",
 		"wrap-iife": ["warn", "inside"],
-		"yoda": [
+		yoda: [
 			"warn",
 			"never",
 			{
