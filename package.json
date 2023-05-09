@@ -8,7 +8,6 @@
 	"scripts": {
 		"build": "tsup",
 		"lint": "eslint src --fix",
-		"prepare": "npm test",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
 		"test": "eslint src && tsc --noEmit && tsup _test.ts --format esm && node dist/_test.mjs",
