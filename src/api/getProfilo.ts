@@ -1,5 +1,5 @@
 import type { APIProfilo, Client } from "..";
-import { Profilo, apiRequest, writeToFile } from "..";
+import { Profilo, apiRequest } from "..";
 
 /**
  * Ottieni i dati riguardo il profilo dell'utente.
@@ -12,7 +12,6 @@ export const getProfilo = async (client: Client) => {
 	if (!body.success) throw new Error(body.msg!);
 	if (!client.profile?.patch(body.data))
 		client.profile = new Profilo(body.data, client);
-	if (client.dataPath !== undefined)
-		void writeToFile("profile", client.profile, client.dataPath);
+	void client.dataProvider?.write("profile", client.profile);
 	return client.profile;
 };

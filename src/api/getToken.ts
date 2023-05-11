@@ -1,7 +1,7 @@
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
 import type { Client } from "..";
-import { Token, clientId, writeToFile } from "..";
+import { Token, clientId } from "..";
 
 /**
  * Ottieni il token tramite l'API.
@@ -35,7 +35,6 @@ export const getToken = async (
 
 	if (!client.token?.patch(data, date))
 		client.token = new Token(data, client, date);
-	if (client.dataPath !== undefined)
-		void writeToFile("token", client.token, client.dataPath);
+	void client.dataProvider?.write("token", client.token);
 	return client.token;
 };

@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Jsonify } from "..";
+import type { Jsonify, ReadData } from "..";
 import { AuthFolder } from "..";
 
 /**
@@ -8,12 +8,12 @@ import { AuthFolder } from "..";
  * @param name - Il nome del file, escludendo l'estensione
  * @returns I dati importati
  */
-export const importData = async <T>(
-	name: string,
+export const importData = async <T extends keyof ReadData>(
+	name: T,
 	path = AuthFolder
-): Promise<Jsonify<T> | undefined> =>
+): Promise<Jsonify<ReadData[T]> | undefined> =>
 	readFile(join(path, `${name}.json`), {
 		encoding: "utf8",
 	})
-		.then(async (content) => JSON.parse(content) as Jsonify<T>)
+		.then(async (content) => JSON.parse(content) as Jsonify<ReadData[T]>)
 		.catch(() => undefined);

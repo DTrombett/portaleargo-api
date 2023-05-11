@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { existsSync, mkdirSync } from "node:fs";
+import { rm, writeFile } from "node:fs/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
@@ -79,9 +79,10 @@ export class Client {
 	headers?: IncomingHttpHeaders;
 
 	/**
-	 * Il percorso della cartella dove salvare i dati
+	 * Le funzioni per leggere e scrivere i dati.
+	 * Impostare questo valore forzerà `dataPath` a `null`
 	 */
-	dataPath?: string;
+	dataProvider?: NonNullable<ClientOptions["dataProvider"]>;
 
 	#credentials?: Partial<Credentials>;
 	#ready = false;
@@ -89,20 +90,28 @@ export class Client {
 	/**
 	 * @param options - Le opzioni per il client
 	 */
-	constructor(options?: ClientOptions) {
+	constructor(options: ClientOptions = {}) {
 		this.#credentials = {
-			schoolCode: options?.schoolCode ?? env.CODICE_SCUOLA,
-			password: options?.password ?? env.PASSWORD,
-			username: options?.username ?? env.NOME_UTENTE,
+			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
+			password: options.password ?? env.PASSWORD,
+			username: options.username ?? env.NOME_UTENTE,
 		};
-		this.token = options?.token;
-		this.loginData = options?.loginData;
-		this.profile = options?.profile;
-		this.dashboard = options?.dashboard;
-		this.debug = options?.debug ?? false;
-		this.headers = options?.headers;
-		if (options?.dataPath !== null)
-			this.dataPath = options?.dataPath ?? AuthFolder;
+		this.token = options.token;
+		this.loginData = options.loginData;
+		this.profile = options.profile;
+		this.dashboard = options.dashboard;
+		this.debug = options.debug ?? false;
+		this.headers = options.headers;
+		if (options.dataProvider !== null) {
+			options.dataPath ??= AuthFolder;
+			if (!options.dataProvider && !existsSync(options.dataPath))
+				mkdirSync(options.dataPath);
+			this.dataProvider = options.dataProvider ?? {
+				read: (name) => importData(name, options.dataPath!),
+				write: (name, value) => writeToFile(name, value, options.dataPath!),
+				reset: () => rm(options.dataPath!, { recursive: true, force: true }),
+			};
+		}
 	}
 
 	/**
@@ -133,12 +142,9 @@ export class Client {
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 				});
 
-				if (
-					(whatData.profiloModificato || whatData.differenzaSchede) &&
-					this.dataPath !== undefined
-				) {
+				if (whatData.profiloModificato || whatData.differenzaSchede) {
 					this.profile.patch(whatData.profilo);
-					void writeToFile("profile", this.profile, this.dataPath);
+					void this.dataProvider?.write("profile", this.profile);
 				}
 				this.#ready = true;
 				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
@@ -156,15 +162,12 @@ export class Client {
 	 * Carica i dati salvati localmente.
 	 */
 	async loadData() {
-		if (this.dataPath === undefined) return;
+		if (!this.dataProvider?.read) return;
 		const [token, loginData, profile, dashboard] = await Promise.all([
-			this.token ? undefined : importData<Token>("token", this.dataPath),
-			this.loginData ? undefined : importData<Login>("login", this.dataPath),
-			this.profile ? undefined : importData<Profilo>("profile", this.dataPath),
-			this.dashboard
-				? undefined
-				: importData<Dashboard>("dashboard", this.dataPath),
-			existsSync(this.dataPath) || mkdir(this.dataPath),
+			this.token ? undefined : this.dataProvider.read("token"),
+			this.loginData ? undefined : this.dataProvider.read("login"),
+			this.profile ? undefined : this.dataProvider.read("profile"),
+			this.dashboard ? undefined : this.dataProvider.read("dashboard"),
 		]);
 
 		if (token) this.token = new Token(token, this);

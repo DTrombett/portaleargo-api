@@ -22,6 +22,12 @@ export type HttpMethod =
 	| "POST"
 	| "PUT"
 	| "TRACE";
+export type ReadData = {
+	dashboard: Dashboard;
+	login: Login;
+	profile: Profilo;
+	token: Token;
+};
 export type Credentials = {
 	/**
 	 * Il codice scuola
@@ -71,9 +77,24 @@ export type ClientOptions = Partial<
 		headers: IncomingHttpHeaders;
 
 		/**
-		 * Il percorso della cartella dove salvare i dati
+		 * Il percorso della cartella dove salvare i dati.
+		 * * Ignorato se `dataProvider` viene fornito
 		 */
 		dataPath: string | null;
+
+		/**
+		 * Le funzioni per leggere e scrivere i dati
+		 */
+		dataProvider: {
+			read?: <T extends keyof ReadData>(
+				name: T
+			) => Promise<Jsonify<ReadData[T]> | undefined>;
+			write: <T extends keyof ReadData>(
+				name: T,
+				data: ReadData[T]
+			) => Promise<void>;
+			reset: () => Promise<void>;
+		} | null;
 	}
 >;
 export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [

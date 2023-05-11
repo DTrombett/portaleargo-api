@@ -1,5 +1,5 @@
 import type { APIDashboard, Client } from "..";
-import { Dashboard, apiRequest, formatDate, writeToFile } from "..";
+import { Dashboard, apiRequest, formatDate } from "..";
 
 /**
  * Ottieni la dashboard dello studente.
@@ -28,7 +28,6 @@ export const getDashboard = async (
 	if (!body.success) throw new Error(body.msg!);
 	if (!client.dashboard?.patch(body.data.dati[0]))
 		client.dashboard = new Dashboard(body.data.dati[0], client);
-	if (client.dataPath !== undefined)
-		void writeToFile("dashboard", client.dashboard, client.dataPath);
+	void client.dataProvider?.write("dashboard", client.dashboard);
 	return client.dashboard;
 };

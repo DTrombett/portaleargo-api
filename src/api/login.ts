@@ -1,5 +1,5 @@
 import type { APILogin, Client } from "..";
-import { Login, apiRequest, randomString, writeToFile } from "..";
+import { Login, apiRequest, randomString } from "..";
 
 /**
  * Effettua il login tramite l'API.
@@ -19,7 +19,6 @@ export const login = async (client: Client) => {
 	if (!body.success) throw new Error(body.msg!);
 	if (!client.loginData?.patch(body.data[0]))
 		client.loginData = new Login(body.data[0], client);
-	if (client.dataPath !== undefined)
-		void writeToFile("login", client.loginData, client.dataPath);
+	void client.dataProvider?.write("login", client.loginData);
 	return client.loginData;
 };

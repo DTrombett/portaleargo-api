@@ -1,4 +1,3 @@
-import { rm } from "node:fs/promises";
 import type { APIResponse, Client } from "..";
 import { apiRequest } from "..";
 
@@ -13,6 +12,5 @@ export const rimuoviProfilo = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	if (client.dataPath !== undefined)
-		await rm(client.dataPath, { recursive: true, force: true });
+	await client.dataProvider?.reset();
 };

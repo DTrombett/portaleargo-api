@@ -1,5 +1,5 @@
 import type { APIToken, Client } from "..";
-import { Token, apiRequest, clientId, formatDate, writeToFile } from "..";
+import { Token, apiRequest, clientId, formatDate } from "..";
 
 /**
  * Aggiorna il token.
@@ -30,8 +30,6 @@ export const refreshToken = async (client: Client) => {
 	const date = new Date(res.headers.date as string);
 	if (!client.token?.patch(body, date))
 		client.token = new Token(body, client, date);
-
-	if (client.dataPath !== undefined)
-		void writeToFile("token", client.token, client.dataPath);
+	void client.dataProvider?.write("token", client.token);
 	return client.token;
 };
