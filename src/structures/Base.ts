@@ -1,7 +1,7 @@
 import { inspect } from "node:util";
 import type { Client, Jsonify, ObjectJson } from "..";
 
-const identifierName = "class name";
+const identifierName = "Class name!";
 
 /**
  * Rappresenta una struttura base
@@ -59,7 +59,7 @@ export class Base<T extends ObjectJson = ObjectJson> {
 	}
 
 	protected isJson<O extends ObjectJson>(data: O | T): data is O {
-		return data[identifierName] === this.constructor.name;
+		return typeof data[identifierName] !== "undefined";
 	}
 
 	protected handleJson(data: Jsonify<Base>) {

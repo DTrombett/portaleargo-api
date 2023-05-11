@@ -12,12 +12,13 @@ import { formatDate } from "..";
 export const apiRequest = async <T extends Json, R extends boolean = false>(
 	path: string,
 	client: Client,
-	options?: Partial<{
+	options: Partial<{
 		body: Json;
 		method: HttpMethod;
 		noWaitAfter: R;
-	}>
+	}> = {}
 ) => {
+	options.method ??= "GET";
 	const res = await request(
 		`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
 		{
@@ -32,13 +33,12 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 					client.token?.expireDate && formatDate(client.token.expireDate),
 				...client.headers,
 			},
-			method: options?.method,
+			method: options.method,
 			body:
-				options?.method === "POST" ? JSON.stringify(options.body) : undefined,
+				options.method === "POST" ? JSON.stringify(options.body) : undefined,
 		}
 	);
-	if (client.debug)
-		console.log(`${options?.method ?? "GET"} /${path} ${res.statusCode}`);
+	if (client.debug) console.log(`${options.method} /${path} ${res.statusCode}`);
 	const result = {
 		res,
 	} as {
@@ -46,6 +46,19 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		body: R extends true ? undefined : T;
 	};
 
-	if (options?.noWaitAfter !== true) result.body = await res.body.json();
+	if (options.noWaitAfter !== true) {
+		const text = await res.body.text();
+
+		try {
+			result.body = JSON.parse(text);
+		} catch (err) {
+			throw new TypeError(
+				`${options.method} /${path} failed with status code ${res.statusCode}`,
+				{
+					cause: text,
+				}
+			);
+		}
+	}
 	return result;
 };
