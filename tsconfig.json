@@ -2,12 +2,14 @@
 	"include": ["src/**/*"],
 	"extends": "@tsconfig/node18/tsconfig.json",
 	"compilerOptions": {
-		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
 		"esModuleInterop": true,
 		"isolatedModules": true,
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"noEmit": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
@@ -17,7 +19,6 @@
 		"outDir": "dist",
 		"pretty": true,
 		"resolveJsonModule": true,
-		"sourceMap": true,
-		"module": "ESNext"
+		"sourceMap": true
 	}
 }

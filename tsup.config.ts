@@ -10,7 +10,6 @@ const options: Options = {
 	minify: true,
 	keepNames: true,
 	sourcemap: true,
-	dts: true,
 };
 
 export default defineConfig(options);

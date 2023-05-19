@@ -49,8 +49,14 @@ export class Tassa extends Base<TassaData> {
 	patch(data: Data) {
 		if (this.isJson(data)) {
 			this.handleJson(data);
-			this.dataCreazione = data.dataCreazione && new Date(data.dataCreazione);
-			this.dataPagamento = data.dataPagamento && new Date(data.dataPagamento);
+			this.dataCreazione =
+				data.dataCreazione === undefined
+					? undefined
+					: new Date(data.dataCreazione);
+			this.dataPagamento =
+				data.dataPagamento === undefined
+					? undefined
+					: new Date(data.dataPagamento);
 			this.scadenza = new Date(data.scadenza);
 		} else {
 			if (data.dataCreazione != null)

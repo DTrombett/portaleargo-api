@@ -97,26 +97,31 @@ export type ClientOptions = Partial<
 		} | null;
 	}
 >;
-export type Jsonify<T, N extends boolean = false, D extends boolean = true> = [
-	T,
-	D
-] extends [
-	{
-		toJSON(): infer J;
-	},
-	true
-]
-	? Jsonify<J, false, false>
+export type Jsonify<T, D extends boolean = true> = D extends true
+	? Jsonify<
+			T extends {
+				toJSON(): infer J;
+			}
+				? J
+				: T,
+			false
+	  >
 	: T extends boolean | number | string | null
 	? T
 	: T extends bigint
 	? never
 	: T extends symbol | ((...args: any[]) => any) | undefined
-	? N extends true
-		? never
-		: undefined
+	? undefined
+	: T extends (infer A)[]
+	? Jsonify<A>[]
 	: {
-			[K in keyof T]: Jsonify<T[K], true>;
+			[K in keyof T as T[K] extends
+				| bigint
+				| symbol
+				| ((...args: any[]) => any)
+				| undefined
+				? never
+				: K]: Jsonify<T[K]>;
 	  };
 export type LoginLink = {
 	url: string;
