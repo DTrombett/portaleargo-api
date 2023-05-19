@@ -11,7 +11,7 @@ import { AuthFolder } from "..";
 export const importData = async <T extends keyof ReadData>(
 	name: T,
 	path = AuthFolder
-): Promise<Jsonify<ReadData[T]> | undefined> =>
+) =>
 	readFile(join(path, `${name}.json`), {
 		encoding: "utf8",
 	})

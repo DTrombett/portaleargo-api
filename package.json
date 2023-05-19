@@ -6,7 +6,7 @@
 	"main": "./dist/index.js",
 	"types": "./src/index.ts",
 	"scripts": {
-		"build": "tsup && tsc --declaration --emitDeclarationOnly --declarationDir dist --noEmit false",
+		"build": "tsup && tsc --emitDeclarationOnly --declarationDir types --noEmit false",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
