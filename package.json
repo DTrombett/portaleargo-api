@@ -10,7 +10,8 @@
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
-		"test": "eslint src && tsc && tsup _test.ts --format esm && node dist/_test.mjs",
+		"test": "npm run test:cli && tsup _test.ts --format esm && node dist/_test.mjs",
+		"test:cli": "eslint src && tsc",
 		"postinstall": "npm run build"
 	},
 	"repository": {
