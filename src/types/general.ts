@@ -97,12 +97,13 @@ export type ClientOptions = Partial<
 		} | null;
 	}
 >;
-export type Jsonify<T, D extends boolean = true> = D extends true
-	? T extends {
-			toJSON(): infer J;
-	  }
-		? Jsonify<J, false>
-		: Jsonify<T, false>
+export type Jsonify<T, D extends boolean = true> = [D, T] extends [
+	true,
+	{
+		toJSON(): infer J;
+	}
+]
+	? Jsonify<J, false>
 	: T extends boolean | number | string | null
 	? T
 	: T extends bigint

@@ -5,7 +5,6 @@
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
-		"composite": true,
 		"esModuleInterop": true,
 		"isolatedModules": true,
 		"module": "ESNext",

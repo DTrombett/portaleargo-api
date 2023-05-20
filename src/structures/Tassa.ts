@@ -50,13 +50,13 @@ export class Tassa extends Base<TassaData> {
 		if (this.isJson(data)) {
 			this.handleJson(data);
 			this.dataCreazione =
-				data.dataCreazione === undefined
-					? undefined
-					: new Date(data.dataCreazione);
+				typeof data.dataCreazione === "string"
+					? new Date(data.dataCreazione)
+					: undefined;
 			this.dataPagamento =
-				data.dataPagamento === undefined
-					? undefined
-					: new Date(data.dataPagamento);
+				typeof data.dataPagamento === "string"
+					? new Date(data.dataPagamento)
+					: undefined;
 			this.scadenza = new Date(data.scadenza);
 		} else {
 			if (data.dataCreazione != null)
