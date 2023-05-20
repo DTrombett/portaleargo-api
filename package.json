@@ -1,12 +1,12 @@
 {
 	"name": "portaleargo-api",
 	"version": "1.0.0",
-	"description": "A library to interact with the api of Argoscuolanext",
+	"description": "A library to interact with the api of ArgoScuolaNext",
 	"exports": "./dist/index.js",
 	"main": "./dist/index.js",
-	"types": "./types/index.d.ts",
+	"types": "./src/index.ts",
 	"scripts": {
-		"build": "tsup && tsc --emitDeclarationOnly --declarationDir types --noEmit false",
+		"build": "tsup",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",

@@ -10,6 +10,7 @@ const options: Options = {
 	minify: true,
 	keepNames: true,
 	sourcemap: true,
+	treeshake: "smallest",
 };
 
 export default defineConfig(options);
