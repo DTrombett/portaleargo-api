@@ -8,7 +8,7 @@ updates:
       timezone: "Europe/Rome"
     commit-message:
       prefix: "deps"
-      prefix-development: "devDeps"
       include: "scope"
     reviewers:
       - "DTrombett"
+    open-pull-requests-limit: 10
