@@ -9,5 +9,5 @@ import { AuthFolder } from "..";
  */
 export const writeToFile = (name: string, value: unknown, path = AuthFolder) =>
 	writeFile(`${join(path, name)}.json`, JSON.stringify(value)).catch(
-		console.error
+		console.error,
 	);

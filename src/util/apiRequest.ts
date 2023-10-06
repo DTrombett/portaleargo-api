@@ -16,7 +16,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		body: Json;
 		method: HttpMethod;
 		noWaitAfter: R;
-	}> = {}
+	}> = {},
 ) => {
 	options.method ??= "GET";
 	const res = await request(
@@ -36,7 +36,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 			method: options.method,
 			body:
 				options.method === "POST" ? JSON.stringify(options.body) : undefined,
-		}
+		},
 	);
 	if (client.debug) console.log(`${options.method} /${path} ${res.statusCode}`);
 	const result = {
@@ -56,7 +56,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 				`${options.method} /${path} failed with status code ${res.statusCode}`,
 				{
 					cause: text,
-				}
+				},
 			);
 		}
 	}

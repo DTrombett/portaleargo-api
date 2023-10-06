@@ -14,6 +14,6 @@ export const getVotiScrutinio = async (client: Client) => {
 
 	if (!body.success) throw new Error(body.msg!);
 	return body.data.votiScrutinio[0].periodi.map(
-		(a) => new Scrutinio(a, client)
+		(a) => new Scrutinio(a, client),
 	);
 };

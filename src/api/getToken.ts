@@ -1,6 +1,6 @@
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
-import type { Client } from "..";
+import type { APIToken, Client } from "..";
 import { Token, clientId } from "..";
 
 /**
@@ -15,7 +15,7 @@ export const getToken = async (
 	options: {
 		code: string;
 		codeVerifier: string;
-	}
+	},
 ) => {
 	const res = await request("https://auth.portaleargo.it/oauth2/token", {
 		headers: {
@@ -30,7 +30,7 @@ export const getToken = async (
 		}).toString(),
 		method: "POST",
 	});
-	const data = await res.body.json();
+	const data = (await res.body.json()) as APIToken;
 	const date = new Date(res.headers.date as string);
 
 	if (!client.token?.patch(data, date))

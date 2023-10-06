@@ -12,7 +12,7 @@ export const downloadAllegatoStudente = async (
 	options: {
 		id: string;
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
 		"downloadallegatobachecaalunno",
@@ -23,7 +23,7 @@ export const downloadAllegatoStudente = async (
 				uid: options.id,
 				pkScheda: options.profileId,
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg);

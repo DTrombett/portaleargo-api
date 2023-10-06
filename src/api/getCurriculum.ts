@@ -11,7 +11,7 @@ export const getCurriculum = async (
 	client: Client,
 	options: {
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APICurriculum>("curriculumalunno", client, {
 		method: "POST",

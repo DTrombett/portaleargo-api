@@ -14,7 +14,7 @@ export const aggiornaData = async (client: Client) => {
 			body: {
 				dataultimoaggiornamento: formatDate(new Date()),
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg!);

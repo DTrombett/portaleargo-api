@@ -48,7 +48,7 @@ export class EventoBacheca extends Base<EventoBachecaData> {
 			this.adRichiesta = data.adRichiesta;
 			this.dataConfermaAdesione = data.dataConfermaAdesione;
 			this.allegati = data.listaAllegati.map(
-				(a) => new Allegato(a, this.client)
+				(a) => new Allegato(a, this.client),
 			);
 			if (data.dataScadAdesione != null)
 				this.dataScadenzaAdesione = data.dataScadAdesione;

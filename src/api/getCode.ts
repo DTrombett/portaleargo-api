@@ -35,7 +35,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof link !== "string")
 		throw new TypeError(
-			`Auth request returned an invalid redirect url with status code ${statusCode}`
+			`Auth request returned an invalid redirect url with status code ${statusCode}`,
 		);
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
 	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
@@ -60,7 +60,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof location !== "string")
 		throw new TypeError(
-			`Login request returned an invalid redirect url with status code ${status}`
+			`Login request returned an invalid redirect url with status code ${status}`,
 		);
 	const { headers: newHeaders, statusCode: newStatus } = await request(
 		location,
@@ -73,12 +73,12 @@ export const getCode = async (credentials: Credentials) => {
 				"sec-fetch-site": "same-site",
 			},
 			method: "GET",
-		}
+		},
 	);
 
 	if (typeof newHeaders.location !== "string")
 		throw new TypeError(
-			`First redirect returned an invalid redirect url with status code ${newStatus}`
+			`First redirect returned an invalid redirect url with status code ${newStatus}`,
 		);
 	cookieHeaders = newHeaders["set-cookie"];
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
@@ -100,7 +100,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof redirect !== "string")
 		throw new TypeError(
-			`Third redirect returned an invalid redirect url with status code ${middleStatus}`
+			`Third redirect returned an invalid redirect url with status code ${middleStatus}`,
 		);
 	const {
 		headers: { location: finalRedirect },
@@ -118,7 +118,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof finalRedirect !== "string")
 		throw new TypeError(
-			`Last redirect returned an invalid redirect url with status code ${finalStatus}`
+			`Last redirect returned an invalid redirect url with status code ${finalStatus}`,
 		);
 	const code = new URL(finalRedirect).searchParams.get("code");
 

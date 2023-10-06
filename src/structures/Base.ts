@@ -27,7 +27,7 @@ export class Base<T extends ObjectJson = ObjectJson> {
 
 	protected static isKey<O extends object>(
 		key: PropertyKey,
-		object: O
+		object: O,
 	): key is keyof O {
 		return Object.hasOwn(object, key);
 	}

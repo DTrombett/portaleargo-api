@@ -30,7 +30,7 @@ export class Login extends Base<LoginData> {
 		else {
 			this.schoolCode = data.codMin;
 			this.options = Object.fromEntries(
-				data.opzioni.map((a) => [a.chiave, a.valore])
+				data.opzioni.map((a) => [a.chiave, a.valore]),
 			);
 			this.firstAccess = data.isPrimoAccesso;
 			this.disabledProfile = data.profiloDisabilitato;

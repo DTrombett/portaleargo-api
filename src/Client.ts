@@ -297,7 +297,7 @@ export class Client {
 	async downloadAllegatoStudente(id: string, file: string, profileId?: string) {
 		this.checkReady();
 		const { body } = await request(
-			await this.getLinkAllegatoStudente(id, profileId)
+			await this.getLinkAllegatoStudente(id, profileId),
 		);
 
 		await writeFile(file, body);

@@ -10,7 +10,7 @@ export const getDettagliProfilo = async <T extends DettagliProfilo>(
 	client: Client,
 	options?: {
 		old?: T;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIDettagliProfilo>(
 		"dettaglioprofilo",
@@ -18,7 +18,7 @@ export const getDettagliProfilo = async <T extends DettagliProfilo>(
 		{
 			body: null,
 			method: "POST",
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg!);

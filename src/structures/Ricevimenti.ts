@@ -28,10 +28,10 @@ export class Ricevimenti extends Base<RicevimentiData> {
 		if (this.isJson(data)) {
 			this.handleJson(data);
 			this.disponibilità = data.disponibilità.map(
-				(a) => new Disponibilità(a, this.client)
+				(a) => new Disponibilità(a, this.client),
 			);
 			this.prenotazioni = data.prenotazioni.map(
-				(a) => new Prenotazione(a, this.client)
+				(a) => new Prenotazione(a, this.client),
 			);
 		} else {
 			this.tipoAccesso = data.tipoAccesso;
@@ -40,7 +40,7 @@ export class Ricevimenti extends Base<RicevimentiData> {
 				telefono: a.telefono,
 			}));
 			this.prenotazioni = data.prenotazioni.map(
-				(a) => new Prenotazione(a, this.client)
+				(a) => new Prenotazione(a, this.client),
 			);
 			for (const k in data.disponibilita)
 				if (Object.hasOwn(data.disponibilita, k))

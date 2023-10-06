@@ -9,7 +9,7 @@ import { Ricevimenti, apiRequest } from "..";
  */
 export const getRicevimenti = async <T extends Ricevimenti>(
 	client: Client,
-	options?: { old?: T }
+	options?: { old?: T },
 ) => {
 	const { body } = await apiRequest<APIRicevimenti>("ricevimento", client, {
 		method: "POST",

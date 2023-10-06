@@ -11,7 +11,7 @@ export const getStoricoBacheca = async (
 	client: Client,
 	options: {
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIBacheca>("storicobacheca", client, {
 		method: "POST",
@@ -24,6 +24,6 @@ export const getStoricoBacheca = async (
 	return handleOperation(
 		body.data.bacheca,
 		undefined,
-		(a) => new EventoBacheca(a, client)
+		(a) => new EventoBacheca(a, client),
 	);
 };

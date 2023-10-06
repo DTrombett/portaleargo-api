@@ -11,7 +11,7 @@ export const downloadAllegato = async (
 	client: Client,
 	options: {
 		id: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
 		"downloadallegatobacheca",
@@ -21,7 +21,7 @@ export const downloadAllegato = async (
 			body: {
 				uid: options.id,
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg);

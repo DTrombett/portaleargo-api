@@ -12,7 +12,7 @@ export const what = async (
 	options: {
 		lastUpdate: Date | number | string;
 		old?: What;
-	}
+	},
 ) => {
 	const authToken = JSON.stringify([client.loginData?.token]);
 	const { body } = await apiRequest<APIWhat>("dashboard/what", client, {

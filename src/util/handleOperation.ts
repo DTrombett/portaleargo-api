@@ -11,11 +11,11 @@ export const handleOperation = <
 	P extends {
 		id: string;
 	},
-	T = Json
+	T = Json,
 >(
 	array: APIOperation<T>[],
 	old: P[] = [],
-	map: (a: Extract<APIOperation<T>, { operazione: "I" }>) => P
+	map: (a: Extract<APIOperation<T>, { operazione: "I" }>) => P,
 ) => {
 	const toDelete: string[] = [];
 

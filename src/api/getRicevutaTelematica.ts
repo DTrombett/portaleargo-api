@@ -11,7 +11,7 @@ export const getRicevutaTelematica = async (
 	client: Client,
 	options: {
 		iuv: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIRicevutaTelematica>(
 		"ricevutatelematica",
@@ -21,7 +21,7 @@ export const getRicevutaTelematica = async (
 			body: {
 				iuv: options.iuv,
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg);

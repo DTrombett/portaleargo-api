@@ -11,7 +11,7 @@ export const getStoricoBachecaAlunno = async (
 	client: Client,
 	options: {
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIBachecaAlunno>(
 		"storicobachecaalunno",
@@ -21,13 +21,13 @@ export const getStoricoBachecaAlunno = async (
 			body: {
 				pkScheda: options.profileId,
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg!);
 	return handleOperation(
 		body.data.bachecaAlunno,
 		undefined,
-		(a) => new EventoBachecaAlunno(a, client)
+		(a) => new EventoBachecaAlunno(a, client),
 	);
 };

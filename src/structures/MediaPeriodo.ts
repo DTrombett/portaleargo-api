@@ -29,7 +29,7 @@ export class MediaPeriodo extends Base<MediaPeriodoData> {
 			for (const k in data.listaMaterie)
 				if (Object.hasOwn(data.listaMaterie, k))
 					this.materie.push(
-						new MediaMateria(data.listaMaterie[k], this.client, k)
+						new MediaMateria(data.listaMaterie[k], this.client, k),
 					);
 		}
 		return this;

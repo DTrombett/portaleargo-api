@@ -8,7 +8,7 @@ import { apiRequest, formatDate } from "..";
  */
 export const logToken = async (
 	client: Client,
-	options: { oldToken: Token; isWhat?: boolean }
+	options: { oldToken: Token; isWhat?: boolean },
 ) => {
 	const { body } = await apiRequest<APIResponse>("logtoken", client, {
 		method: "POST",

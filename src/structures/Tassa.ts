@@ -96,7 +96,7 @@ export class Tassa extends Base<TassaData> {
 			throw new TypeError("Cannot download receipt without an iuv");
 		if (!this.pagato)
 			throw new TypeError(
-				"Cannot download receipt for a tax that was not payed"
+				"Cannot download receipt for a tax that was not payed",
 			);
 		return this.client.downloadRicevuta(this.iuv, file);
 	}

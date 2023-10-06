@@ -11,7 +11,7 @@ export const getPCTOData = async (
 	client: Client,
 	options: {
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIPCTO>("pcto", client, {
 		method: "POST",

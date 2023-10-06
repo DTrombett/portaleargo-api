@@ -42,7 +42,7 @@ export class Voto extends Base<VotoData> {
 			this.handleJson(data);
 			this.dettagliMateria = new DettagliMateria(
 				data.dettagliMateria,
-				this.client
+				this.client,
 			);
 		} else {
 			this.data = data.datEvento;
@@ -61,7 +61,7 @@ export class Voto extends Base<VotoData> {
 			this.conteggioMedia = data.numMedia;
 			this.dettagliMateria = new DettagliMateria(
 				data.materiaLight,
-				this.client
+				this.client,
 			);
 			this.commento = data.desCommento;
 			this.id = data.pk;

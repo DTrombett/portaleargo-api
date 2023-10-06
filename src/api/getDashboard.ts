@@ -11,7 +11,7 @@ export const getDashboard = async (
 	client: Client,
 	options: {
 		lastUpdate: Date | number | string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APIDashboard>(
 		"dashboard/dashboard",
@@ -22,7 +22,7 @@ export const getDashboard = async (
 				opzioni: JSON.stringify(client.loginData?.options),
 			},
 			method: "POST",
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg!);

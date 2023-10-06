@@ -25,7 +25,7 @@ export const refreshToken = async (client: Client) => {
 				proc: "initState_global_random_12345",
 				username: client.loginData?.username,
 			},
-		}
+		},
 	);
 	const date = new Date(res.headers.date as string);
 	if (!client.token?.patch(body, date))

@@ -11,7 +11,7 @@ export const getTasse = async (
 	client: Client,
 	options: {
 		profileId: string;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APITasse>("listatassealunni", client, {
 		method: "POST",

@@ -13,7 +13,7 @@ export const getOrarioGiornaliero = async (
 		year?: number;
 		month?: number;
 		day?: number;
-	}
+	},
 ) => {
 	const now = new Date();
 	const { body } = await apiRequest<APIOrarioGiornaliero>(
@@ -25,10 +25,10 @@ export const getOrarioGiornaliero = async (
 				datGiorno: formatDate(
 					`${options?.year ?? now.getFullYear()}-${
 						options?.month ?? now.getMonth() + 1
-					}-${options?.day ?? now.getDate() + 1}`
+					}-${options?.day ?? now.getDate() + 1}`,
 				),
 			},
-		}
+		},
 	);
 
 	if (!body.success) throw new Error(body.msg!);

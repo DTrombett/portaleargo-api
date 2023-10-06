@@ -12,7 +12,7 @@ export const getCorsiRecupero = async <T extends CorsiRecupero>(
 	options: {
 		profileId: string;
 		old?: T;
-	}
+	},
 ) => {
 	const { body } = await apiRequest<APICorsiRecupero>("corsirecupero", client, {
 		method: "POST",

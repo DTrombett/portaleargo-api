@@ -24,9 +24,9 @@ export const generateLoginLink = ({
 	nonce?: string;
 } = {}): LoginLink => ({
 	url: `https://auth.portaleargo.it/oauth2/auth?redirect_uri=${encodeURIComponent(
-		redirectUri
+		redirectUri,
 	)}&client_id=${id}&response_type=code&prompt=login&state=${state}&nonce=${nonce}&scope=${encodeURIComponent(
-		scopes.join(" ")
+		scopes.join(" "),
 	)}&code_challenge=${challenge}&code_challenge_method=S256`,
 	redirectUri,
 	scopes,

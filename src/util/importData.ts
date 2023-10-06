@@ -10,7 +10,7 @@ import { AuthFolder } from "..";
  */
 export const importData = async <T extends keyof ReadData>(
 	name: T,
-	path = AuthFolder
+	path = AuthFolder,
 ) =>
 	readFile(join(path, `${name}.json`), {
 		encoding: "utf8",
