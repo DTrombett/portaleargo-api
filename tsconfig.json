@@ -1,6 +1,6 @@
 {
 	"include": ["src"],
-	"extends": "@tsconfig/node18/tsconfig.json",
+	"extends": "@tsconfig/node-lts/tsconfig.json",
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
