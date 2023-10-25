@@ -31,7 +31,7 @@
 		"@tsconfig/node-lts": "^18.12.5",
 		"@types/crypto-js": "^4.1.2",
 		"@types/node": "^18.18.3",
-		"crypto-js": "^4.1.1",
+		"crypto-js": "^4.2.0",
 		"tsup": "^7.2.0",
 		"typescript": "^5.2.2",
 		"undici": "^5.25.4"
