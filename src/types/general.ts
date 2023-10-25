@@ -87,21 +87,27 @@ export type ClientOptions = Partial<
 		 */
 		dataProvider: {
 			read?: <T extends keyof ReadData>(
-				name: T
+				name: T,
 			) => Promise<Jsonify<ReadData[T]> | undefined>;
 			write: <T extends keyof ReadData>(
 				name: T,
-				data: ReadData[T]
+				data: ReadData[T],
 			) => Promise<void>;
 			reset: () => Promise<void>;
 		} | null;
+
+		/**
+		 * La versione di didUp da specificare nell'header.
+		 * * Modificare questa opzione potrebbe creare problemi nell'utilizzo della libreria
+		 */
+		version: string;
 	}
 >;
 export type Jsonify<T, D extends boolean = true> = [D, T] extends [
 	true,
 	{
 		toJSON(): infer J;
-	}
+	},
 ]
 	? Jsonify<J, false>
 	: T extends boolean | number | string | null

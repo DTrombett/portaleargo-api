@@ -18,6 +18,7 @@ import {
 	Profilo,
 	Token,
 	aggiornaData,
+	defaultVersion,
 	downloadAllegato,
 	downloadAllegatoStudente,
 	getCode,
@@ -84,6 +85,12 @@ export class Client {
 	 */
 	dataProvider?: NonNullable<ClientOptions["dataProvider"]>;
 
+	/**
+	 * La versione di didUp da specificare nell'header.
+	 * * Modificare questa opzione potrebbe creare problemi nell'utilizzo della libreria
+	 */
+	version: string;
+
 	#credentials?: Partial<Credentials>;
 	#ready = false;
 
@@ -101,6 +108,7 @@ export class Client {
 		this.profile = options.profile;
 		this.dashboard = options.dashboard;
 		this.debug = options.debug ?? false;
+		this.version = options.version ?? defaultVersion;
 		this.headers = options.headers;
 		if (options.dataProvider !== null) {
 			options.dataPath ??= AuthFolder;

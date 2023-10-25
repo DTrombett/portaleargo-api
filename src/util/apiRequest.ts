@@ -24,7 +24,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 		{
 			headers: {
 				accept: "application/json",
-				"argo-client-version": "1.15.1",
+				"argo-client-version": client.version,
 				authorization: `Bearer ${client.token?.accessToken ?? ""}`,
 				"content-type": "application/json; charset=utf-8",
 				"x-auth-token": client.loginData?.token,
