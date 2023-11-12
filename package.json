@@ -2,7 +2,10 @@
 	"name": "portaleargo-api",
 	"version": "1.0.0",
 	"description": "A library to interact with the api of ArgoScuolaNext",
-	"exports": "./dist/index.js",
+	"exports": {
+		"types": "./types/index.d.ts",
+		"default": "./dist/index.js"
+	},
 	"main": "./dist/index.js",
 	"types": "./types/index.d.ts",
 	"scripts": {
