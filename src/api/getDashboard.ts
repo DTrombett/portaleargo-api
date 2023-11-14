@@ -19,7 +19,13 @@ export const getDashboard = async (
 		{
 			body: {
 				dataultimoaggiornamento: formatDate(options.lastUpdate),
-				opzioni: JSON.stringify(client.loginData?.options),
+				opzioni:
+					client.loginData &&
+					JSON.stringify(
+						Object.fromEntries(
+							client.loginData.opzioni.map((a) => [a.chiave, a.valore]),
+						),
+					),
 			},
 			method: "POST",
 		},

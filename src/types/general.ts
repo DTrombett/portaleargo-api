@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { Dashboard, Login, Profilo, Token } from "..";
+import type { APILogin, APIToken, Dashboard, Profilo } from "..";
 
 export type ObjectJson = {
 	[key: string]: Json;
@@ -24,7 +24,7 @@ export type HttpMethod =
 	| "TRACE";
 export type ReadData = {
 	dashboard: Dashboard;
-	login: Login;
+	login: APILogin["data"][number];
 	profile: Profilo;
 	token: Token;
 };
@@ -44,6 +44,9 @@ export type Credentials = {
 	 */
 	password: string;
 };
+export type Token = APIToken & {
+	expireDate: Date;
+};
 export type ClientOptions = Partial<
 	Credentials & {
 		/**
@@ -54,7 +57,7 @@ export type ClientOptions = Partial<
 		/**
 		 * I dati del login
 		 */
-		loginData: Login;
+		loginData: APILogin["data"][number];
 
 		/**
 		 * I dati del profilo
@@ -139,6 +142,6 @@ export type LoginLink = {
 };
 export type ReadyClient = {
 	token: Token;
-	loginData: Login;
+	loginData: APILogin;
 	profile: Profilo;
 };
