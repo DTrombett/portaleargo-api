@@ -1,5 +1,11 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { APILogin, APIProfilo, APIToken, Dashboard } from "..";
+import type {
+	APIDashboard,
+	APILogin,
+	APIOperation,
+	APIProfilo,
+	APIToken,
+} from "..";
 
 export type ObjectJson = {
 	[key: string]: Json;
@@ -23,6 +29,16 @@ export type HttpMethod =
 	| "PUT"
 	| "TRACE";
 export type ReadData = {
+	dashboard: ClearOperations<APIDashboard["data"]["dati"][number]> & {
+		dataAggiornamento: string;
+	};
+	login: APILogin["data"][number];
+	profile: APIProfilo["data"];
+	token: APIToken & {
+		expireDate: string;
+	};
+};
+export type WriteData = {
 	dashboard: Dashboard;
 	login: APILogin["data"][number];
 	profile: APIProfilo["data"];
@@ -44,8 +60,20 @@ export type Credentials = {
 	 */
 	password: string;
 };
+export type ClearOperations<T> = {
+	[K in keyof T]: T[K] extends APIOperation<infer A>[]
+		? (A & { pk: string })[]
+		: T[K] extends object
+		? ClearOperations<T[K]>
+		: T[K];
+};
 export type Token = APIToken & {
 	expireDate: Date;
+};
+export type Dashboard = ClearOperations<
+	APIDashboard["data"]["dati"][number]
+> & {
+	dataAggiornamento: Date;
 };
 export type ClientOptions = Partial<
 	Credentials & {
@@ -91,10 +119,10 @@ export type ClientOptions = Partial<
 		dataProvider: {
 			read?: <T extends keyof ReadData>(
 				name: T,
-			) => Promise<Jsonify<ReadData[T]> | undefined>;
-			write: <T extends keyof ReadData>(
+			) => Promise<ReadData[T] | undefined>;
+			write: <T extends keyof WriteData>(
 				name: T,
-				data: ReadData[T],
+				data: WriteData[T],
 			) => Promise<void>;
 			reset: () => Promise<void>;
 		} | null;

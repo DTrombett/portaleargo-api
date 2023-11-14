@@ -4,7 +4,6 @@ export * from "./Base";
 export * from "./BaseProfilo";
 export * from "./CorsiRecupero";
 export * from "./Curriculum";
-export * from "./Dashboard";
 export * from "./DettagliMateria";
 export * from "./DettagliProfilo";
 export * from "./Disponibilità";

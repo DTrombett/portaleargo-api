@@ -9,6 +9,7 @@ import type {
 	ClientOptions,
 	CorsiRecupero,
 	Credentials,
+	Dashboard,
 	DettagliProfilo,
 	ReadyClient,
 	Ricevimenti,
@@ -16,7 +17,6 @@ import type {
 } from ".";
 import {
 	AuthFolder,
-	Dashboard,
 	aggiornaData,
 	defaultVersion,
 	downloadAllegato,
@@ -186,7 +186,11 @@ export class Client {
 			this.token = { ...token, expireDate: new Date(token.expireDate) };
 		if (loginData) this.loginData = loginData;
 		if (profile) this.profile = profile;
-		if (dashboard) this.dashboard = new Dashboard(dashboard, this);
+		if (dashboard)
+			this.dashboard = {
+				...dashboard,
+				dataAggiornamento: new Date(dashboard.dataAggiornamento),
+			};
 	}
 
 	/**

@@ -7,20 +7,21 @@ import type { APIOperation, Json } from "..";
  * @param map - Una funzione per convertire l'array
  * @returns Il nuovo array
  */
-export const handleOperation = <
-	P extends {
-		id: string;
-	},
-	T = Json,
->(
+export const handleOperation = <T = Json>(
 	array: APIOperation<T>[],
-	old: P[] = [],
-	map: (a: Extract<APIOperation<T>, { operazione: "I" }>) => P,
+	old: (T & { pk: string })[] = [],
+	map?: (
+		a: Omit<Extract<APIOperation<T>, { operazione: "I" }>, "operazione">,
+	) => T & { pk: string },
 ) => {
 	const toDelete: string[] = [];
 
 	for (const a of array)
 		if (a.operazione === "D") toDelete.push(a.pk);
-		else old.push(map(a));
-	return old.filter((a) => !toDelete.includes(a.id));
+		else {
+			const { operazione, ...rest } = a;
+
+			old.push(map?.(rest) ?? (rest as T & { pk: string }));
+		}
+	return old.filter((a) => !toDelete.includes(a.pk));
 };

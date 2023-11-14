@@ -1,5 +1,5 @@
 import type { APIBacheca, Client } from "..";
-import { EventoBacheca, apiRequest, handleOperation } from "..";
+import { apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca.
@@ -21,9 +21,5 @@ export const getStoricoBacheca = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return handleOperation(
-		body.data.bacheca,
-		undefined,
-		(a) => new EventoBacheca(a, client),
-	);
+	return handleOperation(body.data.bacheca);
 };
