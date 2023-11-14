@@ -30,7 +30,7 @@ export const refreshToken = async (client: Client) => {
 	const expireDate = new Date(res.headers.date as string);
 
 	expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
-	client.token = { ...body, expireDate };
+	client.token = Object.assign(client.token ?? {}, body, { expireDate });
 	void client.dataProvider?.write("token", client.token);
 	return client.token;
 };

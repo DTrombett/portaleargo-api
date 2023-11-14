@@ -5,6 +5,7 @@ import { env } from "node:process";
 import { request } from "undici";
 import type {
 	APILogin,
+	APIProfilo,
 	ClientOptions,
 	CorsiRecupero,
 	Credentials,
@@ -16,7 +17,6 @@ import type {
 import {
 	AuthFolder,
 	Dashboard,
-	Profilo,
 	aggiornaData,
 	defaultVersion,
 	downloadAllegato,
@@ -62,7 +62,7 @@ export class Client {
 	/**
 	 * I dati del profilo
 	 */
-	profile?: Profilo;
+	profile?: APIProfilo["data"];
 
 	/**
 	 * I dati della dashboard
@@ -155,7 +155,7 @@ export class Client {
 				});
 
 				if (whatData.profiloModificato || whatData.differenzaSchede) {
-					this.profile.patch(whatData.profilo);
+					Object.assign(this.profile, whatData.profilo);
 					void this.dataProvider?.write("profile", this.profile);
 				}
 				this.#ready = true;
@@ -185,7 +185,7 @@ export class Client {
 		if (token)
 			this.token = { ...token, expireDate: new Date(token.expireDate) };
 		if (loginData) this.loginData = loginData;
-		if (profile) this.profile = new Profilo(profile, this);
+		if (profile) this.profile = profile;
 		if (dashboard) this.dashboard = new Dashboard(dashboard, this);
 	}
 
@@ -297,7 +297,7 @@ export class Client {
 		this.checkReady();
 		return downloadAllegatoStudente(this, {
 			id,
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -365,7 +365,7 @@ export class Client {
 	async getTasse(profileId?: string) {
 		this.checkReady();
 		return getTasse(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -377,7 +377,7 @@ export class Client {
 	async getPCTOData(profileId?: string) {
 		this.checkReady();
 		return getPCTOData(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -389,7 +389,7 @@ export class Client {
 	async getCorsiRecupero<T extends CorsiRecupero>(profileId?: string, old?: T) {
 		this.checkReady();
 		return getCorsiRecupero(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 			old,
 		});
 	}
@@ -402,7 +402,7 @@ export class Client {
 	async getCurriculum(profileId?: string) {
 		this.checkReady();
 		return getCurriculum(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 

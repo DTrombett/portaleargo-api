@@ -17,7 +17,7 @@ export const login = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	client.loginData = { ...client.loginData, ...body.data[0] };
+	client.loginData = Object.assign(client.loginData ?? {}, body.data[0]);
 	void client.dataProvider?.write("login", client.loginData);
 	return client.loginData;
 };

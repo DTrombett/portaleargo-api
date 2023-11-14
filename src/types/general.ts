@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { APILogin, APIToken, Dashboard, Profilo } from "..";
+import type { APILogin, APIProfilo, APIToken, Dashboard } from "..";
 
 export type ObjectJson = {
 	[key: string]: Json;
@@ -25,7 +25,7 @@ export type HttpMethod =
 export type ReadData = {
 	dashboard: Dashboard;
 	login: APILogin["data"][number];
-	profile: Profilo;
+	profile: APIProfilo["data"];
 	token: Token;
 };
 export type Credentials = {
@@ -62,7 +62,7 @@ export type ClientOptions = Partial<
 		/**
 		 * I dati del profilo
 		 */
-		profile: Profilo;
+		profile: APIProfilo["data"];
 
 		/**
 		 * I dati della dashboard
@@ -142,6 +142,6 @@ export type LoginLink = {
 };
 export type ReadyClient = {
 	token: Token;
-	loginData: APILogin;
-	profile: Profilo;
+	loginData: APILogin["data"][number];
+	profile: APIProfilo;
 };

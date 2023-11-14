@@ -22,7 +22,6 @@ export * from "./MediaPeriodo";
 export * from "./Orario";
 export * from "./Periodo";
 export * from "./Prenotazione";
-export * from "./Profilo";
 export * from "./Promemoria";
 export * from "./Ricevimenti";
 export * from "./Ricevuta";
