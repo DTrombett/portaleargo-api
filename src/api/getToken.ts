@@ -1,7 +1,7 @@
 import { URLSearchParams } from "node:url";
 import { request } from "undici";
 import type { APIToken, Client } from "..";
-import { Token, clientId } from "..";
+import { clientId } from "..";
 
 /**
  * Ottieni il token tramite l'API.
@@ -31,10 +31,10 @@ export const getToken = async (
 		method: "POST",
 	});
 	const data = (await res.body.json()) as APIToken;
-	const date = new Date(res.headers.date as string);
+	const expireDate = new Date(res.headers.date as string);
 
-	if (!client.token?.patch(data, date))
-		client.token = new Token(data, client, date);
+	expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
+	client.token = Object.assign(client.token ?? {}, data, { expireDate });
 	void client.dataProvider?.write("token", client.token);
 	return client.token;
 };

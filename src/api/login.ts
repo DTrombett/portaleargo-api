@@ -1,5 +1,5 @@
 import type { APILogin, Client } from "..";
-import { Login, apiRequest, randomString } from "..";
+import { apiRequest, randomString } from "..";
 
 /**
  * Effettua il login tramite l'API.
@@ -17,8 +17,7 @@ export const login = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	if (!client.loginData?.patch(body.data[0]))
-		client.loginData = new Login(body.data[0], client);
+	client.loginData = Object.assign(client.loginData ?? {}, body.data[0]);
 	void client.dataProvider?.write("login", client.loginData);
 	return client.loginData;
 };

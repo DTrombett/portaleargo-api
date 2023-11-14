@@ -25,10 +25,10 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 			headers: {
 				accept: "application/json",
 				"argo-client-version": client.version,
-				authorization: `Bearer ${client.token?.accessToken ?? ""}`,
+				authorization: `Bearer ${client.token?.access_token ?? ""}`,
 				"content-type": "application/json; charset=utf-8",
 				"x-auth-token": client.loginData?.token,
-				"x-cod-min": client.loginData?.schoolCode,
+				"x-cod-min": client.loginData?.codMin,
 				"x-date-exp-auth":
 					client.token?.expireDate && formatDate(client.token.expireDate),
 				...client.headers,

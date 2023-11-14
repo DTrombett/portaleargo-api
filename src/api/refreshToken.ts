@@ -1,5 +1,5 @@
 import type { APIToken, Client } from "..";
-import { Token, apiRequest, clientId, formatDate } from "..";
+import { apiRequest, clientId, formatDate } from "..";
 
 /**
  * Aggiorna il token.
@@ -13,10 +13,10 @@ export const refreshToken = async (client: Client) => {
 		{
 			method: "POST",
 			body: {
-				"r-token": client.token?.refreshToken,
+				"r-token": client.token?.refresh_token,
 				"client-id": clientId,
-				scopes: `[${client.token?.scopes.join(", ") ?? ""}]`,
-				"old-bearer": client.token?.accessToken,
+				scopes: `[${client.token?.scope.split(" ").join(", ") ?? ""}]`,
+				"old-bearer": client.token?.access_token,
 				"primo-accesso": "false",
 				"ripeti-login": "false",
 				"exp-bearer":
@@ -27,9 +27,10 @@ export const refreshToken = async (client: Client) => {
 			},
 		},
 	);
-	const date = new Date(res.headers.date as string);
-	if (!client.token?.patch(body, date))
-		client.token = new Token(body, client, date);
+	const expireDate = new Date(res.headers.date as string);
+
+	expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
+	client.token = Object.assign(client.token ?? {}, body, { expireDate });
 	void client.dataProvider?.write("token", client.token);
 	return client.token;
 };

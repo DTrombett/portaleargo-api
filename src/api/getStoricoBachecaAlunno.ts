@@ -1,5 +1,5 @@
 import type { APIBachecaAlunno, Client } from "..";
-import { EventoBachecaAlunno, apiRequest, handleOperation } from "..";
+import { apiRequest, handleOperation } from "..";
 
 /**
  * Ottieni lo storico della bacheca alunno.
@@ -25,9 +25,5 @@ export const getStoricoBachecaAlunno = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return handleOperation(
-		body.data.bachecaAlunno,
-		undefined,
-		(a) => new EventoBachecaAlunno(a, client),
-	);
+	return handleOperation(body.data.bachecaAlunno);
 };

@@ -1,5 +1,5 @@
 import type { APIOrarioGiornaliero, Client } from "..";
-import { Orario, apiRequest, formatDate } from "..";
+import { apiRequest, formatDate } from "..";
 
 /**
  * Ottieni l'orario giornaliero.
@@ -32,7 +32,5 @@ export const getOrarioGiornaliero = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	return Object.values(body.data.dati)
-		.flat()
-		.map((d) => new Orario(d, client));
+	return Object.values(body.data.dati).flat();
 };

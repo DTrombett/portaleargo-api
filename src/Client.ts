@@ -4,19 +4,19 @@ import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
 import type {
+	APICorsiRecupero,
+	APIDettagliProfilo,
+	APILogin,
+	APIProfilo,
+	APIRicevimenti,
 	ClientOptions,
-	CorsiRecupero,
 	Credentials,
-	DettagliProfilo,
+	Dashboard,
 	ReadyClient,
-	Ricevimenti,
+	Token,
 } from ".";
 import {
 	AuthFolder,
-	Dashboard,
-	Login,
-	Profilo,
-	Token,
 	aggiornaData,
 	defaultVersion,
 	downloadAllegato,
@@ -57,12 +57,12 @@ export class Client {
 	/**
 	 * I dati del login
 	 */
-	loginData?: Login;
+	loginData?: APILogin["data"][number];
 
 	/**
 	 * I dati del profilo
 	 */
-	profile?: Profilo;
+	profile?: APIProfilo["data"];
 
 	/**
 	 * I dati della dashboard
@@ -91,14 +91,18 @@ export class Client {
 	 */
 	version: string;
 
-	#credentials?: Partial<Credentials>;
+	/**
+	 * Le credenziali usate per l'accesso
+	 */
+	credentials?: Partial<Credentials>;
+
 	#ready = false;
 
 	/**
 	 * @param options - Le opzioni per il client
 	 */
 	constructor(options: ClientOptions = {}) {
-		this.#credentials = {
+		this.credentials = {
 			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
 			password: options.password ?? env.PASSWORD,
 			username: options.username ?? env.NOME_UTENTE,
@@ -150,12 +154,13 @@ export class Client {
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 				});
 
-				if (whatData.profiloModificato || whatData.differenzaSchede) {
-					this.profile.patch(whatData.profilo);
+				if (whatData.isModificato || whatData.differenzaSchede) {
+					Object.assign(this.profile, whatData);
 					void this.dataProvider?.write("profile", this.profile);
 				}
 				this.#ready = true;
-				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
+				if (whatData.mostraPallino || !this.dashboard)
+					await this.getDashboard();
 				aggiornaData(this).catch(console.error);
 				return this as ReadyClient & this & { dashboard: Dashboard };
 			}
@@ -178,10 +183,15 @@ export class Client {
 			this.dashboard ? undefined : this.dataProvider.read("dashboard"),
 		]);
 
-		if (token) this.token = new Token(token, this);
-		if (loginData) this.loginData = new Login(loginData, this);
-		if (profile) this.profile = new Profilo(profile, this);
-		if (dashboard) this.dashboard = new Dashboard(dashboard, this);
+		if (token)
+			this.token = { ...token, expireDate: new Date(token.expireDate) };
+		if (loginData) this.loginData = loginData;
+		if (profile) this.profile = profile;
+		if (dashboard)
+			this.dashboard = {
+				...dashboard,
+				dataAggiornamento: new Date(dashboard.dataAggiornamento),
+			};
 	}
 
 	/**
@@ -202,13 +212,13 @@ export class Client {
 	async getToken() {
 		if (
 			[
-				this.#credentials?.password,
-				this.#credentials?.schoolCode,
-				this.#credentials?.username,
+				this.credentials?.password,
+				this.credentials?.schoolCode,
+				this.credentials?.username,
 			].includes(undefined)
 		)
 			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.#credentials as Credentials);
+		const code = await getCode(this.credentials as Credentials);
 
 		return getToken(this, {
 			code: code.code,
@@ -233,7 +243,7 @@ export class Client {
 	 * Ottieni i dettagli del profilo dello studente.
 	 * @returns I dati
 	 */
-	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
+	async getDettagliProfilo<T extends APIDettagliProfilo["data"]>(old?: T) {
 		this.checkReady();
 		return getDettagliProfilo(this, {
 			old,
@@ -292,7 +302,7 @@ export class Client {
 		this.checkReady();
 		return downloadAllegatoStudente(this, {
 			id,
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -347,7 +357,7 @@ export class Client {
 	 * Ottieni i dati riguardo i ricevimenti dello studente.
 	 * @returns I dati
 	 */
-	async getRicevimenti<T extends Ricevimenti>(old?: T) {
+	async getRicevimenti<T extends APIRicevimenti["data"]>(old?: T) {
 		this.checkReady();
 		return getRicevimenti(this, { old });
 	}
@@ -360,7 +370,7 @@ export class Client {
 	async getTasse(profileId?: string) {
 		this.checkReady();
 		return getTasse(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -372,7 +382,7 @@ export class Client {
 	async getPCTOData(profileId?: string) {
 		this.checkReady();
 		return getPCTOData(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
@@ -381,10 +391,13 @@ export class Client {
 	 * @param profileId - L'id del profilo
 	 * @returns I dati
 	 */
-	async getCorsiRecupero<T extends CorsiRecupero>(profileId?: string, old?: T) {
+	async getCorsiRecupero<T extends APICorsiRecupero["data"]>(
+		profileId?: string,
+		old?: T,
+	) {
 		this.checkReady();
 		return getCorsiRecupero(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 			old,
 		});
 	}
@@ -397,7 +410,7 @@ export class Client {
 	async getCurriculum(profileId?: string) {
 		this.checkReady();
 		return getCurriculum(this, {
-			profileId: profileId ?? this.profile.id,
+			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
