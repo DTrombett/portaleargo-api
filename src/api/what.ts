@@ -1,5 +1,5 @@
 import type { APIWhat, Client } from "..";
-import { What, apiRequest, formatDate } from "..";
+import { apiRequest, formatDate } from "..";
 
 /**
  * Richiedi i dati generali.
@@ -11,7 +11,7 @@ export const what = async (
 	client: Client,
 	options: {
 		lastUpdate: Date | number | string;
-		old?: What;
+		old?: APIWhat["data"]["dati"][number];
 	},
 ) => {
 	const authToken = JSON.stringify([client.loginData?.token]);
@@ -32,7 +32,5 @@ export const what = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return (
-		options.old?.patch(body.data.dati[0]) ?? new What(body.data.dati[0], client)
-	);
+	return Object.assign(options.old ?? {}, body.data.dati[0]);
 };

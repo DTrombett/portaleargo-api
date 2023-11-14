@@ -4,15 +4,15 @@ import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
 import type {
+	APICorsiRecupero,
+	APIDettagliProfilo,
 	APILogin,
 	APIProfilo,
+	APIRicevimenti,
 	ClientOptions,
-	CorsiRecupero,
 	Credentials,
 	Dashboard,
-	DettagliProfilo,
 	ReadyClient,
-	Ricevimenti,
 	Token,
 } from ".";
 import {
@@ -154,12 +154,13 @@ export class Client {
 						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
 				});
 
-				if (whatData.profiloModificato || whatData.differenzaSchede) {
-					Object.assign(this.profile, whatData.profilo);
+				if (whatData.isModificato || whatData.differenzaSchede) {
+					Object.assign(this.profile, whatData);
 					void this.dataProvider?.write("profile", this.profile);
 				}
 				this.#ready = true;
-				if (whatData.aggiornato || !this.dashboard) await this.getDashboard();
+				if (whatData.mostraPallino || !this.dashboard)
+					await this.getDashboard();
 				aggiornaData(this).catch(console.error);
 				return this as ReadyClient & this & { dashboard: Dashboard };
 			}
@@ -242,7 +243,7 @@ export class Client {
 	 * Ottieni i dettagli del profilo dello studente.
 	 * @returns I dati
 	 */
-	async getDettagliProfilo<T extends DettagliProfilo>(old?: T) {
+	async getDettagliProfilo<T extends APIDettagliProfilo["data"]>(old?: T) {
 		this.checkReady();
 		return getDettagliProfilo(this, {
 			old,
@@ -356,7 +357,7 @@ export class Client {
 	 * Ottieni i dati riguardo i ricevimenti dello studente.
 	 * @returns I dati
 	 */
-	async getRicevimenti<T extends Ricevimenti>(old?: T) {
+	async getRicevimenti<T extends APIRicevimenti["data"]>(old?: T) {
 		this.checkReady();
 		return getRicevimenti(this, { old });
 	}
@@ -390,7 +391,10 @@ export class Client {
 	 * @param profileId - L'id del profilo
 	 * @returns I dati
 	 */
-	async getCorsiRecupero<T extends CorsiRecupero>(profileId?: string, old?: T) {
+	async getCorsiRecupero<T extends APICorsiRecupero["data"]>(
+		profileId?: string,
+		old?: T,
+	) {
 		this.checkReady();
 		return getCorsiRecupero(this, {
 			profileId: profileId ?? this.profile.scheda.pk,

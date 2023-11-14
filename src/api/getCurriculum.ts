@@ -1,5 +1,5 @@
 import type { APICurriculum, Client } from "..";
-import { Curriculum, apiRequest } from "..";
+import { apiRequest } from "..";
 
 /**
  * Ottieni il curriculum dello studente.
@@ -21,5 +21,5 @@ export const getCurriculum = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return body.data.curriculum.map((c) => new Curriculum(c, client));
+	return body.data.curriculum;
 };

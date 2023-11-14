@@ -1,5 +1,5 @@
 import type { APICorsiRecupero, Client } from "..";
-import { CorsiRecupero, apiRequest } from "..";
+import { apiRequest } from "..";
 
 /**
  * Ottieni i dati dei corsi di recupero dello studente.
@@ -7,7 +7,7 @@ import { CorsiRecupero, apiRequest } from "..";
  * @param options - Altre opzioni della richiesta
  * @returns I dati
  */
-export const getCorsiRecupero = async <T extends CorsiRecupero>(
+export const getCorsiRecupero = async <T extends APICorsiRecupero["data"]>(
 	client: Client,
 	options: {
 		profileId: string;
@@ -22,6 +22,5 @@ export const getCorsiRecupero = async <T extends CorsiRecupero>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return (options.old?.patch(body.data) ??
-		new CorsiRecupero(body.data, client, options.profileId)) as T;
+	return Object.assign(options.old ?? {}, body.data);
 };

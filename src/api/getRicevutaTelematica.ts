@@ -1,5 +1,5 @@
 import type { APIRicevutaTelematica, Client } from "..";
-import { Ricevuta, apiRequest } from "..";
+import { apiRequest } from "..";
 
 /**
  * Ottieni i dati di una ricevuta telematica.
@@ -25,5 +25,7 @@ export const getRicevutaTelematica = async (
 	);
 
 	if (!body.success) throw new Error(body.msg);
-	return new Ricevuta(body, client);
+	const { success, msg, ...rest } = body;
+
+	return rest;
 };

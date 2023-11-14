@@ -1,5 +1,5 @@
 import type { APIRicevimenti, Client } from "..";
-import { Ricevimenti, apiRequest } from "..";
+import { apiRequest } from "..";
 
 /**
  * Ottieni i dati riguardo i ricevimenti dello studente.
@@ -7,7 +7,7 @@ import { Ricevimenti, apiRequest } from "..";
  * @param options - Altre opzioni della richiesta
  * @returns I dati
  */
-export const getRicevimenti = async <T extends Ricevimenti>(
+export const getRicevimenti = async <T extends APIRicevimenti["data"]>(
 	client: Client,
 	options?: { old?: T },
 ) => {
@@ -17,7 +17,5 @@ export const getRicevimenti = async <T extends Ricevimenti>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	return (
-		options?.old?.patch(body.data) ?? (new Ricevimenti(body.data, client) as T)
-	);
+	return Object.assign(options?.old ?? {}, body.data);
 };
