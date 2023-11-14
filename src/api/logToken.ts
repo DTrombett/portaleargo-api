@@ -13,16 +13,16 @@ export const logToken = async (
 	const { body } = await apiRequest<APIResponse>("logtoken", client, {
 		method: "POST",
 		body: {
-			bearerOld: options.oldToken.accessToken,
+			bearerOld: options.oldToken.access_token,
 			dateExpOld: formatDate(options.oldToken.expireDate),
-			refreshOld: options.oldToken.refreshToken,
-			bearerNew: client.token?.accessToken,
+			refreshOld: options.oldToken.refresh_token,
+			bearerNew: client.token?.access_token,
 			dateExpNew:
 				client.token?.expireDate && formatDate(client.token.expireDate),
-			refreshNew: client.token?.refreshToken,
+			refreshNew: client.token?.refresh_token,
 			isWhat: (options.isWhat ?? false).toString(),
 			isRefreshed: (
-				client.token?.accessToken === options.oldToken.accessToken
+				client.token?.access_token === options.oldToken.access_token
 			).toString(),
 			proc: "initState_global_random_12345",
 		},

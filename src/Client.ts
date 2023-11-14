@@ -4,19 +4,19 @@ import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
 import { request } from "undici";
 import type {
+	APILogin,
 	ClientOptions,
 	CorsiRecupero,
 	Credentials,
 	DettagliProfilo,
 	ReadyClient,
 	Ricevimenti,
+	Token,
 } from ".";
 import {
 	AuthFolder,
 	Dashboard,
-	Login,
 	Profilo,
-	Token,
 	aggiornaData,
 	defaultVersion,
 	downloadAllegato,
@@ -57,7 +57,7 @@ export class Client {
 	/**
 	 * I dati del login
 	 */
-	loginData?: Login;
+	loginData?: APILogin["data"][number];
 
 	/**
 	 * I dati del profilo
@@ -91,14 +91,18 @@ export class Client {
 	 */
 	version: string;
 
-	#credentials?: Partial<Credentials>;
+	/**
+	 * Le credenziali usate per l'accesso
+	 */
+	credentials?: Partial<Credentials>;
+
 	#ready = false;
 
 	/**
 	 * @param options - Le opzioni per il client
 	 */
 	constructor(options: ClientOptions = {}) {
-		this.#credentials = {
+		this.credentials = {
 			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
 			password: options.password ?? env.PASSWORD,
 			username: options.username ?? env.NOME_UTENTE,
@@ -178,8 +182,9 @@ export class Client {
 			this.dashboard ? undefined : this.dataProvider.read("dashboard"),
 		]);
 
-		if (token) this.token = new Token(token, this);
-		if (loginData) this.loginData = new Login(loginData, this);
+		if (token)
+			this.token = { ...token, expireDate: new Date(token.expireDate) };
+		if (loginData) this.loginData = loginData;
 		if (profile) this.profile = new Profilo(profile, this);
 		if (dashboard) this.dashboard = new Dashboard(dashboard, this);
 	}
@@ -202,13 +207,13 @@ export class Client {
 	async getToken() {
 		if (
 			[
-				this.#credentials?.password,
-				this.#credentials?.schoolCode,
-				this.#credentials?.username,
+				this.credentials?.password,
+				this.credentials?.schoolCode,
+				this.credentials?.username,
 			].includes(undefined)
 		)
 			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.#credentials as Credentials);
+		const code = await getCode(this.credentials as Credentials);
 
 		return getToken(this, {
 			code: code.code,

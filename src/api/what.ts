@@ -19,7 +19,7 @@ export const what = async (
 		method: "POST",
 		body: {
 			dataultimoaggiornamento: formatDate(options.lastUpdate),
-			opzioni: JSON.stringify(client.loginData?.options),
+			opzioni: JSON.stringify(client.loginData?.opzioni),
 			"lista-x-auth-token": authToken,
 			"lista-x-auth-token-account": authToken,
 		},

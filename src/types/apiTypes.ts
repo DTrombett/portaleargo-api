@@ -37,7 +37,7 @@ export type APILogin = APIResponse<
 			isSpid: boolean;
 			token: string;
 			username: string;
-		}
+		},
 	]
 >;
 export type APIProfilo = APIResponse<{
@@ -303,7 +303,7 @@ export type APIDashboard = APIResponse<{
 				nota: string;
 			}>[];
 			classiExtra: boolean;
-		}
+		},
 	];
 }>;
 export type APIDettagliProfilo = APIResponse<{
@@ -382,7 +382,7 @@ export type APIWhat = APIResponse<{
 			};
 			differenzaSchede: boolean;
 			profiloStorico: boolean;
-		}
+		},
 	];
 }>;
 export type APIOrarioGiornaliero = APIResponse<{
@@ -424,7 +424,7 @@ export type APIVotiScrutinio = APIResponse<{
 				scrutinioFinale: boolean;
 			}[];
 			pk: string;
-		}
+		},
 	];
 }>;
 export type APIRicevimenti = APIResponse<{
