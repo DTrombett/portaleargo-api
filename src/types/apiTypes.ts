@@ -42,7 +42,7 @@ export type APILogin = APIResponse<
 >;
 export type APIProfilo = APIResponse<{
 	resetPassword: boolean;
-	ultimoCambioPwd: null;
+	ultimoCambioPwd: string | null;
 	anno: {
 		dataInizio: string;
 		anno: string;
@@ -400,7 +400,7 @@ export type APIOrarioGiornaliero = APIResponse<{
 			desDenominazione: string;
 			desEmail: string;
 			desSezione: string;
-			ora: null;
+			ora: string | null;
 		}[]
 	>;
 }>;
@@ -418,7 +418,7 @@ export type APIVotiScrutinio = APIResponse<{
 		{
 			periodi: {
 				desDescrizione: string;
-				materie: any[];
+				materie: string;
 				suddivisione: string;
 				votiGiudizi: boolean;
 				scrutinioFinale: boolean;
