@@ -1,5 +1,6 @@
 import type { APICurriculum, Client } from "..";
 import { apiRequest } from "..";
+import { validateCurriculum } from "../schemas";
 
 /**
  * Ottieni il curriculum dello studente.
@@ -21,5 +22,6 @@ export const getCurriculum = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	validateCurriculum(body);
 	return body.data.curriculum;
 };

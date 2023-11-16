@@ -1,5 +1,6 @@
 import type { APIDettagliProfilo, Client } from "..";
 import { apiRequest } from "..";
+import { validateDettagliProfilo } from "../schemas";
 
 /**
  * Ottieni i dettagli del profilo dello studente.
@@ -22,5 +23,6 @@ export const getDettagliProfilo = async <T extends APIDettagliProfilo["data"]>(
 	);
 
 	if (!body.success) throw new Error(body.msg!);
+	validateDettagliProfilo(body);
 	return Object.assign(options?.old ?? {}, body.data);
 };

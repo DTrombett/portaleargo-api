@@ -1,5 +1,6 @@
 import type { APITasse, Client } from "..";
 import { apiRequest } from "..";
+import { validateTasse } from "../schemas";
 
 /**
  * Ottieni i dati delle tasse dello studente.
@@ -23,6 +24,7 @@ export const getTasse = async (
 	if (!body.success) throw new Error(body.msg!);
 	const { success, msg, data, ...rest } = body;
 
+	validateTasse(body);
 	return {
 		...rest,
 		tasse: data,

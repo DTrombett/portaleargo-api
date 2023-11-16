@@ -4,11 +4,17 @@ import { fastUri } from "fast-uri";
 import { mkdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import type {
+	APICorsiRecupero,
+	APICurriculum,
 	APIDettagliProfilo,
 	APIDownloadAllegato,
 	APILogin,
 	APIOrarioGiornaliero,
+	APIPCTO,
 	APIProfilo,
+	APIRicevimenti,
+	APIRicevutaTelematica,
+	APITasse,
 	APIToken,
 	APIVotiScrutinio,
 	APIWhat,
@@ -18,10 +24,14 @@ import {
 	allRequired,
 	apiResponse,
 	array,
+	arrayOfAny,
 	base,
 	boolean,
+	merge,
+	nullableNumber,
 	nullableString,
 	number,
+	record,
 	string,
 } from "./utilityTypes";
 
@@ -36,32 +46,37 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	const func = ajv.compile(schema);
 
 	return (data: unknown) => {
-		func(data);
-		if (func.errors) {
-			const fileName = `${name}-${Date.now()}`;
-			const errorsPath = join(AuthFolder, "errors");
+		setImmediate(() => {
+			func(data);
+			if (func.errors) {
+				const fileName = `${name}-${Date.now()}`;
+				const errorsPath = join(AuthFolder, "errors");
 
-			stat(errorsPath)
-				.catch(() => mkdir(errorsPath))
-				.then((stats) => {
-					if (!stats || stats.isDirectory())
-						void writeToFile(fileName, data, errorsPath);
-				})
-				.catch(() => {});
-			console.warn(
-				`\x1b[33m⚠️  Received an unexpected ${name}\n${func.errors
-					.map(
-						(err) =>
-							`${name}${err.instancePath.replaceAll("/", ".")} ${err.message!}`,
-					)
-					.join(
-						"\n",
-					)}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing this message and, possibly, the data received from the API saved in ${join(
-					errorsPath,
-					fileName,
-				)}.json (remember to hide eventual sensitive data)\x1b[0m`,
-			);
-		}
+				stat(errorsPath)
+					.catch(() => mkdir(errorsPath))
+					.then((stats) => {
+						if (!stats || stats.isDirectory())
+							void writeToFile(fileName, data, errorsPath);
+					})
+					.catch(() => {});
+				console.warn(
+					`\x1b[33m⚠️  Received an unexpected ${name}\n${func.errors
+						.map(
+							(err) =>
+								`${name}${err.instancePath.replaceAll(
+									"/",
+									".",
+								)} ${err.message!}`,
+						)
+						.join(
+							"\n",
+						)}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing this message and, possibly, the data received from the API saved in ${join(
+						errorsPath,
+						fileName,
+					)}.json (remember to hide eventual sensitive data)\x1b[0m`,
+				);
+			}
+		});
 	};
 };
 
@@ -78,29 +93,32 @@ export const validateToken = validate<APIToken>(
 );
 export const validateLogin = validate<APILogin>(
 	"loginData",
-	apiResponse({
-		type: "array",
-		minItems: 1,
-		maxItems: 1,
-		additionalItems: false,
-		items: [
-			allRequired({
-				codMin: string,
-				isPrimoAccesso: boolean,
-				isResetPassword: boolean,
-				isSpid: boolean,
-				profiloDisabilitato: boolean,
-				token: string,
-				username: string,
-				opzioni: array(
-					allRequired({
-						chiave: string,
-						valore: boolean,
-					}),
-				),
-			}),
-		],
-	}),
+	merge<Omit<APILogin, "total">, Pick<APILogin, "total">>(
+		apiResponse({
+			type: "array",
+			minItems: 1,
+			maxItems: 1,
+			additionalItems: false,
+			items: [
+				allRequired({
+					codMin: string,
+					isPrimoAccesso: boolean,
+					isResetPassword: boolean,
+					isSpid: boolean,
+					profiloDisabilitato: boolean,
+					token: string,
+					username: string,
+					opzioni: array(
+						allRequired({
+							chiave: string,
+							valore: boolean,
+						}),
+					),
+				}),
+			],
+		}),
+		allRequired({ total: number }),
+	),
 );
 export const validateProfilo = validate<APIProfilo>(
 	"profilo",
@@ -252,43 +270,41 @@ export const validateOrarioGiornaliero = validate<APIOrarioGiornaliero>(
 	"orario",
 	apiResponse(
 		allRequired({
-			dati: {
-				type: "object",
-				propertyNames: { type: "string" },
-				additionalProperty: {
-					type: "array",
-					items: {
-						...base,
-						properties: {
-							numOra: number,
-							mostra: boolean,
-							desCognome: string,
-							desNome: string,
-							docente: string,
-							materia: string,
-							pk: string,
-							scuAnagrafePK: string,
-							desDenominazione: string,
-							desEmail: string,
-							desSezione: string,
-							ora: nullableString,
-						},
-						required: [
-							"numOra",
-							"mostra",
-							"desCognome",
-							"desNome",
-							"docente",
-							"materia",
-							"desDenominazione",
-							"desEmail",
-							"desSezione",
-							"ora",
-						],
+			dati: record<
+				`${number}`,
+				APIOrarioGiornaliero["data"]["dati"][`${number}`]
+			>(string, {
+				type: "array",
+				items: {
+					...base,
+					properties: {
+						numOra: number,
+						mostra: boolean,
+						desCognome: string,
+						desNome: string,
+						docente: string,
+						materia: string,
+						pk: { ...string, nullable: true },
+						scuAnagrafePK: { ...string, nullable: true },
+						desDenominazione: string,
+						desEmail: string,
+						desSezione: string,
+						ora: nullableString,
 					},
+					required: [
+						"numOra",
+						"mostra",
+						"desCognome",
+						"desNome",
+						"docente",
+						"materia",
+						"desDenominazione",
+						"desEmail",
+						"desSezione",
+						"ora",
+					],
 				},
-				required: [],
-			},
+			}),
 		}),
 	),
 );
@@ -298,7 +314,10 @@ export const validateDownloadAllegato = validate<APIDownloadAllegato>(
 		...base,
 		required: ["success"],
 		properties: { success: boolean, url: string, msg: string },
-		oneOf: [{ required: ["msg"] }, { required: ["url"] }],
+		oneOf: [
+			{ required: ["msg"], properties: { msg: string } },
+			{ required: ["url"], properties: { url: string } },
+		],
 	},
 );
 export const validateVotiScrutinio = validate<APIVotiScrutinio>(
@@ -316,7 +335,7 @@ export const validateVotiScrutinio = validate<APIVotiScrutinio>(
 						periodi: array(
 							allRequired({
 								desDescrizione: string,
-								materie: string,
+								materie: array(string),
 								suddivisione: string,
 								votiGiudizi: boolean,
 								scrutinioFinale: boolean,
@@ -327,4 +346,215 @@ export const validateVotiScrutinio = validate<APIVotiScrutinio>(
 			},
 		}),
 	),
+);
+export const validateRicevimenti = validate<APIRicevimenti>(
+	"ricevimenti",
+	apiResponse(
+		allRequired({
+			tipoAccesso: string,
+			genitoreOAlunno: array(
+				allRequired({
+					desEMail: string,
+					nominativo: string,
+					pk: string,
+					telefono: string,
+				}),
+			),
+			prenotazioni: array(
+				allRequired({
+					operazione: string,
+					datEvento: string,
+					prenotazione: allRequired({
+						prgScuola: number,
+						datPrenotazione: string,
+						numPrenotazione: number,
+						prgAlunno: number,
+						genitore: string,
+						numMax: number,
+						orarioPrenotazione: string,
+						prgGenitore: number,
+						flgAnnullato: nullableString,
+						flgAnnullatoDa: nullableString,
+						desTelefonoGenitore: string,
+						flgTipo: nullableString,
+						datAnnullamento: nullableString,
+						desUrl: nullableString,
+						pk: string,
+						genitorePK: string,
+						desEMailGenitore: string,
+						numPrenotazioni: number,
+					}),
+					disponibilita: allRequired({
+						ora_Fine: string,
+						desNota: string,
+						datDisponibilita: string,
+						desUrl: string,
+						numMax: number,
+						ora_Inizio: string,
+						flgAttivo: string,
+						desLuogoRicevimento: string,
+						pk: string,
+					}),
+					docente: allRequired({
+						desCognome: string,
+						desNome: string,
+						pk: string,
+						desEmail: nullableString,
+					}),
+				}),
+			),
+			disponibilita: record<
+				string,
+				APIRicevimenti["data"]["disponibilita"][string]
+			>(string, {
+				type: "array",
+				items: allRequired({
+					numMax: number,
+					desNota: string,
+					docente: allRequired({
+						desCognome: string,
+						desNome: string,
+						pk: string,
+						desEmail: nullableString,
+					}),
+					numPrenotazioniAnnullate: nullableNumber,
+					flgAttivo: string,
+					oraFine: string,
+					indisponibilita: nullableString,
+					datInizioPrenotazione: string,
+					desUrl: string,
+					unaTantum: string,
+					oraInizioPrenotazione: string,
+					datScadenza: string,
+					desLuogoRicevimento: string,
+					oraInizio: string,
+					pk: string,
+					flgMostraEmail: string,
+					desEMailDocente: string,
+					numPrenotazioni: number,
+				}),
+			}),
+		}),
+	),
+);
+export const validateTasse = validate<APITasse>(
+	"tasse",
+	merge<
+		Omit<APITasse, "isPagOnlineAttivo">,
+		Pick<APITasse, "isPagOnlineAttivo">
+	>(
+		apiResponse(
+			array(
+				allRequired({
+					importoPrevisto: string,
+					dataPagamento: nullableString,
+					dataCreazione: nullableString,
+					scadenza: string,
+					rptPresent: boolean,
+					rata: string,
+					iuv: nullableString,
+					importoTassa: string,
+					stato: string,
+					descrizione: string,
+					debitore: string,
+					importoPagato: nullableString,
+					pagabileOltreScadenza: boolean,
+					rtPresent: boolean,
+					isPagoOnLine: boolean,
+					status: string,
+					listaSingoliPagamenti: {
+						type: "array",
+						items: allRequired({
+							descrizione: string,
+							importoPrevisto: string,
+							importoTassa: string,
+						}),
+						...({ nullable: true } as object),
+					},
+				}),
+			),
+		),
+		allRequired({
+			isPagOnlineAttivo: boolean,
+		}),
+	),
+);
+export const validatePCTO = validate<APIPCTO>(
+	"pcto",
+	apiResponse(
+		allRequired({
+			pcto: array(
+				allRequired({
+					percorsi: arrayOfAny,
+					pk: string,
+				}),
+			),
+		}),
+	),
+);
+export const validateCorsiRecupero = validate<APICorsiRecupero>(
+	"corsiRecupero",
+	apiResponse(
+		allRequired({
+			corsiRecupero: arrayOfAny,
+			periodi: arrayOfAny,
+		}),
+	),
+);
+export const validateCurriculum = validate<APICurriculum>(
+	"curriculum",
+	apiResponse(
+		allRequired({
+			curriculum: array(
+				allRequired({
+					anno: number,
+					classe: string,
+					credito: number,
+					CVAbilitato: boolean,
+					esito: {
+						oneOf: [
+							string,
+							allRequired({
+								desDescrizione: string,
+								numColore: number,
+								flgPositivo: string,
+								flgTipoParticolare: nullableString,
+								tipoEsito: string,
+								descrizione: string,
+								icona: string,
+								codEsito: string,
+								particolarita: string,
+								positivo: string,
+								tipoEsitoParticolare: string,
+								esitoPK: allRequired({
+									codMin: string,
+									codEsito: string,
+								}),
+							}),
+						],
+					},
+					isInterruzioneFR: boolean,
+					isSuperiore: boolean,
+					media: nullableNumber,
+					mostraCredito: boolean,
+					mostraInfo: boolean,
+					ordineScuola: string,
+					pkScheda: string,
+				}),
+			),
+		}),
+	),
+);
+export const validateRicevutaTelematica = validate<APIRicevutaTelematica>(
+	"ricevuta",
+	{
+		...base,
+		properties: {
+			fileName: string,
+			msg: { ...string, nullable: true },
+			success: boolean,
+			url: string,
+		},
+		required: ["fileName", "success", "url"],
+	},
 );

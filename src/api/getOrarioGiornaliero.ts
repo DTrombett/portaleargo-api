@@ -1,5 +1,6 @@
 import type { APIOrarioGiornaliero, Client } from "..";
 import { apiRequest, formatDate } from "..";
+import { validateOrarioGiornaliero } from "../schemas";
 
 /**
  * Ottieni l'orario giornaliero.
@@ -32,5 +33,6 @@ export const getOrarioGiornaliero = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
+	validateOrarioGiornaliero(body);
 	return Object.values(body.data.dati).flat();
 };

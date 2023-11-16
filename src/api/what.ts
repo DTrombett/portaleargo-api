@@ -1,5 +1,6 @@
 import type { APIWhat, Client } from "..";
 import { apiRequest, formatDate } from "..";
+import { validateWhat } from "../schemas";
 
 /**
  * Richiedi i dati generali.
@@ -32,5 +33,6 @@ export const what = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	validateWhat(body);
 	return Object.assign(options.old ?? {}, body.data.dati[0]);
 };

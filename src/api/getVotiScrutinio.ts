@@ -1,5 +1,6 @@
 import type { APIVotiScrutinio, Client } from "..";
 import { apiRequest } from "..";
+import { validateVotiScrutinio } from "../schemas";
 
 /**
  * Ottieni i voti dello scrutinio dello studente.
@@ -13,5 +14,6 @@ export const getVotiScrutinio = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	validateVotiScrutinio(body);
 	return body.data.votiScrutinio[0].periodi;
 };

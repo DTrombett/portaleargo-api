@@ -1,5 +1,6 @@
 import type { APIDownloadAllegato, Client } from "..";
 import { apiRequest } from "..";
+import { validateDownloadAllegato } from "../schemas";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca alunno.
@@ -27,5 +28,6 @@ export const downloadAllegatoStudente = async (
 	);
 
 	if (!body.success) throw new Error(body.msg);
+	validateDownloadAllegato(body);
 	return body.url;
 };

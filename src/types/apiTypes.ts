@@ -39,7 +39,7 @@ export type APILogin = APIResponse<
 			username: string;
 		},
 	]
->;
+> & { total: number };
 export type APIProfilo = APIResponse<{
 	resetPassword: boolean;
 	ultimoCambioPwd: string | null;
@@ -218,7 +218,7 @@ export type APIDashboard = APIResponse<{
 			}>[];
 			ricaricaDati: boolean;
 			listaDocentiClasse: {
-				desCognome: "DI LUCA";
+				desCognome: string;
 				materie: string[];
 				desNome: string;
 				pk: string;
@@ -418,7 +418,7 @@ export type APIVotiScrutinio = APIResponse<{
 		{
 			periodi: {
 				desDescrizione: string;
-				materie: string;
+				materie: string[];
 				suddivisione: string;
 				votiGiudizi: boolean;
 				scrutinioFinale: boolean;
@@ -439,10 +439,10 @@ export type APIRicevimenti = APIResponse<{
 				pk: string;
 				desEmail: string | null;
 			};
-			numPrenotazioniAnnullate: null;
+			numPrenotazioniAnnullate: number | null;
 			flgAttivo: string;
 			oraFine: string;
-			indisponibilita: null;
+			indisponibilita: string | null;
 			datInizioPrenotazione: string;
 			desUrl: string;
 			unaTantum: string;
@@ -475,11 +475,11 @@ export type APIRicevimenti = APIResponse<{
 			numMax: number;
 			orarioPrenotazione: string;
 			prgGenitore: number;
-			flgAnnullato: null;
-			flgAnnullatoDa: null;
+			flgAnnullato: string | null;
+			flgAnnullatoDa: string | null;
 			desTelefonoGenitore: string;
-			flgTipo: null;
-			datAnnullamento: null;
+			flgTipo: string | null;
+			datAnnullamento: string | null;
 			desUrl: string | null;
 			pk: string;
 			genitorePK: string;
@@ -559,7 +559,7 @@ export type APICurriculum = APIResponse<{
 					desDescrizione: string;
 					numColore: number;
 					flgPositivo: string;
-					flgTipoParticolare: null;
+					flgTipoParticolare: string | null;
 					tipoEsito: string;
 					descrizione: string;
 					icona: string;
@@ -573,7 +573,7 @@ export type APICurriculum = APIResponse<{
 		mostraCredito: boolean;
 		isSuperiore: boolean;
 		isInterruzioneFR: boolean;
-		media: number;
+		media: number | null;
 		CVAbilitato: boolean;
 		ordineScuola: string;
 	}[];
