@@ -23,6 +23,6 @@ export const getDettagliProfilo = async <T extends APIDettagliProfilo["data"]>(
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	validateDettagliProfilo(body);
+	if (!client.noTypeCheck) validateDettagliProfilo(body);
 	return Object.assign(options?.old ?? {}, body.data);
 };

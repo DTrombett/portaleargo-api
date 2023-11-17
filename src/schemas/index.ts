@@ -2,6 +2,7 @@ import type { JSONSchemaType } from "ajv";
 import Ajv from "ajv";
 import { fastUri } from "fast-uri";
 import { mkdir, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
 	APICorsiRecupero,
@@ -19,7 +20,7 @@ import type {
 	APIVotiScrutinio,
 	APIWhat,
 } from "../types";
-import { AuthFolder, writeToFile } from "../util";
+import { writeToFile } from "../util";
 import {
 	allRequired,
 	apiResponse,
@@ -50,7 +51,7 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 			func(data);
 			if (func.errors) {
 				const fileName = `${name}-${Date.now()}`;
-				const errorsPath = join(AuthFolder, "errors");
+				const errorsPath = join(tmpdir(), "argo");
 
 				stat(errorsPath)
 					.catch(() => mkdir(errorsPath))

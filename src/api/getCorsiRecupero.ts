@@ -23,6 +23,6 @@ export const getCorsiRecupero = async <T extends APICorsiRecupero["data"]>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validateCorsiRecupero(body);
+	if (!client.noTypeCheck) validateCorsiRecupero(body);
 	return Object.assign(options.old ?? {}, body.data);
 };

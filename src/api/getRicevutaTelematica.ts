@@ -28,6 +28,6 @@ export const getRicevutaTelematica = async (
 	if (!body.success) throw new Error(body.msg);
 	const { success, msg, ...rest } = body;
 
-	validateRicevutaTelematica(body);
+	if (!client.noTypeCheck) validateRicevutaTelematica(body);
 	return rest;
 };

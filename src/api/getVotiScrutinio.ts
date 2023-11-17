@@ -14,6 +14,6 @@ export const getVotiScrutinio = async (client: Client) => {
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validateVotiScrutinio(body);
+	if (!client.noTypeCheck) validateVotiScrutinio(body);
 	return body.data.votiScrutinio[0].periodi;
 };

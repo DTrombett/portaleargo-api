@@ -33,6 +33,6 @@ export const what = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validateWhat(body);
+	if (!client.noTypeCheck) validateWhat(body);
 	return Object.assign(options.old ?? {}, body.data.dati[0]);
 };

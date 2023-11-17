@@ -13,6 +13,6 @@ export const getProfilo = async (client: Client) => {
 	if (!body.success) throw new Error(body.msg!);
 	client.profile = Object.assign(client.profile ?? {}, body.data);
 	void client.dataProvider?.write("profile", client.profile);
-	validateProfilo(body);
+	if (!client.noTypeCheck) validateProfilo(body);
 	return client.profile;
 };

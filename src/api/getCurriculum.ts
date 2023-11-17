@@ -22,6 +22,6 @@ export const getCurriculum = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validateCurriculum(body);
+	if (!client.noTypeCheck) validateCurriculum(body);
 	return body.data.curriculum;
 };

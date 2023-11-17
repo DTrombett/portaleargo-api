@@ -33,6 +33,6 @@ export const getOrarioGiornaliero = async (
 	);
 
 	if (!body.success) throw new Error(body.msg!);
-	validateOrarioGiornaliero(body);
+	if (!client.noTypeCheck) validateOrarioGiornaliero(body);
 	return Object.values(body.data.dati).flat();
 };

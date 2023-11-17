@@ -24,7 +24,7 @@ export const getTasse = async (
 	if (!body.success) throw new Error(body.msg!);
 	const { success, msg, data, ...rest } = body;
 
-	validateTasse(body);
+	if (!client.noTypeCheck) validateTasse(body);
 	return {
 		...rest,
 		tasse: data,

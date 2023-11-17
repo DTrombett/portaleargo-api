@@ -26,6 +26,6 @@ export const downloadAllegato = async (
 	);
 
 	if (!body.success) throw new Error(body.msg);
-	validateDownloadAllegato(body);
+	if (!client.noTypeCheck) validateDownloadAllegato(body);
 	return body.url;
 };

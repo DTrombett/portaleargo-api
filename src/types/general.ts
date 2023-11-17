@@ -64,8 +64,8 @@ export type ClearOperations<T> = {
 	[K in keyof T]: T[K] extends APIOperation<infer A>[]
 		? (A & { pk: string })[]
 		: T[K] extends object
-		? ClearOperations<T[K]>
-		: T[K];
+		  ? ClearOperations<T[K]>
+		  : T[K];
 };
 export type Token = APIToken & {
 	expireDate: Date;
@@ -132,6 +132,12 @@ export type ClientOptions = Partial<
 		 * * Modificare questa opzione potrebbe creare problemi nell'utilizzo della libreria
 		 */
 		version: string;
+
+		/**
+		 * Non controllare il tipo dei dati ricevuti dall'API.
+		 * * Nota che il controllo dei dati viene fatto in maniera asincrona e non blocca o rallenta il processo
+		 */
+		noTypeCheck: boolean;
 	}
 >;
 export type Jsonify<T, D extends boolean = true> = [D, T] extends [
@@ -142,22 +148,22 @@ export type Jsonify<T, D extends boolean = true> = [D, T] extends [
 ]
 	? Jsonify<J, false>
 	: T extends boolean | number | string | null
-	? T
-	: T extends bigint
-	? never
-	: T extends symbol | ((...args: any[]) => any) | undefined
-	? undefined
-	: T extends (infer A)[]
-	? Jsonify<A>[]
-	: {
-			[K in keyof T as T[K] extends
-				| bigint
-				| symbol
-				| ((...args: any[]) => any)
-				| undefined
-				? never
-				: K]: Jsonify<T[K]>;
-	  };
+	  ? T
+	  : T extends bigint
+	    ? never
+	    : T extends symbol | ((...args: any[]) => any) | undefined
+	      ? undefined
+	      : T extends (infer A)[]
+	        ? Jsonify<A>[]
+	        : {
+							[K in keyof T as T[K] extends
+								| bigint
+								| symbol
+								| ((...args: any[]) => any)
+								| undefined
+								? never
+								: K]: Jsonify<T[K]>;
+	          };
 export type LoginLink = {
 	url: string;
 	redirectUri: string;

@@ -20,6 +20,6 @@ export const login = async (client: Client) => {
 	if (!body.success) throw new Error(body.msg!);
 	client.loginData = Object.assign(client.loginData ?? {}, body.data[0]);
 	void client.dataProvider?.write("login", client.loginData);
-	validateLogin(body);
+	if (!client.noTypeCheck) validateLogin(body);
 	return client.loginData;
 };

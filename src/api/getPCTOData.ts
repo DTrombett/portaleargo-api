@@ -22,6 +22,6 @@ export const getPCTOData = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validatePCTO(body);
+	if (!client.noTypeCheck) validatePCTO(body);
 	return body.data.pcto;
 };

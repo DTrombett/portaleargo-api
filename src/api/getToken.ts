@@ -37,6 +37,6 @@ export const getToken = async (
 	expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
 	client.token = Object.assign(client.token ?? {}, data, { expireDate });
 	void client.dataProvider?.write("token", client.token);
-	validateToken(data);
+	if (!client.noTypeCheck) validateToken(data);
 	return client.token;
 };

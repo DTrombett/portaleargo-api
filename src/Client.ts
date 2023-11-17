@@ -80,6 +80,12 @@ export class Client {
 	headers?: IncomingHttpHeaders;
 
 	/**
+	 * Non controllare il tipo dei dati ricevuti dall'API.
+	 * * Nota che il controllo dei dati viene fatto in maniera asincrona e non blocca o rallenta il processo
+	 */
+	noTypeCheck: boolean;
+
+	/**
 	 * Le funzioni per leggere e scrivere i dati.
 	 * Impostare questo valore forzerà `dataPath` a `null`
 	 */
@@ -112,6 +118,7 @@ export class Client {
 		this.profile = options.profile;
 		this.dashboard = options.dashboard;
 		this.debug = options.debug ?? false;
+		this.noTypeCheck = options.noTypeCheck ?? false;
 		this.version = options.version ?? defaultVersion;
 		this.headers = options.headers;
 		if (options.dataProvider !== null) {

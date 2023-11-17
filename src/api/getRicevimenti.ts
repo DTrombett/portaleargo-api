@@ -18,6 +18,6 @@ export const getRicevimenti = async <T extends APIRicevimenti["data"]>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	validateRicevimenti(body);
+	if (!client.noTypeCheck) validateRicevimenti(body);
 	return Object.assign(options?.old ?? {}, body.data);
 };
