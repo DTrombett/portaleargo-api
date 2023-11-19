@@ -1,5 +1,6 @@
 import type { APIDownloadAllegato, Client } from "..";
 import { apiRequest } from "..";
+import { validateDownloadAllegato } from "../schemas";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca alunno.
@@ -10,7 +11,7 @@ import { apiRequest } from "..";
 export const downloadAllegatoStudente = async (
 	client: Client,
 	options: {
-		id: string;
+		uid: string;
 		profileId: string;
 	},
 ) => {
@@ -20,12 +21,13 @@ export const downloadAllegatoStudente = async (
 		{
 			method: "POST",
 			body: {
-				uid: options.id,
+				uid: options.uid,
 				pkScheda: options.profileId,
 			},
 		},
 	);
 
 	if (!body.success) throw new Error(body.msg);
+	if (!client.noTypeCheck) validateDownloadAllegato(body);
 	return body.url;
 };

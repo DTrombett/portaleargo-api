@@ -1,5 +1,6 @@
 import type { APIDashboard, Client } from "..";
 import { apiRequest, formatDate, handleOperation } from "..";
+import { validateDashboard } from "../schemas";
 
 /**
  * Ottieni la dashboard dello studente.
@@ -31,28 +32,31 @@ export const getDashboard = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
-	const [newData] = body.data.dati;
+	const [data] = body.data.dati;
 
 	client.dashboard = Object.assign(client.dashboard ?? {}, {
-		...newData,
+		...data,
 		fuoriClasse: handleOperation(
-			newData.fuoriClasse,
+			data.fuoriClasse,
 			client.dashboard?.fuoriClasse,
 		),
-		promemoria: handleOperation(
-			newData.promemoria,
-			client.dashboard?.promemoria,
-		),
-		bacheca: handleOperation(newData.bacheca, client.dashboard?.bacheca),
-		voti: handleOperation(newData.voti, client.dashboard?.voti),
+		promemoria: handleOperation(data.promemoria, client.dashboard?.promemoria),
+		bacheca: handleOperation(data.bacheca, client.dashboard?.bacheca),
+		voti: handleOperation(data.voti, client.dashboard?.voti),
 		bachecaAlunno: handleOperation(
-			newData.bachecaAlunno,
+			data.bachecaAlunno,
 			client.dashboard?.bachecaAlunno,
 		),
-		registro: handleOperation(newData.registro, client.dashboard?.registro),
-		appello: handleOperation(newData.appello, client.dashboard?.appello),
+		registro: handleOperation(data.registro, client.dashboard?.registro),
+		appello: handleOperation(data.appello, client.dashboard?.appello),
+		prenotazioniAlunni: handleOperation(
+			data.prenotazioniAlunni,
+			client.dashboard?.prenotazioniAlunni,
+			(a) => a.prenotazione.pk,
+		),
 		dataAggiornamento: new Date(headers.date as string),
 	});
 	void client.dataProvider?.write("dashboard", client.dashboard);
+	if (!client.noTypeCheck) validateDashboard(body);
 	return client.dashboard;
 };

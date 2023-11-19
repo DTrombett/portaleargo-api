@@ -1,5 +1,6 @@
 import type { APICorsiRecupero, Client } from "..";
 import { apiRequest } from "..";
+import { validateCorsiRecupero } from "../schemas";
 
 /**
  * Ottieni i dati dei corsi di recupero dello studente.
@@ -22,5 +23,6 @@ export const getCorsiRecupero = async <T extends APICorsiRecupero["data"]>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	if (!client.noTypeCheck) validateCorsiRecupero(body);
 	return Object.assign(options.old ?? {}, body.data);
 };

@@ -5,16 +5,27 @@ export type APIResponse<T = Json> = {
 	msg?: string | null;
 	data: T;
 };
-export type APIOperation<T> = {
-	pk: string;
-} & (
-	| {
-			operazione: "D";
+export type APIOperation<T, P extends boolean = false> = (P extends true
+	? {
+			pk?: undefined;
 	  }
-	| (T & {
-			operazione: "I";
-	  })
-);
+	: {
+			pk: string;
+	  }) &
+	(
+		| {
+				operazione: "D";
+				pk: string;
+		  }
+		| (T &
+				(P extends true
+					? {
+							operazione: "I";
+					  }
+					: {
+							operazione?: "I";
+					  }))
+	);
 export type APIToken = {
 	access_token: string;
 	expires_in: number;
@@ -39,10 +50,10 @@ export type APILogin = APIResponse<
 			username: string;
 		},
 	]
->;
+> & { total: number };
 export type APIProfilo = APIResponse<{
 	resetPassword: boolean;
-	ultimoCambioPwd: null;
+	ultimoCambioPwd: string | null;
 	anno: {
 		dataInizio: string;
 		anno: string;
@@ -105,13 +116,14 @@ export type APIDashboard = APIResponse<{
 				chiave: string;
 			}[];
 			mediaGenerale: number;
-			mensa: any;
-			mediaPerMese: Record<`${number}`, number>;
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			mensa?: {};
+			mediaPerMese: Record<string, number>;
 			listaMaterie: {
 				abbreviazione: string;
 				scrut: boolean;
 				codTipo: string;
-				faMedia: false;
+				faMedia: boolean;
 				materia: string;
 				pk: string;
 			}[];
@@ -120,12 +132,12 @@ export type APIDashboard = APIResponse<{
 				pkPeriodo: string;
 				dataInizio: string;
 				descrizione: string;
-				datInizio: string;
+				datInizio?: string;
 				votoUnico: boolean;
 				mediaScrutinio: number;
 				isMediaScrutinio: boolean;
 				dataFine: string;
-				datFine: string;
+				datFine?: string;
 				codPeriodo: string;
 				isScrutinioFinale: boolean;
 			}[];
@@ -163,8 +175,8 @@ export type APIDashboard = APIResponse<{
 				isPresaAdesioneConfermata: boolean;
 			}>[];
 			fileCondivisi: {
-				fileAlunniScollegati: [];
-				listaFile: [];
+				fileAlunniScollegati: any[];
+				listaFile: any[];
 			};
 			voti: APIOperation<{
 				datEvento: string;
@@ -174,7 +186,7 @@ export type APIDashboard = APIResponse<{
 				codVotoPratico: string;
 				docente: string;
 				pkMateria: string;
-				tipoValutazione: null;
+				tipoValutazione: string | null;
 				prgVoto: number;
 				descrizioneProva: string;
 				faMenoMedia: string;
@@ -198,10 +210,10 @@ export type APIDashboard = APIResponse<{
 					codSuddivisione: string;
 					codTipo: string;
 					flgConcorreMedia: string;
-					codAggrDisciplina: string;
-					flgLezioniIndividuali: null;
-					codAggrInvalsi: null;
-					codMinisteriale: null;
+					codAggrDisciplina: string | null;
+					flgLezioniIndividuali: string | null;
+					codAggrInvalsi: string | null;
+					codMinisteriale: string | null;
 					icona: string;
 					descrizione: string | null;
 					conInsufficienze: boolean;
@@ -218,7 +230,7 @@ export type APIDashboard = APIResponse<{
 			}>[];
 			ricaricaDati: boolean;
 			listaDocentiClasse: {
-				desCognome: "DI LUCA";
+				desCognome: string;
 				materie: string[];
 				desNome: string;
 				pk: string;
@@ -252,7 +264,7 @@ export type APIDashboard = APIResponse<{
 							mediaOrale: number;
 						}
 					>;
-					mediaMese: Record<`${number}`, number>;
+					mediaMese: Record<string, number>;
 				}
 			>;
 			mediaMaterie: Record<
@@ -270,10 +282,12 @@ export type APIDashboard = APIResponse<{
 					mediaOrale: number;
 				}
 			>;
-			autocertificazione: any;
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			autocertificazione?: {};
 			registro: APIOperation<{
 				datEvento: string;
-				desUrl: string;
+				isFirmato: boolean;
+				desUrl: string | null;
 				pkDocente: string;
 				compiti: {
 					compito: string;
@@ -283,11 +297,53 @@ export type APIDashboard = APIResponse<{
 				docente: string;
 				materia: string;
 				pkMateria: string;
-				attivita: string;
+				attivita: string | null;
 				ora: number;
 			}>[];
 			schede: any[];
-			prenotazioniAlunni: any[];
+			prenotazioniAlunni: APIOperation<
+				{
+					datEvento: string;
+					prenotazione: {
+						prgScuola: number;
+						datPrenotazione: string;
+						numPrenotazione: number | null;
+						prgAlunno: number;
+						genitore: string;
+						numMax: number;
+						orarioPrenotazione: string;
+						prgGenitore: number;
+						flgAnnullato: string | null;
+						flgAnnullatoDa: string | null;
+						desTelefonoGenitore: string;
+						flgTipo: string | null;
+						datAnnullamento: string | null;
+						desUrl: string | null;
+						genitorePK: string;
+						desEMailGenitore: string;
+						numPrenotazioni: number | null;
+						pk: string;
+					};
+					disponibilita: {
+						ora_Fine: string;
+						desNota: string;
+						datDisponibilita: string;
+						desUrl: string;
+						numMax: number;
+						ora_Inizio: string;
+						flgAttivo: string;
+						desLuogoRicevimento: string;
+						pk: string;
+					};
+					docente: {
+						desCognome: string;
+						desNome: string;
+						pk: string;
+						desEmail: string;
+					};
+				},
+				true
+			>[];
 			noteDisciplinari: any[];
 			pk: string;
 			appello: APIOperation<{
@@ -387,7 +443,7 @@ export type APIWhat = APIResponse<{
 }>;
 export type APIOrarioGiornaliero = APIResponse<{
 	dati: Record<
-		`${number}`,
+		string,
 		{
 			numOra: number;
 			mostra: boolean;
@@ -400,7 +456,7 @@ export type APIOrarioGiornaliero = APIResponse<{
 			desDenominazione: string;
 			desEmail: string;
 			desSezione: string;
-			ora: null;
+			ora: string | null;
 		}[]
 	>;
 }>;
@@ -418,7 +474,7 @@ export type APIVotiScrutinio = APIResponse<{
 		{
 			periodi: {
 				desDescrizione: string;
-				materie: any[];
+				materie: string[];
 				suddivisione: string;
 				votiGiudizi: boolean;
 				scrutinioFinale: boolean;
@@ -439,10 +495,10 @@ export type APIRicevimenti = APIResponse<{
 				pk: string;
 				desEmail: string | null;
 			};
-			numPrenotazioniAnnullate: null;
+			numPrenotazioniAnnullate: number | null;
 			flgAttivo: string;
 			oraFine: string;
-			indisponibilita: null;
+			indisponibilita: string | null;
 			datInizioPrenotazione: string;
 			desUrl: string;
 			unaTantum: string;
@@ -475,11 +531,11 @@ export type APIRicevimenti = APIResponse<{
 			numMax: number;
 			orarioPrenotazione: string;
 			prgGenitore: number;
-			flgAnnullato: null;
-			flgAnnullatoDa: null;
+			flgAnnullato: string | null;
+			flgAnnullatoDa: string | null;
 			desTelefonoGenitore: string;
-			flgTipo: null;
-			datAnnullamento: null;
+			flgTipo: string | null;
+			datAnnullamento: string | null;
 			desUrl: string | null;
 			pk: string;
 			genitorePK: string;
@@ -559,7 +615,7 @@ export type APICurriculum = APIResponse<{
 					desDescrizione: string;
 					numColore: number;
 					flgPositivo: string;
-					flgTipoParticolare: null;
+					flgTipoParticolare: string | null;
 					tipoEsito: string;
 					descrizione: string;
 					icona: string;
@@ -573,7 +629,7 @@ export type APICurriculum = APIResponse<{
 		mostraCredito: boolean;
 		isSuperiore: boolean;
 		isInterruzioneFR: boolean;
-		media: number;
+		media: number | null;
 		CVAbilitato: boolean;
 		ordineScuola: string;
 	}[];

@@ -1,5 +1,6 @@
 import type { APIRicevimenti, Client } from "..";
 import { apiRequest } from "..";
+import { validateRicevimenti } from "../schemas";
 
 /**
  * Ottieni i dati riguardo i ricevimenti dello studente.
@@ -17,5 +18,6 @@ export const getRicevimenti = async <T extends APIRicevimenti["data"]>(
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	if (!client.noTypeCheck) validateRicevimenti(body);
 	return Object.assign(options?.old ?? {}, body.data);
 };

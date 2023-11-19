@@ -1,5 +1,6 @@
 import type { APIDownloadAllegato, Client } from "..";
 import { apiRequest } from "..";
+import { validateDownloadAllegato } from "../schemas";
 
 /**
  * Ottieni il link per scaricare un allegato della bacheca.
@@ -10,7 +11,7 @@ import { apiRequest } from "..";
 export const downloadAllegato = async (
 	client: Client,
 	options: {
-		id: string;
+		uid: string;
 	},
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
@@ -19,11 +20,12 @@ export const downloadAllegato = async (
 		{
 			method: "POST",
 			body: {
-				uid: options.id,
+				uid: options.uid,
 			},
 		},
 	);
 
 	if (!body.success) throw new Error(body.msg);
+	if (!client.noTypeCheck) validateDownloadAllegato(body);
 	return body.url;
 };

@@ -1,5 +1,6 @@
 import type { APIToken, Client } from "..";
 import { apiRequest, clientId, formatDate } from "..";
+import { validateToken } from "../schemas";
 
 /**
  * Aggiorna il token.
@@ -32,5 +33,6 @@ export const refreshToken = async (client: Client) => {
 	expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
 	client.token = Object.assign(client.token ?? {}, body, { expireDate });
 	void client.dataProvider?.write("token", client.token);
+	if (!client.noTypeCheck) validateToken(body);
 	return client.token;
 };

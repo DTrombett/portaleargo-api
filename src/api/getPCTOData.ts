@@ -1,5 +1,6 @@
 import type { APIPCTO, Client } from "..";
 import { apiRequest } from "..";
+import { validatePCTO } from "../schemas";
 
 /**
  * Ottieni i dati del PCTO dello studente.
@@ -21,5 +22,6 @@ export const getPCTOData = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	if (!client.noTypeCheck) validatePCTO(body);
 	return body.data.pcto;
 };
