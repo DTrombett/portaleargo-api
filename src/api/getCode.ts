@@ -44,7 +44,11 @@ export const getCode = async (credentials: Credentials) => {
 		headers: { location },
 		statusCode: status,
 	} = await request("https://www.portaleargo.it/auth/sso/login", {
-		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${credentials.schoolCode}&username=${credentials.username}&password=${credentials.password}&login=true`,
+		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${encodeURIComponent(
+			credentials.schoolCode,
+		)}&username=${encodeURIComponent(
+			credentials.username,
+		)}&password=${encodeURIComponent(credentials.password)}&login=true`,
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
