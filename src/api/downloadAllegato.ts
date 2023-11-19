@@ -11,7 +11,7 @@ import { validateDownloadAllegato } from "../schemas";
 export const downloadAllegato = async (
 	client: Client,
 	options: {
-		id: string;
+		uid: string;
 	},
 ) => {
 	const { body } = await apiRequest<APIDownloadAllegato>(
@@ -20,7 +20,7 @@ export const downloadAllegato = async (
 		{
 			method: "POST",
 			body: {
-				uid: options.id,
+				uid: options.uid,
 			},
 		},
 	);

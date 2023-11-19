@@ -11,7 +11,7 @@ import { validateDownloadAllegato } from "../schemas";
 export const downloadAllegatoStudente = async (
 	client: Client,
 	options: {
-		id: string;
+		uid: string;
 		profileId: string;
 	},
 ) => {
@@ -21,7 +21,7 @@ export const downloadAllegatoStudente = async (
 		{
 			method: "POST",
 			body: {
-				uid: options.id,
+				uid: options.uid,
 				pkScheda: options.profileId,
 			},
 		},

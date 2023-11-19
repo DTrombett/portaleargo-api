@@ -277,52 +277,54 @@ export class Client {
 
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca.
-	 * @param id - L'id dell'allegato
+	 * @param uid - L'uid dell'allegato
 	 * @returns L'url
 	 */
-	async getLinkAllegato(id: string) {
+	async getLinkAllegato(uid: string) {
 		this.checkReady();
-		return downloadAllegato(this, {
-			id,
-		});
+		return downloadAllegato(this, { uid });
 	}
 
 	/**
 	 * Scarica un allegato.
-	 * @param id - L'id dell'allegato
+	 * @param uid - L'uid dell'allegato
 	 * @param file - Il percorso dove salvare il file
 	 */
-	async downloadAllegato(id: string, file: string) {
+	async downloadAllegato(uid: string, file: string) {
 		this.checkReady();
-		const { body } = await request(await this.getLinkAllegato(id));
+		const { body } = await request(await this.getLinkAllegato(uid));
 
 		await writeFile(file, body);
 	}
 
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca alunno.
-	 * @param id - l'id dell'allegato
+	 * @param uid - l'uid dell'allegato
 	 * @param profileId - L'id del profilo
 	 * @returns L'url
 	 */
-	async getLinkAllegatoStudente(id: string, profileId?: string) {
+	async getLinkAllegatoStudente(uid: string, profileId?: string) {
 		this.checkReady();
 		return downloadAllegatoStudente(this, {
-			id,
+			uid,
 			profileId: profileId ?? this.profile.scheda.pk,
 		});
 	}
 
 	/**
 	 * Scarica un allegato dello studente.
-	 * @param id - L'id dell'allegato
+	 * @param uid - L'uid dell'allegato
 	 * @param file - Il percorso dove salvare il file
 	 * @param profileId - L'id del profilo
 	 */
-	async downloadAllegatoStudente(id: string, file: string, profileId?: string) {
+	async downloadAllegatoStudente(
+		uid: string,
+		file: string,
+		profileId?: string,
+	) {
 		this.checkReady();
 		const { body } = await request(
-			await this.getLinkAllegatoStudente(id, profileId),
+			await this.getLinkAllegatoStudente(uid, profileId),
 		);
 
 		await writeFile(file, body);
