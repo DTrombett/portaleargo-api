@@ -12,7 +12,7 @@ export type APIOperation<T> = {
 			operazione: "D";
 	  }
 	| (T & {
-			operazione: "I";
+			operazione?: "I";
 	  })
 );
 export type APIToken = {
@@ -105,13 +105,14 @@ export type APIDashboard = APIResponse<{
 				chiave: string;
 			}[];
 			mediaGenerale: number;
-			mensa: any;
-			mediaPerMese: Record<`${number}`, number>;
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			mensa?: {};
+			mediaPerMese: Record<string, number>;
 			listaMaterie: {
 				abbreviazione: string;
 				scrut: boolean;
 				codTipo: string;
-				faMedia: false;
+				faMedia: boolean;
 				materia: string;
 				pk: string;
 			}[];
@@ -120,12 +121,12 @@ export type APIDashboard = APIResponse<{
 				pkPeriodo: string;
 				dataInizio: string;
 				descrizione: string;
-				datInizio: string;
+				datInizio?: string;
 				votoUnico: boolean;
 				mediaScrutinio: number;
 				isMediaScrutinio: boolean;
 				dataFine: string;
-				datFine: string;
+				datFine?: string;
 				codPeriodo: string;
 				isScrutinioFinale: boolean;
 			}[];
@@ -163,8 +164,8 @@ export type APIDashboard = APIResponse<{
 				isPresaAdesioneConfermata: boolean;
 			}>[];
 			fileCondivisi: {
-				fileAlunniScollegati: [];
-				listaFile: [];
+				fileAlunniScollegati: any[];
+				listaFile: any[];
 			};
 			voti: APIOperation<{
 				datEvento: string;
@@ -174,7 +175,7 @@ export type APIDashboard = APIResponse<{
 				codVotoPratico: string;
 				docente: string;
 				pkMateria: string;
-				tipoValutazione: null;
+				tipoValutazione: string | null;
 				prgVoto: number;
 				descrizioneProva: string;
 				faMenoMedia: string;
@@ -198,10 +199,10 @@ export type APIDashboard = APIResponse<{
 					codSuddivisione: string;
 					codTipo: string;
 					flgConcorreMedia: string;
-					codAggrDisciplina: string;
-					flgLezioniIndividuali: null;
-					codAggrInvalsi: null;
-					codMinisteriale: null;
+					codAggrDisciplina: string | null;
+					flgLezioniIndividuali: string | null;
+					codAggrInvalsi: string | null;
+					codMinisteriale: string | null;
 					icona: string;
 					descrizione: string | null;
 					conInsufficienze: boolean;
@@ -252,7 +253,7 @@ export type APIDashboard = APIResponse<{
 							mediaOrale: number;
 						}
 					>;
-					mediaMese: Record<`${number}`, number>;
+					mediaMese: Record<string, number>;
 				}
 			>;
 			mediaMaterie: Record<
@@ -270,10 +271,12 @@ export type APIDashboard = APIResponse<{
 					mediaOrale: number;
 				}
 			>;
-			autocertificazione: any;
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			autocertificazione?: {};
 			registro: APIOperation<{
 				datEvento: string;
-				desUrl: string;
+				isFirmato: boolean;
+				desUrl: string | null;
 				pkDocente: string;
 				compiti: {
 					compito: string;
@@ -283,7 +286,7 @@ export type APIDashboard = APIResponse<{
 				docente: string;
 				materia: string;
 				pkMateria: string;
-				attivita: string;
+				attivita: string | null;
 				ora: number;
 			}>[];
 			schede: any[];
@@ -387,7 +390,7 @@ export type APIWhat = APIResponse<{
 }>;
 export type APIOrarioGiornaliero = APIResponse<{
 	dati: Record<
-		`${number}`,
+		string,
 		{
 			numOra: number;
 			mostra: boolean;

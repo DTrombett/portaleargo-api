@@ -1,5 +1,5 @@
 import type { JSONSchemaType } from "ajv";
-import type { APIResponse } from "../types";
+import type { APIOperation, APIResponse } from "../types";
 
 export const base = { type: "object", additionalProperties: false } as const;
 export const allRequired = <
@@ -65,6 +65,32 @@ export const merge = <A, B>(
 		properties: { ...second.properties, ...first.properties },
 		required: [...second.required, ...first.required],
 	}) as JSONSchemaType<A & B>;
-export const arrayOfAny: JSONSchemaType<any[]> = array(
-	{} as JSONSchemaType<any>,
-);
+export const apiOperation = <T>(
+	items: JSONSchemaType<T>,
+): JSONSchemaType<APIOperation<T>[]> =>
+	array({
+		type: "object",
+		properties: {
+			pk: string,
+			operazione: { type: "string", enum: ["D", "I"], nullable: true },
+		},
+		required: ["pk"],
+		oneOf: [
+			{
+				additionalProperties: false,
+				properties: { pk: string, operazione: { const: "D" } },
+				required: ["operazione", "pk"],
+			},
+			{
+				...items,
+				properties: {
+					...items.properties,
+					pk: string,
+					operazione: { type: "string", enum: ["I"], nullable: true },
+				},
+				required: [...items.required, "pk"],
+			},
+		],
+	} as JSONSchemaType<APIOperation<T>>);
+export const any = {} as JSONSchemaType<any>;
+export const arrayOfAny: JSONSchemaType<any[]> = array(any);

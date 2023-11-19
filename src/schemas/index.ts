@@ -7,6 +7,7 @@ import { join } from "node:path";
 import type {
 	APICorsiRecupero,
 	APICurriculum,
+	APIDashboard,
 	APIDettagliProfilo,
 	APIDownloadAllegato,
 	APILogin,
@@ -23,9 +24,10 @@ import type {
 import { writeToFile } from "../util";
 import {
 	allRequired,
+	any,
+	apiOperation,
 	apiResponse,
 	array,
-	arrayOfAny,
 	base,
 	boolean,
 	merge,
@@ -49,7 +51,9 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	return (data: unknown) => {
 		setImmediate(() => {
 			func(data);
-			if (func.errors) {
+			const { errors } = func;
+
+			if (errors) {
 				const fileName = `${name}-${Date.now()}`;
 				const errorsPath = join(tmpdir(), "argo");
 
@@ -57,21 +61,24 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 					.catch(() => mkdir(errorsPath))
 					.then((stats) => {
 						if (!stats || stats.isDirectory())
-							void writeToFile(fileName, data, errorsPath);
+							void writeToFile(
+								fileName,
+								{
+									data,
+									errors: errors.map(
+										(err) =>
+											`${name}${err.instancePath.replaceAll(
+												"/",
+												".",
+											)} ${err.message!}`,
+									),
+								},
+								errorsPath,
+							);
 					})
 					.catch(() => {});
 				console.warn(
-					`\x1b[33m⚠️  Received an unexpected ${name}\n${func.errors
-						.map(
-							(err) =>
-								`${name}${err.instancePath.replaceAll(
-									"/",
-									".",
-								)} ${err.message!}`,
-						)
-						.join(
-							"\n",
-						)}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing this message and, possibly, the data received from the API saved in ${join(
+					`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
 						errorsPath,
 						fileName,
 					)}.json (remember to hide eventual sensitive data)\x1b[0m`,
@@ -271,41 +278,41 @@ export const validateOrarioGiornaliero = validate<APIOrarioGiornaliero>(
 	"orario",
 	apiResponse(
 		allRequired({
-			dati: record<
-				`${number}`,
-				APIOrarioGiornaliero["data"]["dati"][`${number}`]
-			>(string, {
-				type: "array",
-				items: {
-					...base,
-					properties: {
-						numOra: number,
-						mostra: boolean,
-						desCognome: string,
-						desNome: string,
-						docente: string,
-						materia: string,
-						pk: { ...string, nullable: true },
-						scuAnagrafePK: { ...string, nullable: true },
-						desDenominazione: string,
-						desEmail: string,
-						desSezione: string,
-						ora: nullableString,
+			dati: record<string, APIOrarioGiornaliero["data"]["dati"][string]>(
+				string,
+				{
+					type: "array",
+					items: {
+						...base,
+						properties: {
+							numOra: number,
+							mostra: boolean,
+							desCognome: string,
+							desNome: string,
+							docente: string,
+							materia: string,
+							pk: { ...string, nullable: true },
+							scuAnagrafePK: { ...string, nullable: true },
+							desDenominazione: string,
+							desEmail: string,
+							desSezione: string,
+							ora: nullableString,
+						},
+						required: [
+							"numOra",
+							"mostra",
+							"desCognome",
+							"desNome",
+							"docente",
+							"materia",
+							"desDenominazione",
+							"desEmail",
+							"desSezione",
+							"ora",
+						],
 					},
-					required: [
-						"numOra",
-						"mostra",
-						"desCognome",
-						"desNome",
-						"docente",
-						"materia",
-						"desDenominazione",
-						"desEmail",
-						"desSezione",
-						"ora",
-					],
 				},
-			}),
+			),
 		}),
 	),
 );
@@ -486,7 +493,7 @@ export const validatePCTO = validate<APIPCTO>(
 		allRequired({
 			pcto: array(
 				allRequired({
-					percorsi: arrayOfAny,
+					percorsi: array(any),
 					pk: string,
 				}),
 			),
@@ -497,8 +504,8 @@ export const validateCorsiRecupero = validate<APICorsiRecupero>(
 	"corsiRecupero",
 	apiResponse(
 		allRequired({
-			corsiRecupero: arrayOfAny,
-			periodi: arrayOfAny,
+			corsiRecupero: array(any),
+			periodi: array(any),
 		}),
 	),
 );
@@ -558,4 +565,302 @@ export const validateRicevutaTelematica = validate<APIRicevutaTelematica>(
 		},
 		required: ["fileName", "success", "url"],
 	},
+);
+export const validateDashboard = validate<APIDashboard>(
+	"dashboard",
+	apiResponse(
+		allRequired({
+			dati: {
+				type: "array",
+				minItems: 1,
+				maxItems: 1,
+				additionalItems: false,
+				items: [
+					{
+						...base,
+						properties: {
+							msg: string,
+							mediaGenerale: number,
+							mensa: { type: "object", nullable: true },
+							rimuoviDatiLocali: boolean,
+							ricaricaDati: boolean,
+							profiloDisabilitato: boolean,
+							autocertificazione: { type: "object", nullable: true },
+							schede: array(any),
+							prenotazioniAlunni: array(any),
+							noteDisciplinari: array(any),
+							pk: string,
+							classiExtra: boolean,
+							opzioni: array(
+								allRequired({
+									chiave: string,
+									valore: boolean,
+								}),
+							),
+							mediaPerMese: record(string, number),
+							listaMaterie: array(
+								allRequired({
+									abbreviazione: string,
+									scrut: boolean,
+									codTipo: string,
+									faMedia: boolean,
+									materia: string,
+									pk: string,
+								}),
+							),
+							listaPeriodi: array({
+								...base,
+								properties: {
+									pkPeriodo: string,
+									dataInizio: string,
+									descrizione: string,
+									datInizio: { type: "string", nullable: true },
+									votoUnico: boolean,
+									mediaScrutinio: number,
+									isMediaScrutinio: boolean,
+									dataFine: string,
+									datFine: { type: "string", nullable: true },
+									codPeriodo: string,
+									isScrutinioFinale: boolean,
+								},
+								required: [
+									"codPeriodo",
+									"dataFine",
+									"dataInizio",
+									"descrizione",
+									"isMediaScrutinio",
+									"isScrutinioFinale",
+									"mediaScrutinio",
+									"pkPeriodo",
+									"votoUnico",
+								],
+							}),
+							fileCondivisi: allRequired({
+								fileAlunniScollegati: array(any),
+								listaFile: array(any),
+							}),
+							listaDocentiClasse: array(
+								allRequired({
+									desCognome: string,
+									materie: array(string),
+									desNome: string,
+									pk: string,
+									desEmail: string,
+								}),
+							),
+							mediaPerPeriodo: record(
+								string,
+								allRequired({
+									mediaGenerale: number,
+									mediaMese: record(string, number),
+									listaMaterie: record(
+										string,
+										allRequired({
+											sommaValutazioniOrale: number,
+											numValutazioniOrale: number,
+											mediaMateria: number,
+											mediaScritta: number,
+											sumValori: number,
+											numValori: number,
+											numVoti: number,
+											numValutazioniScritto: number,
+											sommaValutazioniScritto: number,
+											mediaOrale: number,
+										}),
+									),
+								}),
+							),
+							mediaMaterie: record(
+								string,
+								allRequired({
+									sommaValutazioniOrale: number,
+									numValutazioniOrale: number,
+									mediaMateria: number,
+									mediaScritta: number,
+									sumValori: number,
+									numValori: number,
+									numVoti: number,
+									numValutazioniScritto: number,
+									sommaValutazioniScritto: number,
+									mediaOrale: number,
+								}),
+							),
+							appello: apiOperation(
+								allRequired({
+									datEvento: string,
+									descrizione: string,
+									daGiustificare: boolean,
+									giustificata: string,
+									data: string,
+									codEvento: string,
+									docente: string,
+									commentoGiustificazione: string,
+									dataGiustificazione: string,
+									nota: string,
+								}),
+							),
+							bacheca: apiOperation(
+								allRequired({
+									datEvento: string,
+									messaggio: string,
+									data: string,
+									pvRichiesta: boolean,
+									categoria: string,
+									dataConfermaPresaVisione: string,
+									url: nullableString,
+									autore: string,
+									dataScadenza: nullableString,
+									adRichiesta: boolean,
+									isPresaVisione: boolean,
+									dataConfermaAdesione: string,
+									listaAllegati: array(
+										allRequired({
+											nomeFile: string,
+											path: string,
+											descrizioneFile: nullableString,
+											pk: string,
+											url: string,
+										}),
+									),
+									dataScadAdesione: nullableString,
+									isPresaAdesioneConfermata: boolean,
+								}),
+							),
+							bachecaAlunno: apiOperation(
+								allRequired({
+									nomeFile: string,
+									datEvento: string,
+									messaggio: string,
+									data: string,
+									flgDownloadGenitore: string,
+									isPresaVisione: boolean,
+								}),
+							),
+							fuoriClasse: apiOperation(
+								allRequired({
+									datEvento: string,
+									descrizione: string,
+									data: string,
+									docente: string,
+									nota: string,
+									frequenzaOnLine: boolean,
+								}),
+							),
+							promemoria: apiOperation(
+								allRequired({
+									datEvento: string,
+									desAnnotazioni: string,
+									pkDocente: string,
+									flgVisibileFamiglia: string,
+									datGiorno: string,
+									docente: string,
+									oraInizio: string,
+									oraFine: string,
+								}),
+							),
+							registro: apiOperation(
+								allRequired({
+									datEvento: string,
+									isFirmato: boolean,
+									desUrl: nullableString,
+									pkDocente: string,
+									compiti: array(
+										allRequired({
+											compito: string,
+											dataConsegna: string,
+										}),
+									),
+									datGiorno: string,
+									docente: string,
+									materia: string,
+									pkMateria: string,
+									attivita: nullableString,
+									ora: number,
+								}),
+							),
+							voti: apiOperation(
+								allRequired({
+									datEvento: string,
+									pkPeriodo: string,
+									codCodice: string,
+									valore: number,
+									codVotoPratico: string,
+									docente: string,
+									pkMateria: string,
+									tipoValutazione: nullableString,
+									prgVoto: number,
+									descrizioneProva: string,
+									faMenoMedia: string,
+									pkDocente: string,
+									descrizioneVoto: string,
+									codTipo: string,
+									datGiorno: string,
+									mese: number,
+									numMedia: number,
+									desMateria: string,
+									materiaLight: allRequired({
+										scuMateriaPK: allRequired({
+											codMin: string,
+											prgScuola: number,
+											numAnno: number,
+											prgMateria: number,
+										}),
+										codMateria: string,
+										desDescrizione: string,
+										desDescrAbbrev: string,
+										codSuddivisione: string,
+										codTipo: string,
+										flgConcorreMedia: string,
+										codAggrDisciplina: nullableString,
+										flgLezioniIndividuali: nullableString,
+										codAggrInvalsi: nullableString,
+										codMinisteriale: nullableString,
+										icona: string,
+										descrizione: nullableString,
+										conInsufficienze: boolean,
+										selezionata: boolean,
+										prgMateria: number,
+										tipo: string,
+										articolata: string,
+										lezioniIndividuali: boolean,
+										idmateria: string,
+										codEDescrizioneMateria: string,
+										tipoOnGrid: string,
+									}),
+									desCommento: string,
+								}),
+							),
+						},
+						required: [
+							"appello",
+							"bacheca",
+							"bachecaAlunno",
+							"classiExtra",
+							"fileCondivisi",
+							"fuoriClasse",
+							"listaDocentiClasse",
+							"listaMaterie",
+							"listaPeriodi",
+							"mediaGenerale",
+							"mediaMaterie",
+							"mediaPerMese",
+							"mediaPerPeriodo",
+							"msg",
+							"noteDisciplinari",
+							"opzioni",
+							"pk",
+							"prenotazioniAlunni",
+							"profiloDisabilitato",
+							"promemoria",
+							"registro",
+							"ricaricaDati",
+							"rimuoviDatiLocali",
+							"schede",
+							"voti",
+						],
+					},
+				],
+			},
+		}),
+	),
 );

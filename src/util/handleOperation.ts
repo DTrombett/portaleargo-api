@@ -11,7 +11,7 @@ export const handleOperation = <T = Json>(
 	array: APIOperation<T>[],
 	old: (T & { pk: string })[] = [],
 	map?: (
-		a: Omit<Extract<APIOperation<T>, { operazione: "I" }>, "operazione">,
+		a: Omit<Extract<APIOperation<T>, { operazione?: "I" }>, "operazione">,
 	) => T & { pk: string },
 ) => {
 	const toDelete: string[] = [];
