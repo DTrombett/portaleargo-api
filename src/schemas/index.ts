@@ -5,6 +5,8 @@ import { mkdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
+	APIBacheca,
+	APIBachecaAlunno,
 	APICorsiRecupero,
 	APICurriculum,
 	APIDashboard,
@@ -903,6 +905,57 @@ export const validateDashboard = validate<APIDashboard>(
 					},
 				],
 			},
+		}),
+	),
+);
+export const validateBacheca = validate<APIBacheca>(
+	"bacheca",
+	apiResponse(
+		allRequired({
+			bacheca: apiOperation(
+				allRequired({
+					datEvento: string,
+					messaggio: string,
+					data: string,
+					pvRichiesta: boolean,
+					categoria: string,
+					dataConfermaPresaVisione: string,
+					url: nullableString,
+					autore: string,
+					dataScadenza: nullableString,
+					adRichiesta: boolean,
+					isPresaVisione: boolean,
+					dataConfermaAdesione: string,
+					listaAllegati: array(
+						allRequired({
+							nomeFile: string,
+							path: string,
+							descrizioneFile: nullableString,
+							pk: string,
+							url: string,
+						}),
+					),
+					dataScadAdesione: nullableString,
+					isPresaAdesioneConfermata: boolean,
+				}),
+			),
+		}),
+	),
+);
+export const validateBachecaAlunno = validate<APIBachecaAlunno>(
+	"bachecaAlunno",
+	apiResponse(
+		allRequired({
+			bachecaAlunno: apiOperation(
+				allRequired({
+					nomeFile: string,
+					datEvento: string,
+					messaggio: string,
+					data: string,
+					flgDownloadGenitore: string,
+					isPresaVisione: boolean,
+				}),
+			),
 		}),
 	),
 );

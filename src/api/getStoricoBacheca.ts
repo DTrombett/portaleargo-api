@@ -1,5 +1,6 @@
 import type { APIBacheca, Client } from "..";
 import { apiRequest, handleOperation } from "..";
+import { validateBacheca } from "../schemas";
 
 /**
  * Ottieni lo storico della bacheca.
@@ -21,5 +22,6 @@ export const getStoricoBacheca = async (
 	});
 
 	if (!body.success) throw new Error(body.msg!);
+	if (!client.noTypeCheck) validateBacheca(body);
 	return handleOperation(body.data.bacheca);
 };
