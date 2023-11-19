@@ -65,21 +65,24 @@ export const merge = <A, B>(
 		properties: { ...second.properties, ...first.properties },
 		required: [...second.required, ...first.required],
 	}) as JSONSchemaType<A & B>;
-export const apiOperation = <T>(
+export const apiOperation = <T, P extends boolean = false>(
 	items: JSONSchemaType<T>,
-): JSONSchemaType<APIOperation<T>[]> =>
+	omitPk = false as P,
+): JSONSchemaType<
+	(P extends true ? Omit<APIOperation<T>, "pk"> : APIOperation<T>)[]
+> =>
 	array({
 		type: "object",
 		properties: {
 			pk: string,
 			operazione: { type: "string", enum: ["D", "I"], nullable: true },
 		},
-		required: ["pk"],
+		required: omitPk ? undefined : ["pk"],
 		oneOf: [
 			{
 				additionalProperties: false,
 				properties: { pk: string, operazione: { const: "D" } },
-				required: ["operazione", "pk"],
+				required: ["operazione", ...(omitPk ? [] : ["pk"])],
 			},
 			{
 				...items,
@@ -88,7 +91,7 @@ export const apiOperation = <T>(
 					pk: string,
 					operazione: { type: "string", enum: ["I"], nullable: true },
 				},
-				required: [...items.required, "pk"],
+				required: [...items.required, ...(omitPk ? [] : ["pk"])],
 			},
 		],
 	} as JSONSchemaType<APIOperation<T>>);

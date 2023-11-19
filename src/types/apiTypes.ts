@@ -5,16 +5,27 @@ export type APIResponse<T = Json> = {
 	msg?: string | null;
 	data: T;
 };
-export type APIOperation<T> = {
-	pk: string;
-} & (
-	| {
-			operazione: "D";
+export type APIOperation<T, P extends boolean = false> = (P extends true
+	? {
+			pk?: undefined;
 	  }
-	| (T & {
-			operazione?: "I";
-	  })
-);
+	: {
+			pk: string;
+	  }) &
+	(
+		| {
+				operazione: "D";
+				pk: string;
+		  }
+		| (T &
+				(P extends true
+					? {
+							operazione: "I";
+					  }
+					: {
+							operazione?: "I";
+					  }))
+	);
 export type APIToken = {
 	access_token: string;
 	expires_in: number;
@@ -290,7 +301,49 @@ export type APIDashboard = APIResponse<{
 				ora: number;
 			}>[];
 			schede: any[];
-			prenotazioniAlunni: any[];
+			prenotazioniAlunni: APIOperation<
+				{
+					datEvento: string;
+					prenotazione: {
+						prgScuola: number;
+						datPrenotazione: string;
+						numPrenotazione: number | null;
+						prgAlunno: number;
+						genitore: string;
+						numMax: number;
+						orarioPrenotazione: string;
+						prgGenitore: number;
+						flgAnnullato: string | null;
+						flgAnnullatoDa: string | null;
+						desTelefonoGenitore: string;
+						flgTipo: string | null;
+						datAnnullamento: string | null;
+						desUrl: string | null;
+						genitorePK: string;
+						desEMailGenitore: string;
+						numPrenotazioni: number | null;
+						pk: string;
+					};
+					disponibilita: {
+						ora_Fine: string;
+						desNota: string;
+						datDisponibilita: string;
+						desUrl: string;
+						numMax: number;
+						ora_Inizio: string;
+						flgAttivo: string;
+						desLuogoRicevimento: string;
+						pk: string;
+					};
+					docente: {
+						desCognome: string;
+						desNome: string;
+						pk: string;
+						desEmail: string;
+					};
+				},
+				true
+			>[];
 			noteDisciplinari: any[];
 			pk: string;
 			appello: APIOperation<{

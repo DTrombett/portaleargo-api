@@ -49,6 +49,11 @@ export const getDashboard = async (
 		),
 		registro: handleOperation(data.registro, client.dashboard?.registro),
 		appello: handleOperation(data.appello, client.dashboard?.appello),
+		prenotazioniAlunni: handleOperation(
+			data.prenotazioniAlunni,
+			client.dashboard?.prenotazioniAlunni,
+			(a) => a.prenotazione.pk,
+		),
 		dataAggiornamento: new Date(headers.date as string),
 	});
 	void client.dataProvider?.write("dashboard", client.dashboard);
