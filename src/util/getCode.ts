@@ -1,4 +1,3 @@
-import { request } from "undici";
 import { clientId, generateLoginLink } from ".";
 import type { Credentials } from "..";
 
@@ -20,6 +19,7 @@ const baseHeaders = {
  * @returns I dati del codice da usare
  */
 export const getCode = async (credentials: Credentials) => {
+	const { request } = await import("undici");
 	const link = generateLoginLink();
 	const res = await request(link.url, {
 		headers: {
