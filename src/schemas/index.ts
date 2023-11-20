@@ -1,6 +1,5 @@
 import type { JSONSchemaType } from "ajv";
 import Ajv from "ajv";
-import { fastUri } from "fast-uri";
 import type {
 	APIBacheca,
 	APIBachecaAlunno,
@@ -41,7 +40,6 @@ const ajv = new Ajv({
 	allErrors: true,
 	strictRequired: "log",
 	verbose: true,
-	uriResolver: fastUri,
 	// code: { esm: true },
 });
 const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
@@ -84,6 +82,7 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 								fileName,
 							)}.json (remember to hide eventual sensitive data)\x1b[0m`,
 						);
+						return;
 					}
 					console.warn(
 						`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data)`,

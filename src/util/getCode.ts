@@ -20,7 +20,7 @@ const baseHeaders = {
  */
 export const getCode = async (credentials: Credentials) => {
 	const { request } = await import("undici");
-	const link = generateLoginLink();
+	const link = await generateLoginLink();
 	const res = await request(link.url, {
 		headers: {
 			...baseHeaders,
