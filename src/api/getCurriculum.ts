@@ -1,5 +1,5 @@
 import type { APICurriculum, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateCurriculum } from "../schemas";
 
 /**

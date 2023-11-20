@@ -3,17 +3,17 @@
 	"version": "1.0.0",
 	"description": "A library to interact with the api of ArgoScuolaNext",
 	"exports": {
-		"types": "./types/index.d.ts",
+		"types": "./dist/index.d.ts",
 		"default": "./dist/index.js"
 	},
 	"main": "./dist/index.js",
 	"types": "./types/index.d.ts",
 	"scripts": {
-		"build": "tsup && tsc --declaration --emitDeclarationOnly --declarationDir types --noEmit false",
+		"build": "tsup --dts",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
-		"test": "npm run test:cli && tsup _test.ts --format esm && node dist/_test.mjs --enable-source-maps",
+		"test": "npm run test:cli && tsup _test.ts && node dist/_test.js --enable-source-maps",
 		"test:cli": "eslint src && tsc",
 		"postinstall": "npm run build"
 	},
@@ -32,13 +32,14 @@
 	},
 	"dependencies": {
 		"@tsconfig/node20": "^20.1.2",
+		"@tsconfig/recommended": "^1.0.3",
+		"@tsconfig/strictest": "^2.0.2",
 		"@types/crypto-js": "^4.2.1",
 		"@types/node": "^20.9.2",
 		"ajv": "^8.12.0",
 		"crypto-js": "^4.2.0",
 		"fast-uri": "^2.3.0",
 		"tsup": "^8.0.0",
-		"typescript": "^5.2.2",
 		"undici": "^5.27.2"
 	},
 	"devDependencies": {
@@ -47,6 +48,7 @@
 		"dotenv": "^16.3.1",
 		"eslint": "^8.54.0",
 		"eslint-plugin-node": "^11.1.0",
-		"prettier": "^3.1.0"
+		"prettier": "^3.1.0",
+		"typescript": "^5.2.2"
 	}
 }

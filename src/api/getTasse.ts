@@ -1,5 +1,5 @@
 import type { APITasse, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateTasse } from "../schemas";
 
 /**

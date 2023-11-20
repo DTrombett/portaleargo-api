@@ -1,5 +1,5 @@
 import type { APICorsiRecupero, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateCorsiRecupero } from "../schemas";
 
 /**

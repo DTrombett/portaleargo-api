@@ -1,6 +1,5 @@
-import { request } from "undici";
 import type { Client, HttpMethod, Json } from "..";
-import { formatDate } from "..";
+import { formatDate } from ".";
 
 /**
  * Effettua una richiesta API.
@@ -19,26 +18,30 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 	}> = {},
 ) => {
 	options.method ??= "GET";
-	const res = await request(
+	const headers: Record<string, string> = {
+		accept: "application/json",
+		"argo-client-version": client.version,
+		authorization: `Bearer ${client.token?.access_token ?? ""}`,
+		"content-type": "application/json; charset=utf-8",
+		...client.headers,
+	};
+
+	if (client.loginData) {
+		headers["x-auth-token"] = client.loginData.token;
+		headers["x-cod-min"] = client.loginData.codMin;
+	}
+	if (client.token)
+		headers["x-date-exp-auth"] = formatDate(client.token.expireDate);
+	const res = await fetch(
 		`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
 		{
-			headers: {
-				accept: "application/json",
-				"argo-client-version": client.version,
-				authorization: `Bearer ${client.token?.access_token ?? ""}`,
-				"content-type": "application/json; charset=utf-8",
-				"x-auth-token": client.loginData?.token,
-				"x-cod-min": client.loginData?.codMin,
-				"x-date-exp-auth":
-					client.token?.expireDate && formatDate(client.token.expireDate),
-				...client.headers,
-			},
+			headers,
 			method: options.method,
 			body:
 				options.method === "POST" ? JSON.stringify(options.body) : undefined,
 		},
 	);
-	if (client.debug) console.log(`${options.method} /${path} ${res.statusCode}`);
+	if (client.debug) console.log(`${options.method} /${path} ${res.status}`);
 	const result = {
 		res,
 	} as {
@@ -47,13 +50,13 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 	};
 
 	if (options.noWaitAfter !== true) {
-		const text = await res.body.text();
+		const text = await res.text();
 
 		try {
 			result.body = JSON.parse(text);
 		} catch (err) {
 			throw new TypeError(
-				`${options.method} /${path} failed with status code ${res.statusCode}`,
+				`${options.method} /${path} failed with status code ${res.status}`,
 				{
 					cause: text,
 				},

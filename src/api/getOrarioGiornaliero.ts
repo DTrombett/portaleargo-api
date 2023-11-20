@@ -1,5 +1,5 @@
 import type { APIOrarioGiornaliero, Client } from "..";
-import { apiRequest, formatDate } from "..";
+import { apiRequest, formatDate } from "../util";
 import { validateOrarioGiornaliero } from "../schemas";
 
 /**

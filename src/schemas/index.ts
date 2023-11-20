@@ -1,9 +1,6 @@
 import type { JSONSchemaType } from "ajv";
 import Ajv from "ajv";
 import { fastUri } from "fast-uri";
-import { mkdir, stat } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import type {
 	APIBacheca,
 	APIBachecaAlunno,
@@ -22,7 +19,7 @@ import type {
 	APIToken,
 	APIVotiScrutinio,
 	APIWhat,
-} from "../types";
+} from "..";
 import { writeToFile } from "../util";
 import {
 	allRequired,
@@ -51,40 +48,51 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	const func = ajv.compile(schema);
 
 	return (data: unknown) => {
-		setImmediate(() => {
-			func(data);
-			const { errors } = func;
+		setImmediate(async () => {
+			try {
+				func(data);
+				const { errors } = func;
 
-			if (errors) {
-				const fileName = `${name}-${Date.now()}`;
-				const errorsPath = join(tmpdir(), "argo");
+				if (errors) {
+					const resolvedErrors = errors.map(
+						(err) =>
+							`${name}${err.instancePath.replaceAll("/", ".")} ${err.message!}`,
+					);
 
-				stat(errorsPath)
-					.catch(() => mkdir(errorsPath))
-					.then((stats) => {
+					if (typeof process !== "undefined") {
+						const fileName = `${name}-${Date.now()}`;
+						const [{ mkdir, stat }, { tmpdir }, { join }] = await Promise.all([
+							import("node:fs/promises"),
+							import("node:os"),
+							import("node:path"),
+						]);
+						const errorsPath = join(tmpdir(), "argo");
+						const stats = await stat(errorsPath).catch(() => mkdir(errorsPath));
+
 						if (!stats || stats.isDirectory())
-							void writeToFile(
+							await writeToFile(
 								fileName,
 								{
 									data,
-									errors: errors.map(
-										(err) =>
-											`${name}${err.instancePath.replaceAll(
-												"/",
-												".",
-											)} ${err.message!}`,
-									),
+									errors: resolvedErrors,
 								},
 								errorsPath,
 							);
-					})
-					.catch(() => {});
-				console.warn(
-					`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
-						errorsPath,
-						fileName,
-					)}.json (remember to hide eventual sensitive data)\x1b[0m`,
-				);
+						console.warn(
+							`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
+								errorsPath,
+								fileName,
+							)}.json (remember to hide eventual sensitive data)\x1b[0m`,
+						);
+					}
+					console.warn(
+						`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data)`,
+						data,
+						resolvedErrors,
+					);
+				}
+			} catch (err) {
+				console.error(err);
 			}
 		});
 	};

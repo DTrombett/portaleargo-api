@@ -1,5 +1,5 @@
 import type { APIBacheca, Client } from "..";
-import { apiRequest, handleOperation } from "..";
+import { apiRequest, handleOperation } from "../util";
 import { validateBacheca } from "../schemas";
 
 /**

@@ -1,7 +1,5 @@
-import { URLSearchParams } from "node:url";
-import { request } from "undici";
 import type { APIToken, Client } from "..";
-import { clientId } from "..";
+import { clientId } from "../util";
 import { validateToken } from "../schemas";
 
 /**
@@ -18,7 +16,7 @@ export const getToken = async (
 		codeVerifier: string;
 	},
 ) => {
-	const res = await request("https://auth.portaleargo.it/oauth2/token", {
+	const res = await fetch("https://auth.portaleargo.it/oauth2/token", {
 		headers: {
 			"content-type": "application/x-www-form-urlencoded",
 		},
@@ -31,8 +29,8 @@ export const getToken = async (
 		}).toString(),
 		method: "POST",
 	});
-	const data = (await res.body.json()) as APIToken;
-	const expireDate = new Date(res.headers.date as string);
+	const data: APIToken = await res.json();
+	const expireDate = new Date(res.headers.get("date")!);
 
 	expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
 	client.token = Object.assign(client.token ?? {}, data, { expireDate });

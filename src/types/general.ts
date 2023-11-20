@@ -1,11 +1,10 @@
-import type { IncomingHttpHeaders } from "node:http";
 import type {
 	APIDashboard,
 	APILogin,
 	APIOperation,
 	APIProfilo,
 	APIToken,
-} from "..";
+} from ".";
 
 export type ObjectJson = {
 	[key: string]: Json;
@@ -106,7 +105,7 @@ export type ClientOptions = Partial<
 		/**
 		 * Headers aggiuntivi per ogni richiesta API
 		 */
-		headers: IncomingHttpHeaders;
+		headers: Record<string, string>;
 
 		/**
 		 * Il percorso della cartella dove salvare i dati.

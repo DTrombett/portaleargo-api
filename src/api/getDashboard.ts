@@ -1,5 +1,5 @@
 import type { APIDashboard, Client } from "..";
-import { apiRequest, formatDate, handleOperation } from "..";
+import { apiRequest, formatDate, handleOperation } from "../util";
 import { validateDashboard } from "../schemas";
 
 /**
@@ -54,7 +54,7 @@ export const getDashboard = async (
 			client.dashboard?.prenotazioniAlunni,
 			(a) => a.prenotazione.pk,
 		),
-		dataAggiornamento: new Date(headers.date as string),
+		dataAggiornamento: new Date(headers.get("date")!),
 	});
 	void client.dataProvider?.write("dashboard", client.dashboard);
 	if (!client.noTypeCheck) validateDashboard(body);

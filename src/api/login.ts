@@ -1,5 +1,5 @@
 import type { APILogin, Client } from "..";
-import { apiRequest, randomString } from "..";
+import { apiRequest, randomString } from "../util";
 import { validateLogin } from "../schemas";
 
 /**

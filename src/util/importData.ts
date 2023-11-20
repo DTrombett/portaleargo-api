@@ -1,7 +1,4 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import type { ReadData } from "..";
-import { AuthFolder } from "..";
 
 /**
  * Importa dei dati salvati in un file.
@@ -10,10 +7,17 @@ import { AuthFolder } from "..";
  */
 export const importData = async <T extends keyof ReadData>(
 	name: T,
-	path = AuthFolder,
-) =>
-	readFile(join(path, `${name}.json`), {
+	path: Promise<string> | string,
+) => {
+	const [{ readFile }, { join }, resolvedPath] = await Promise.all([
+		import("node:fs/promises"),
+		import("node:path"),
+		path,
+	]);
+
+	return readFile(join(resolvedPath, `${name}.json`), {
 		encoding: "utf8",
 	})
 		.then(async (content) => JSON.parse(content) as ReadData[T])
 		.catch(() => undefined);
+};

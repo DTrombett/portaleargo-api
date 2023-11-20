@@ -1,5 +1,5 @@
 import type { APIBachecaAlunno, Client } from "..";
-import { apiRequest, handleOperation } from "..";
+import { apiRequest, handleOperation } from "../util";
 import { validateBachecaAlunno } from "../schemas";
 
 /**

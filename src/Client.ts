@@ -1,8 +1,3 @@
-import { existsSync, mkdirSync } from "node:fs";
-import { rm, writeFile } from "node:fs/promises";
-import type { IncomingHttpHeaders } from "node:http";
-import { env } from "node:process";
-import { request } from "undici";
 import type {
 	APICorsiRecupero,
 	APIDettagliProfilo,
@@ -16,9 +11,7 @@ import type {
 	Token,
 } from ".";
 import {
-	AuthFolder,
 	aggiornaData,
-	defaultVersion,
 	downloadAllegato,
 	downloadAllegatoStudente,
 	getCode,
@@ -36,14 +29,13 @@ import {
 	getTasse,
 	getToken,
 	getVotiScrutinio,
-	importData,
 	logToken,
 	login,
 	refreshToken,
 	rimuoviProfilo,
 	what,
-	writeToFile,
-} from ".";
+} from "./api";
+import { defaultVersion, getAuthFolder, importData, writeToFile } from "./util";
 
 /**
  * Un client per interagire con l'API
@@ -77,7 +69,7 @@ export class Client {
 	/**
 	 * Headers aggiuntivi per ogni richiesta API
 	 */
-	headers?: IncomingHttpHeaders;
+	headers?: Record<string, string>;
 
 	/**
 	 * Non controllare il tipo dei dati ricevuti dall'API.
@@ -100,7 +92,7 @@ export class Client {
 	/**
 	 * Le credenziali usate per l'accesso
 	 */
-	credentials?: Partial<Credentials>;
+	#credentials?: Partial<Credentials>;
 
 	#ready = false;
 
@@ -108,10 +100,18 @@ export class Client {
 	 * @param options - Le opzioni per il client
 	 */
 	constructor(options: ClientOptions = {}) {
-		this.credentials = {
-			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
-			password: options.password ?? env.PASSWORD,
-			username: options.username ?? env.NOME_UTENTE,
+		this.#credentials = {
+			schoolCode:
+				options.schoolCode ??
+				(typeof process === "undefined"
+					? undefined
+					: process.env.CODICE_SCUOLA),
+			password:
+				options.password ??
+				(typeof process === "undefined" ? undefined : process.env.PASSWORD),
+			username:
+				options.username ??
+				(typeof process === "undefined" ? undefined : process.env.NOME_UTENTE),
 		};
 		this.token = options.token;
 		this.loginData = options.loginData;
@@ -121,16 +121,60 @@ export class Client {
 		this.noTypeCheck = options.noTypeCheck ?? false;
 		this.version = options.version ?? defaultVersion;
 		this.headers = options.headers;
-		if (options.dataProvider !== null) {
-			options.dataPath ??= AuthFolder;
-			if (!options.dataProvider && !existsSync(options.dataPath))
-				mkdirSync(options.dataPath);
-			this.dataProvider = options.dataProvider ?? {
-				read: (name) => importData(name, options.dataPath!),
-				write: (name, value) => writeToFile(name, value, options.dataPath!),
-				reset: () => rm(options.dataPath!, { recursive: true, force: true }),
-			};
-		}
+		if (options.dataProvider !== null)
+			if (!(this.dataProvider = options.dataProvider))
+				if (typeof localStorage !== "undefined")
+					this.dataProvider = {
+						read: async (name) => {
+							const text = localStorage.getItem(name);
+
+							if (text == null) return undefined;
+							try {
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+								return JSON.parse(text);
+							} catch (err) {
+								return undefined;
+							}
+						},
+						write: async (name, value) => {
+							try {
+								const text = JSON.stringify(value);
+
+								localStorage.setItem(name, text);
+							} catch (err) {}
+						},
+						reset: async () => {
+							localStorage.clear();
+						},
+					};
+				else if (typeof process !== "undefined") {
+					const getFolder = async () => {
+						if (options.dataPath != null) return options.dataPath;
+						const [{ existsSync }, { mkdir }, folder] = await Promise.all([
+							import("node:fs"),
+							import("node:fs/promises"),
+							getAuthFolder(),
+						]);
+						options.dataPath = folder;
+						if (!existsSync(options.dataPath))
+							await mkdir(options.dataPath).catch(console.error);
+						return options.dataPath;
+					};
+
+					this.dataProvider = {
+						read: (name) => importData(name, options.dataPath ?? getFolder()),
+						write: (name, value) =>
+							writeToFile(name, value, options.dataPath ?? getFolder()),
+						reset: async () => {
+							const [{ rm }, path] = await Promise.all([
+								import("node:fs/promises"),
+								options.dataPath ?? getFolder(),
+							]);
+
+							return rm(path, { recursive: true, force: true });
+						},
+					};
+				}
 	}
 
 	/**
@@ -219,13 +263,13 @@ export class Client {
 	async getToken() {
 		if (
 			[
-				this.credentials?.password,
-				this.credentials?.schoolCode,
-				this.credentials?.username,
+				this.#credentials?.password,
+				this.#credentials?.schoolCode,
+				this.#credentials?.username,
 			].includes(undefined)
 		)
 			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.credentials as Credentials);
+		const code = await getCode(this.#credentials as Credentials);
 
 		return getToken(this, {
 			code: code.code,
@@ -286,18 +330,6 @@ export class Client {
 	}
 
 	/**
-	 * Scarica un allegato.
-	 * @param uid - L'uid dell'allegato
-	 * @param file - Il percorso dove salvare il file
-	 */
-	async downloadAllegato(uid: string, file: string) {
-		this.checkReady();
-		const { body } = await request(await this.getLinkAllegato(uid));
-
-		await writeFile(file, body);
-	}
-
-	/**
 	 * Ottieni il link per scaricare un allegato della bacheca alunno.
 	 * @param uid - l'uid dell'allegato
 	 * @param profileId - L'id del profilo
@@ -312,25 +344,6 @@ export class Client {
 	}
 
 	/**
-	 * Scarica un allegato dello studente.
-	 * @param uid - L'uid dell'allegato
-	 * @param file - Il percorso dove salvare il file
-	 * @param profileId - L'id del profilo
-	 */
-	async downloadAllegatoStudente(
-		uid: string,
-		file: string,
-		profileId?: string,
-	) {
-		this.checkReady();
-		const { body } = await request(
-			await this.getLinkAllegatoStudente(uid, profileId),
-		);
-
-		await writeFile(file, body);
-	}
-
-	/**
 	 * Ottieni i dati di una ricevuta telematica.
 	 * @param iuv - L'iuv del pagamento
 	 * @returns La ricevuta
@@ -338,19 +351,6 @@ export class Client {
 	async getRicevuta(iuv: string) {
 		this.checkReady();
 		return getRicevutaTelematica(this, { iuv });
-	}
-
-	/**
-	 * Scarica la ricevuta di un pagamento.
-	 * @param iuv - L'iuv del pagamento
-	 * @param file - Il percorso dove salvare il file
-	 */
-	async downloadRicevuta(iuv: string, file: string) {
-		this.checkReady();
-		const ricevuta = await this.getRicevuta(iuv);
-		const { body } = await request(ricevuta.url);
-
-		await writeFile(file, body);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 import type { APIWhat, Client } from "..";
-import { apiRequest, formatDate } from "..";
 import { validateWhat } from "../schemas";
+import { apiRequest, formatDate } from "../util";
 
 /**
  * Richiedi i dati generali.

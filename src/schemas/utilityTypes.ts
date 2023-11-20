@@ -1,5 +1,5 @@
 import type { JSONSchemaType } from "ajv";
-import type { APIOperation, APIResponse } from "../types";
+import type { APIOperation, APIResponse } from "..";
 
 export const base = { type: "object", additionalProperties: false } as const;
 export const allRequired = <

@@ -1,5 +1,5 @@
 import type { APIDownloadAllegato, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateDownloadAllegato } from "../schemas";
 
 /**

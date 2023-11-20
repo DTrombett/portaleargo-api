@@ -1,5 +1,5 @@
 import type { APIRicevutaTelematica, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateRicevutaTelematica } from "../schemas";
 
 /**

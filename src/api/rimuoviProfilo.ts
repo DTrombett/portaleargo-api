@@ -1,5 +1,5 @@
 import type { APIResponse, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 
 /**
  * Rimuovi il profilo.

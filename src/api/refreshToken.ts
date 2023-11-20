@@ -1,5 +1,5 @@
 import type { APIToken, Client } from "..";
-import { apiRequest, clientId, formatDate } from "..";
+import { apiRequest, clientId, formatDate } from "../util";
 import { validateToken } from "../schemas";
 
 /**
@@ -28,7 +28,7 @@ export const refreshToken = async (client: Client) => {
 			},
 		},
 	);
-	const expireDate = new Date(res.headers.date as string);
+	const expireDate = new Date(res.headers.get("date")!);
 
 	expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
 	client.token = Object.assign(client.token ?? {}, body, { expireDate });

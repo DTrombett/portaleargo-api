@@ -1,5 +1,5 @@
 import type { APIResponse, Client, Token } from "..";
-import { apiRequest, formatDate } from "..";
+import { apiRequest, formatDate } from "../util";
 
 /**
  * Registra il token

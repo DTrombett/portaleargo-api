@@ -1,5 +1,5 @@
 import type { APIVotiScrutinio, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateVotiScrutinio } from "../schemas";
 
 /**

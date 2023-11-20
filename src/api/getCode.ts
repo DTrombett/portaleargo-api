@@ -1,7 +1,6 @@
-import { URL } from "node:url";
 import { request } from "undici";
 import type { Credentials } from "..";
-import { clientId, generateLoginLink } from "..";
+import { clientId, generateLoginLink } from "../util";
 
 const baseHeaders = {
 	accept:
@@ -21,29 +20,30 @@ const baseHeaders = {
  * @returns I dati del codice da usare
  */
 export const getCode = async (credentials: Credentials) => {
-	const url = generateLoginLink();
-	const { headers, statusCode } = await request(url.url, {
+	const link = generateLoginLink();
+	const res = await request(link.url, {
 		headers: {
 			...baseHeaders,
 			"sec-fetch-site": "none",
 		},
 		method: "GET",
 	});
-	const link = headers.location;
+	const url = res.headers.location;
 	const cookies: string[] = [];
-	let cookieHeaders = headers["set-cookie"];
+	let cookieHeaders = res.headers["set-cookie"];
 
-	if (typeof link !== "string")
+	if (typeof url !== "string")
 		throw new TypeError(
-			`Auth request returned an invalid redirect url with status code ${statusCode}`,
+			`Auth request returned an invalid redirect url with status code ${res.statusCode}`,
 		);
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
-	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
-	const challenge = new URL(link).searchParams.get("login_challenge")!;
-	const {
-		headers: { location },
-		statusCode: status,
-	} = await request("https://www.portaleargo.it/auth/sso/login", {
+	for (const c of cookieHeaders ?? []) {
+		const [cookie] = c.split(";");
+
+		if (cookie != null) cookies.push(cookie);
+	}
+	const challenge = new URL(url).searchParams.get("login_challenge")!;
+	const res1 = await request("https://www.portaleargo.it/auth/sso/login", {
 		body: `challenge=${challenge}&client_id=${clientId}&prefill=false&famiglia_customer_code=${encodeURIComponent(
 			credentials.schoolCode,
 		)}&username=${encodeURIComponent(
@@ -56,41 +56,41 @@ export const getCode = async (credentials: Credentials) => {
 			"content-type": "application/x-www-form-urlencoded",
 			host: "www.portaleargo.it",
 			origin: "https://www.portaleargo.it",
-			referer: link,
+			referer: url,
 			"sec-fetch-site": "same-origin",
 		},
 		method: "POST",
 	});
+	const url1 = res1.headers.location;
 
-	if (typeof location !== "string")
+	if (typeof url1 !== "string")
 		throw new TypeError(
-			`Login request returned an invalid redirect url with status code ${status}`,
+			`Login request returned an invalid redirect url with status code ${res1.statusCode}`,
 		);
-	const { headers: newHeaders, statusCode: newStatus } = await request(
-		location,
-		{
-			headers: {
-				...baseHeaders,
-				"cache-control": "max-age=0",
-				cookie: cookies.join("; "),
-				referer: "https://www.portaleargo.it/",
-				"sec-fetch-site": "same-site",
-			},
-			method: "GET",
+	const res2 = await request(url1, {
+		headers: {
+			...baseHeaders,
+			"cache-control": "max-age=0",
+			cookie: cookies.join("; "),
+			referer: "https://www.portaleargo.it/",
+			"sec-fetch-site": "same-site",
 		},
-	);
+		method: "GET",
+	});
+	const url2 = res2.headers.location;
 
-	if (typeof newHeaders.location !== "string")
+	if (typeof url2 !== "string")
 		throw new TypeError(
-			`First redirect returned an invalid redirect url with status code ${newStatus}`,
+			`First redirect returned an invalid redirect url with status code ${res2.statusCode}`,
 		);
-	cookieHeaders = newHeaders["set-cookie"];
+	cookieHeaders = res2.headers["set-cookie"];
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
-	for (const c of cookieHeaders ?? []) cookies.push(c.split(";")[0]);
-	const {
-		headers: { location: redirect },
-		statusCode: middleStatus,
-	} = await request(newHeaders.location, {
+	for (const c of cookieHeaders ?? []) {
+		const [cookie] = c.split(";");
+
+		if (cookie != null) cookies.push(cookie);
+	}
+	const res3 = await request(url2, {
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
@@ -101,15 +101,13 @@ export const getCode = async (credentials: Credentials) => {
 		},
 		method: "GET",
 	});
+	const url3 = res3.headers.location;
 
-	if (typeof redirect !== "string")
+	if (typeof url3 !== "string")
 		throw new TypeError(
-			`Third redirect returned an invalid redirect url with status code ${middleStatus}`,
+			`Third redirect returned an invalid redirect url with status code ${res3.statusCode}`,
 		);
-	const {
-		headers: { location: finalRedirect },
-		statusCode: finalStatus,
-	} = await request(redirect, {
+	const res4 = await request(url3, {
 		headers: {
 			...baseHeaders,
 			"cache-control": "max-age=0",
@@ -119,14 +117,15 @@ export const getCode = async (credentials: Credentials) => {
 		},
 		method: "GET",
 	});
+	const url4 = res4.headers.location;
 
-	if (typeof finalRedirect !== "string")
+	if (typeof url4 !== "string")
 		throw new TypeError(
-			`Last redirect returned an invalid redirect url with status code ${finalStatus}`,
+			`Last redirect returned an invalid redirect url with status code ${res4.statusCode}`,
 		);
-	const code = new URL(finalRedirect).searchParams.get("code");
+	const code = new URL(url4).searchParams.get("code");
 
 	if (code == null)
-		throw new TypeError(`Invalid code returned by API: ${finalRedirect}`);
-	return { ...url, code };
+		throw new TypeError(`Invalid code returned by API: ${url4}`);
+	return { ...link, code };
 };

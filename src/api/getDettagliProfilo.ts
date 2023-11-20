@@ -1,5 +1,5 @@
 import type { APIDettagliProfilo, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateDettagliProfilo } from "../schemas";
 
 /**

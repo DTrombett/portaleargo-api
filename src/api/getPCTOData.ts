@@ -1,5 +1,5 @@
 import type { APIPCTO, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validatePCTO } from "../schemas";
 
 /**

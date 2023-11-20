@@ -1,5 +1,5 @@
 import type { APIRicevimenti, Client } from "..";
-import { apiRequest } from "..";
+import { apiRequest } from "../util";
 import { validateRicevimenti } from "../schemas";
 
 /**

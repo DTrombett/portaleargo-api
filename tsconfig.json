@@ -1,25 +1,26 @@
 {
 	"include": ["src"],
-	"extends": "@tsconfig/node20/tsconfig.json",
+	"extends": [
+		"@tsconfig/recommended/tsconfig.json",
+		"@tsconfig/strictest/tsconfig.json",
+		"@tsconfig/node20/tsconfig.json"
+	],
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
-		"allowUnreachableCode": false,
 		"alwaysStrict": true,
 		"esModuleInterop": true,
-		"isolatedModules": true,
-		"module": "ESNext",
-		"moduleResolution": "node",
+		"exactOptionalPropertyTypes": false,
+		"lib": ["es2023", "dom"],
+		"module": "ES2022",
+		"moduleResolution": "bundler",
 		"noEmit": true,
-		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": true,
-		"noImplicitReturns": true,
 		"noImplicitThis": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"outDir": "dist",
+		"noPropertyAccessFromIndexSignature": false,
+		"outDir": "./dist",
 		"pretty": true,
 		"resolveJsonModule": true,
-		"rootDir": "src",
+		"rootDir": "./src",
 		"sourceMap": true
 	}
 }
