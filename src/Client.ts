@@ -176,7 +176,7 @@ export class Client {
 						]);
 						options.dataPath = folder;
 						if (!existsSync(options.dataPath))
-							await mkdir(options.dataPath).catch(console.error);
+							await mkdir(options.dataPath).catch(() => {});
 						return options.dataPath;
 					};
 

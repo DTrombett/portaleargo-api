@@ -7,14 +7,14 @@
 		"default": "./dist/index.js"
 	},
 	"main": "./dist/index.js",
-	"types": "./types/index.d.ts",
+	"types": "./dist/index.d.ts",
 	"scripts": {
-		"build": "tsup --dts",
+		"build": "tsup && tsc --emitDeclarationOnly",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
 		"start": "npm run build && node --trace-warnings --enable-source-maps .",
 		"test": "npm run test:cli && tsup _test.ts && node dist/_test.js --enable-source-maps",
-		"test:cli": "eslint src && tsc",
+		"test:cli": "eslint src && tsc --noEmit",
 		"postinstall": "npm run build"
 	},
 	"repository": {
@@ -40,6 +40,7 @@
 		"crypto-js": "^4.2.0",
 		"fast-uri": "^2.3.0",
 		"tsup": "^8.0.0",
+		"typescript": "^5.2.2",
 		"undici": "^5.27.2"
 	},
 	"devDependencies": {
@@ -48,7 +49,6 @@
 		"dotenv": "^16.3.1",
 		"eslint": "^8.54.0",
 		"eslint-plugin-node": "^11.1.0",
-		"prettier": "^3.1.0",
-		"typescript": "^5.2.2"
+		"prettier": "^3.1.0"
 	}
 }
