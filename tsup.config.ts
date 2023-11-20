@@ -4,7 +4,7 @@ const options: Options = {
 	clean: true,
 	entry: ["src/index.ts"],
 	// format: ["esm"],
-	external: ["dotenv", "node:*"],
+	external: ["dotenv"],
 	platform: "neutral",
 	target: "esnext",
 	minify: true,

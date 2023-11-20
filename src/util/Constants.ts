@@ -5,10 +5,8 @@ let AuthFolder: string;
 
 export const getAuthFolder = async () => {
 	if (AuthFolder) return AuthFolder;
-	const [{ join }, { cwd }] = await Promise.all([
-		import("node:path"),
-		import("node:process"),
-	]);
-
-	return (AuthFolder = join(cwd(), ".argo"));
+	return (AuthFolder = (await import("node:path")).join(
+		process.cwd(),
+		".argo",
+	));
 };
