@@ -1,6 +1,6 @@
 import { request } from "undici";
+import { clientId, generateLoginLink } from ".";
 import type { Credentials } from "..";
-import { clientId, generateLoginLink } from "../util";
 
 const baseHeaders = {
 	accept:
