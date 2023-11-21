@@ -36,6 +36,7 @@ module.exports = {
 		filename: "index.js",
 		globalObject: "this",
 		library: { name: "portaleargo-api", type: "umd" },
+		libraryTarget: "umd",
 		path: path.resolve(__dirname, "dist"),
 		publicPath: "",
 		asyncChunks: true,
@@ -51,4 +52,5 @@ module.exports = {
 		cache: true,
 		cacheWithContext: true,
 	},
+	// target: "node",
 };
