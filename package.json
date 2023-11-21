@@ -16,7 +16,7 @@
 		"start": "webpack serve --open --config webpack.dev.js",
 		"test": "npm run test:cli && webpack ./_test.ts --config webpack.dev.js && node dist --enable-source-maps",
 		"test:cli": "eslint src && tsc --noEmit",
-		"postinstall": "npm run build"
+		"postinstall": "npm run build || exit 0"
 	},
 	"repository": {
 		"type": "git",
