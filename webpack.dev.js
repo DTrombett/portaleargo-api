@@ -8,6 +8,6 @@ module.exports = merge(common, {
 	devServer: {
 		static: "./dist",
 	},
-	devtool: "inline-source-map",
+	devtool: "eval-source-map",
 	mode: "development",
 });
