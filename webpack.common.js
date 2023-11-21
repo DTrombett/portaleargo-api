@@ -21,7 +21,7 @@ module.exports = {
 						options: { transpileOnly: true, happyPackMode: true },
 					},
 				],
-				exclude: /node_modules/,
+				exclude: path.join(__dirname, "node_modules"),
 			},
 		],
 	},
