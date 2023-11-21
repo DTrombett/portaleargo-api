@@ -111,7 +111,7 @@ export class Client {
 	/**
 	 * Le credenziali usate per l'accesso
 	 */
-	#credentials?: Partial<Credentials>;
+	credentials?: Partial<Credentials>;
 
 	#ready = false;
 
@@ -119,7 +119,7 @@ export class Client {
 	 * @param options - Le opzioni per il client
 	 */
 	constructor(options: ClientOptions = {}) {
-		this.#credentials = {
+		this.credentials = {
 			schoolCode:
 				options.schoolCode ??
 				(typeof process === "undefined"
@@ -370,13 +370,13 @@ export class Client {
 	async getToken() {
 		if (
 			[
-				this.#credentials?.password,
-				this.#credentials?.schoolCode,
-				this.#credentials?.username,
+				this.credentials?.password,
+				this.credentials?.schoolCode,
+				this.credentials?.username,
 			].includes(undefined)
 		)
 			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.#credentials as Credentials);
+		const code = await getCode(this.credentials as Credentials);
 		const res = await fetch("https://auth.portaleargo.it/oauth2/token", {
 			headers: {
 				"content-type": "application/x-www-form-urlencoded",
