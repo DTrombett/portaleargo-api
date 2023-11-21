@@ -97,17 +97,23 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	};
 };
 
-export const validateToken = validate<APIToken>(
-	"token",
-	allRequired({
-		access_token: string,
-		expires_in: number,
-		id_token: string,
-		refresh_token: string,
-		scope: string,
-		token_type: string,
-	}),
-);
+export const validateToken = validate<APIToken>("token", {
+	...base,
+	oneOf: [
+		allRequired({
+			access_token: string,
+			expires_in: number,
+			id_token: string,
+			refresh_token: string,
+			scope: string,
+			token_type: string,
+		}),
+		allRequired({
+			error: string,
+			error_description: string,
+		}),
+	],
+});
 export const validateLogin = validate<APILogin>(
 	"loginData",
 	merge<Omit<APILogin, "total">, Pick<APILogin, "total">>(

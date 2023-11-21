@@ -353,6 +353,8 @@ export class Client {
 			);
 			const expireDate = new Date(res.headers.get("date")!);
 
+			if ("error" in body)
+				throw new Error(body.error, { cause: body.error_description });
 			expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
 			this.token = Object.assign(this.token, body, { expireDate });
 			void this.dataProvider?.write("token", this.token);
@@ -391,6 +393,8 @@ export class Client {
 		const data: APIToken = await res.json();
 		const expireDate = new Date(res.headers.get("date")!);
 
+		if ("error" in data)
+			throw new Error(data.error, { cause: data.error_description });
 		expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
 		this.token = Object.assign(this.token ?? {}, data, { expireDate });
 		void this.dataProvider?.write("token", this.token);

@@ -33,9 +33,7 @@ export type ReadData = {
 	};
 	login: APILogin["data"][number];
 	profile: APIProfilo["data"];
-	token: APIToken & {
-		expireDate: string;
-	};
+	token: Token;
 };
 export type WriteData = {
 	dashboard: Dashboard;
@@ -67,7 +65,7 @@ export type ClearOperations<T> = {
 		  ? ClearOperations<T[K]>
 		  : T[K];
 };
-export type Token = APIToken & {
+export type Token = Exclude<APIToken, { error: string }> & {
 	expireDate: Date;
 };
 export type Dashboard = ClearOperations<
