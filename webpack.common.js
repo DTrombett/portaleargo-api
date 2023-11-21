@@ -37,7 +37,7 @@ module.exports = {
 		globalObject: "this",
 		library: { name: "portaleargo-api", type: "umd" },
 		path: path.resolve(__dirname, "dist"),
-		// publicPath: "",
+		publicPath: "",
 		asyncChunks: true,
 	},
 	// plugins: [
