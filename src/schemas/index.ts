@@ -99,6 +99,16 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 
 export const validateToken = validate<APIToken>("token", {
 	...base,
+	properties: {
+		access_token: string,
+		expires_in: number,
+		id_token: string,
+		refresh_token: string,
+		scope: string,
+		token_type: string,
+		error: string,
+		error_description: string,
+	},
 	oneOf: [
 		allRequired({
 			access_token: string,
