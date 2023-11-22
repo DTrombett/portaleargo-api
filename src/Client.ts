@@ -22,6 +22,7 @@ import type {
 	Dashboard,
 	HttpMethod,
 	Json,
+	LoginLink,
 	ReadyClient,
 	Token,
 } from ".";
@@ -354,18 +355,21 @@ export class Client {
 
 	/**
 	 * Ottieni il token tramite l'API.
+	 * @param code - The code for the access
 	 * @returns I dati del token
 	 */
-	async getToken() {
-		if (
-			[
-				this.credentials?.password,
-				this.credentials?.schoolCode,
-				this.credentials?.username,
-			].includes(undefined)
-		)
-			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.credentials as Credentials);
+	async getToken(code?: LoginLink & { code: string }) {
+		if (!code) {
+			if (
+				[
+					this.credentials?.password,
+					this.credentials?.schoolCode,
+					this.credentials?.username,
+				].includes(undefined)
+			)
+				throw new TypeError("Password, school code, or username missing");
+			code = await getCode(this.credentials as Credentials);
+		}
 		const res = await fetch("https://auth.portaleargo.it/oauth2/token", {
 			headers: {
 				"content-type": "application/x-www-form-urlencoded",
