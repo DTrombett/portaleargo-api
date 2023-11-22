@@ -1,6 +1,7 @@
 import { APIToken, LoginLink, clientId } from "..";
 
 export const getToken = async (code: LoginLink & { code: string }) => {
+	const date = new Date();
 	const res = await fetch("https://auth.portaleargo.it/oauth2/token", {
 		headers: {
 			"content-type": "application/x-www-form-urlencoded",
@@ -15,7 +16,7 @@ export const getToken = async (code: LoginLink & { code: string }) => {
 		method: "POST",
 	});
 	const data: APIToken = await res.json();
-	const expireDate = new Date(res.headers.get("date")!);
+	const expireDate = new Date(res.headers.get("date") ?? date);
 
 	if ("error" in data)
 		throw new Error(data.error, { cause: data.error_description });

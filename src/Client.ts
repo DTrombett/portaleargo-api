@@ -330,6 +330,7 @@ export class Client {
 	async refreshToken() {
 		if (!this.token) return this.getToken();
 		if (this.token.expireDate.getTime() <= Date.now()) {
+			const date = new Date();
 			const { res, body } = await this.apiRequest<APIToken>(
 				"auth/refresh-token",
 				{
@@ -342,13 +343,13 @@ export class Client {
 						"primo-accesso": "false",
 						"ripeti-login": "false",
 						"exp-bearer": formatDate(this.token.expireDate),
-						"ts-app": formatDate(new Date()),
+						"ts-app": formatDate(date),
 						proc: "initState_global_random_12345",
 						username: this.loginData?.username,
 					},
 				},
 			);
-			const expireDate = new Date(res.headers.get("date")!);
+			const expireDate = new Date(res.headers.get("date") ?? date);
 
 			if ("error" in body)
 				throw new Error(body.error, { cause: body.error_description });
@@ -665,6 +666,7 @@ export class Client {
 	 */
 	private async getDashboard() {
 		this.checkReady();
+		const date = new Date();
 		const {
 			body,
 			res: { headers },
@@ -705,7 +707,7 @@ export class Client {
 				this.dashboard?.prenotazioniAlunni,
 				(a) => a.prenotazione.pk,
 			),
-			dataAggiornamento: new Date(headers.get("date")!),
+			dataAggiornamento: new Date(headers.get("date") ?? date),
 		});
 		void this.dataProvider?.write("dashboard", this.dashboard);
 		if (!this.noTypeCheck) validateDashboard(body);
