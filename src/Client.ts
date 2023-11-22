@@ -262,6 +262,12 @@ export class Client {
 	 * @returns Il client aggiornato
 	 */
 	async login() {
+		await Promise.all([
+			this.token && this.dataProvider?.write("token", this.token),
+			this.loginData && this.dataProvider?.write("login", this.loginData),
+			this.profile && this.dataProvider?.write("profile", this.profile),
+			this.dashboard && this.dataProvider?.write("dashboard", this.dashboard),
+		]);
 		await this.loadData();
 		const oldToken = this.token;
 
