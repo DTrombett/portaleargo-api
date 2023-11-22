@@ -51,6 +51,7 @@ import {
 	formatDate,
 	getAuthFolder,
 	getCode,
+	getToken,
 	handleOperation,
 	importData,
 	randomString,
@@ -370,28 +371,11 @@ export class Client {
 				throw new TypeError("Password, school code, or username missing");
 			code = await getCode(this.credentials as Credentials);
 		}
-		const res = await fetch("https://auth.portaleargo.it/oauth2/token", {
-			headers: {
-				"content-type": "application/x-www-form-urlencoded",
-			},
-			body: new URLSearchParams({
-				code: code.code,
-				grant_type: "authorization_code",
-				redirect_uri: "it.argosoft.didup.famiglia.new://login-callback",
-				code_verifier: code.codeVerifier,
-				client_id: clientId,
-			}).toString(),
-			method: "POST",
-		});
-		const data: APIToken = await res.json();
-		const expireDate = new Date(res.headers.get("date")!);
+		const { expireDate, ...token } = await getToken(code);
 
-		if ("error" in data)
-			throw new Error(data.error, { cause: data.error_description });
-		expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
-		this.token = Object.assign(this.token ?? {}, data, { expireDate });
+		this.token = Object.assign(this.token ?? {}, token, { expireDate });
 		void this.dataProvider?.write("token", this.token);
-		if (!this.noTypeCheck) validateToken(data);
+		if (!this.noTypeCheck) validateToken(token);
 		return this.token;
 	}
 
