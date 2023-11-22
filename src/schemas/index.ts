@@ -46,7 +46,7 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	const func = ajv.compile(schema);
 
 	return (data: unknown) => {
-		setImmediate(async () => {
+		setTimeout(async () => {
 			try {
 				func(data);
 				const { errors } = func;
