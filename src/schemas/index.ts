@@ -60,10 +60,10 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 					if (typeof process !== "undefined") {
 						const fileName = `${name}-${Date.now()}`;
 						const { mkdir, stat } =
-							require("fs/promises") as typeof import("node:fs/promises");
-						const { tmpdir } = require("os") as typeof import("node:os");
+							require("node:fs/promises") as typeof import("node:fs/promises");
+						const { tmpdir } = require("node:os") as typeof import("node:os");
 						// eslint-disable-next-line @typescript-eslint/unbound-method
-						const { join } = require("path") as typeof import("node:path");
+						const { join } = require("node:path") as typeof import("node:path");
 						const errorsPath = join(tmpdir(), "argo");
 						const stats = await stat(errorsPath).catch(() => mkdir(errorsPath));
 

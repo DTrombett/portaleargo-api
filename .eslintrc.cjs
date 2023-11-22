@@ -41,8 +41,8 @@ module.exports = {
 		"no-restricted-imports": [
 			"warn",
 			...builtinModules.map((name) => ({
-				name: `node:${name}`,
-				message: `Don't use the \`node:\` protocol to import a built-in module for compatibility with webpack`,
+				name,
+				message: "Use the `node:` protocol to import a built-in module",
 			})),
 		],
 		"no-useless-return": "warn",

@@ -10,9 +10,9 @@ export const writeToFile = async (
 	value: unknown,
 	path = getAuthFolder(),
 ) =>
-	(require("fs/promises") as typeof import("node:fs/promises"))
+	(require("node:fs/promises") as typeof import("node:fs/promises"))
 		.writeFile(
-			`${(require("path") as typeof import("node:path")).join(
+			`${(require("node:path") as typeof import("node:path")).join(
 				path,
 				name,
 			)}.json`,

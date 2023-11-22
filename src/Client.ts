@@ -170,7 +170,7 @@ export class Client {
 						},
 					};
 				else if (typeof process !== "undefined") {
-					const fs = require("fs") as typeof import("node:fs");
+					const fs = require("node:fs") as typeof import("node:fs");
 
 					options.dataPath ??= getAuthFolder();
 					if (!fs.existsSync(options.dataPath)) fs.mkdirSync(options.dataPath);
@@ -178,10 +178,9 @@ export class Client {
 						read: (name) => importData(name, options.dataPath!),
 						write: (name, value) => writeToFile(name, value, options.dataPath!),
 						reset: () =>
-							(require("fs/promises") as typeof import("node:fs/promises")).rm(
-								options.dataPath!,
-								{ recursive: true, force: true },
-							),
+							(
+								require("node:fs/promises") as typeof import("node:fs/promises")
+							).rm(options.dataPath!, { recursive: true, force: true }),
 					};
 				}
 	}

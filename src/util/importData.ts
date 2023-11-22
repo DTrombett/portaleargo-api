@@ -9,9 +9,9 @@ export const importData = async <T extends keyof ReadData>(
 	name: T,
 	path = getAuthFolder(),
 ) =>
-	(require("fs/promises") as typeof import("node:fs/promises"))
+	(require("node:fs/promises") as typeof import("node:fs/promises"))
 		.readFile(
-			(require("path") as typeof import("node:path")).join(
+			(require("node:path") as typeof import("node:path")).join(
 				path,
 				`${name}.json`,
 			),

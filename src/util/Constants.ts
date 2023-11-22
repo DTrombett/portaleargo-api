@@ -4,7 +4,7 @@ export const defaultVersion = "1.18.0";
 let AuthFolder: string | undefined;
 
 export const getAuthFolder = () =>
-	(AuthFolder ??= (require("path") as typeof import("node:path")).join(
+	(AuthFolder ??= (require("node:path") as typeof import("node:path")).join(
 		process.cwd(),
 		".argo",
 	));
