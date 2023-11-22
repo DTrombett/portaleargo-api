@@ -124,13 +124,16 @@ export class Client {
 				options.schoolCode ??
 				(typeof process === "undefined"
 					? undefined
-					: process.env.CODICE_SCUOLA),
+					: // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+					  process.env?.CODICE_SCUOLA),
 			password:
 				options.password ??
-				(typeof process === "undefined" ? undefined : process.env.PASSWORD),
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				(typeof process === "undefined" ? undefined : process.env?.PASSWORD),
 			username:
 				options.username ??
-				(typeof process === "undefined" ? undefined : process.env.NOME_UTENTE),
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				(typeof process === "undefined" ? undefined : process.env?.NOME_UTENTE),
 		};
 		this.token = options.token;
 		this.loginData = options.loginData;
