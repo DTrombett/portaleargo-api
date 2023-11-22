@@ -167,31 +167,18 @@ export class Client {
 						},
 					};
 				else if (typeof process !== "undefined") {
-					const getFolder = async () => {
-						if (options.dataPath != null) return options.dataPath;
-						const [{ existsSync }, { mkdir }, folder] = await Promise.all([
-							import("node:fs"),
-							import("node:fs/promises"),
-							getAuthFolder(),
-						]);
-						options.dataPath = folder;
-						if (!existsSync(options.dataPath))
-							await mkdir(options.dataPath).catch(() => {});
-						return options.dataPath;
-					};
+					const fs = require("fs") as typeof import("node:fs");
 
+					options.dataPath ??= getAuthFolder();
+					if (!fs.existsSync(options.dataPath)) fs.mkdirSync(options.dataPath);
 					this.dataProvider = {
-						read: (name) => importData(name, options.dataPath ?? getFolder()),
-						write: (name, value) =>
-							writeToFile(name, value, options.dataPath ?? getFolder()),
-						reset: async () => {
-							const [{ rm }, path] = await Promise.all([
-								import("node:fs/promises"),
-								options.dataPath ?? getFolder(),
-							]);
-
-							return rm(path, { recursive: true, force: true });
-						},
+						read: (name) => importData(name, options.dataPath!),
+						write: (name, value) => writeToFile(name, value, options.dataPath!),
+						reset: () =>
+							(require("fs/promises") as typeof import("node:fs/promises")).rm(
+								options.dataPath!,
+								{ recursive: true, force: true },
+							),
 					};
 				}
 	}

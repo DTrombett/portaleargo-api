@@ -41,8 +41,8 @@ module.exports = {
 		"no-restricted-imports": [
 			"warn",
 			...builtinModules.map((name) => ({
-				name,
-				message: `Use the \`node:\` protocol to import a built-in module`,
+				name: `node:${name}`,
+				message: `Don't use the \`node:\` protocol to import a built-in module for compatibility with webpack`,
 			})),
 		],
 		"no-useless-return": "warn",
@@ -139,7 +139,6 @@ module.exports = {
 		"@typescript-eslint/array-type": "warn",
 		"@typescript-eslint/consistent-type-assertions": "warn",
 		"@typescript-eslint/consistent-type-definitions": ["warn", "type"],
-		"@typescript-eslint/consistent-type-imports": "warn",
 		"@typescript-eslint/class-literal-property-style": "warn",
 		"@typescript-eslint/member-ordering": "warn",
 		"@typescript-eslint/no-confusing-non-null-assertion": "warn",
