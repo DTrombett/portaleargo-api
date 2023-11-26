@@ -1,5 +1,4 @@
 const path = require("path");
-const nodeExternals = require("webpack-node-externals");
 
 /**
  * @type {import("webpack").Configuration}
@@ -8,7 +7,7 @@ module.exports = {
 	bail: true,
 	cache: true,
 	entry: "./src/index.ts",
-	externals: [nodeExternals()],
+	externals: ["undici"],
 	externalsPresets: { node: true, web: true },
 	mode: "none",
 	module: {
@@ -35,22 +34,19 @@ module.exports = {
 		clean: true,
 		filename: "index.js",
 		globalObject: "this",
-		library: { name: "portaleargo-api", type: "umd" },
+		library: {
+			name: "portaleargoApi",
+			type: "umd",
+		},
 		libraryTarget: "umd",
 		path: path.resolve(__dirname, "dist"),
 		publicPath: "",
 		asyncChunks: true,
 	},
-	// plugins: [
-	// 	new NormalModuleReplacementPlugin(/^node:/, (resource) => {
-	// 		resource.request = resource.request.replace(/^node:/, "");
-	// 	}),
-	// ],
 	resolve: {
 		extensions: [".ts", ".js"],
 		symlinks: false,
 		cache: true,
 		cacheWithContext: true,
 	},
-	// target: "node",
 };
