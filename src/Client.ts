@@ -1,49 +1,62 @@
-import { existsSync, mkdirSync } from "node:fs";
-import { rm, writeFile } from "node:fs/promises";
-import type { IncomingHttpHeaders } from "node:http";
-import { env } from "node:process";
-import { request } from "undici";
 import type {
+	APIBacheca,
+	APIBachecaAlunno,
 	APICorsiRecupero,
+	APICurriculum,
+	APIDashboard,
 	APIDettagliProfilo,
+	APIDownloadAllegato,
 	APILogin,
+	APIOrarioGiornaliero,
+	APIPCTO,
 	APIProfilo,
+	APIResponse,
 	APIRicevimenti,
+	APIRicevutaTelematica,
+	APITasse,
+	APIToken,
+	APIVotiScrutinio,
+	APIWhat,
 	ClientOptions,
 	Credentials,
 	Dashboard,
+	HttpMethod,
+	Json,
+	LoginLink,
 	ReadyClient,
 	Token,
 } from ".";
 import {
-	AuthFolder,
-	aggiornaData,
+	validateBacheca,
+	validateBachecaAlunno,
+	validateCorsiRecupero,
+	validateCurriculum,
+	validateDashboard,
+	validateDettagliProfilo,
+	validateDownloadAllegato,
+	validateLogin,
+	validateOrarioGiornaliero,
+	validatePCTO,
+	validateProfilo,
+	validateRicevimenti,
+	validateRicevutaTelematica,
+	validateTasse,
+	validateToken,
+	validateVotiScrutinio,
+	validateWhat,
+} from "./schemas";
+import {
+	clientId,
 	defaultVersion,
-	downloadAllegato,
-	downloadAllegatoStudente,
+	formatDate,
+	getAuthFolder,
 	getCode,
-	getCorsiRecupero,
-	getCurriculum,
-	getDashboard,
-	getDettagliProfilo,
-	getOrarioGiornaliero,
-	getPCTOData,
-	getProfilo,
-	getRicevimenti,
-	getRicevutaTelematica,
-	getStoricoBacheca,
-	getStoricoBachecaAlunno,
-	getTasse,
 	getToken,
-	getVotiScrutinio,
+	handleOperation,
 	importData,
-	logToken,
-	login,
-	refreshToken,
-	rimuoviProfilo,
-	what,
+	randomString,
 	writeToFile,
-} from ".";
+} from "./util";
 
 /**
  * Un client per interagire con l'API
@@ -77,7 +90,7 @@ export class Client {
 	/**
 	 * Headers aggiuntivi per ogni richiesta API
 	 */
-	headers?: IncomingHttpHeaders;
+	headers?: Record<string, string>;
 
 	/**
 	 * Non controllare il tipo dei dati ricevuti dall'API.
@@ -109,9 +122,20 @@ export class Client {
 	 */
 	constructor(options: ClientOptions = {}) {
 		this.credentials = {
-			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
-			password: options.password ?? env.PASSWORD,
-			username: options.username ?? env.NOME_UTENTE,
+			schoolCode:
+				options.schoolCode ??
+				(typeof process === "undefined"
+					? undefined
+					: // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+					  process.env?.CODICE_SCUOLA),
+			password:
+				options.password ??
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				(typeof process === "undefined" ? undefined : process.env?.PASSWORD),
+			username:
+				options.username ??
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				(typeof process === "undefined" ? undefined : process.env?.NOME_UTENTE),
 		};
 		this.token = options.token;
 		this.loginData = options.loginData;
@@ -121,16 +145,46 @@ export class Client {
 		this.noTypeCheck = options.noTypeCheck ?? false;
 		this.version = options.version ?? defaultVersion;
 		this.headers = options.headers;
-		if (options.dataProvider !== null) {
-			options.dataPath ??= AuthFolder;
-			if (!options.dataProvider && !existsSync(options.dataPath))
-				mkdirSync(options.dataPath);
-			this.dataProvider = options.dataProvider ?? {
-				read: (name) => importData(name, options.dataPath!),
-				write: (name, value) => writeToFile(name, value, options.dataPath!),
-				reset: () => rm(options.dataPath!, { recursive: true, force: true }),
-			};
-		}
+		if (options.dataProvider !== null)
+			if (!(this.dataProvider = options.dataProvider))
+				if (typeof localStorage !== "undefined")
+					this.dataProvider = {
+						read: async (name) => {
+							const text = localStorage.getItem(name);
+
+							if (text == null) return undefined;
+							try {
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+								return JSON.parse(text);
+							} catch (err) {
+								return undefined;
+							}
+						},
+						write: async (name, value) => {
+							try {
+								const text = JSON.stringify(value);
+
+								localStorage.setItem(name, text);
+							} catch (err) {}
+						},
+						reset: async () => {
+							localStorage.clear();
+						},
+					};
+				else if (typeof process !== "undefined") {
+					const fs = require("node:fs") as typeof import("node:fs");
+
+					options.dataPath ??= getAuthFolder();
+					if (!fs.existsSync(options.dataPath)) fs.mkdirSync(options.dataPath);
+					this.dataProvider = {
+						read: (name) => importData(name, options.dataPath!),
+						write: (name, value) => writeToFile(name, value, options.dataPath!),
+						reset: () =>
+							(
+								require("node:fs/promises") as typeof import("node:fs/promises")
+							).rm(options.dataPath!, { recursive: true, force: true }),
+					};
+				}
 	}
 
 	/**
@@ -141,25 +195,93 @@ export class Client {
 	}
 
 	/**
+	 * Effettua una richiesta API.
+	 * @param path - Il percorso della richiesta
+	 * @param options - Altre opzioni
+	 * @returns La risposta
+	 */
+	async apiRequest<T extends Json, R extends boolean = false>(
+		path: string,
+		options: Partial<{
+			body: Json;
+			method: HttpMethod;
+			noWaitAfter: R;
+		}> = {},
+	) {
+		options.method ??= "GET";
+		const headers: Record<string, string> = {
+			accept: "application/json",
+			"argo-client-version": this.version,
+			authorization: `Bearer ${this.token?.access_token ?? ""}`,
+			"content-type": "application/json; charset=utf-8",
+			...this.headers,
+		};
+
+		if (this.loginData) {
+			headers["x-auth-token"] = this.loginData.token;
+			headers["x-cod-min"] = this.loginData.codMin;
+		}
+		if (this.token)
+			headers["x-date-exp-auth"] = formatDate(this.token.expireDate);
+		const res = await fetch(
+			`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
+			{
+				headers,
+				method: options.method,
+				body:
+					options.method === "POST" ? JSON.stringify(options.body) : undefined,
+			},
+		);
+		if (this.debug) console.log(`${options.method} /${path} ${res.status}`);
+		const result = {
+			res,
+		} as {
+			res: typeof res;
+			body: R extends true ? undefined : T;
+		};
+
+		if (options.noWaitAfter !== true) {
+			const text = await res.text();
+
+			try {
+				result.body = JSON.parse(text);
+			} catch (err) {
+				throw new TypeError(
+					`${options.method} /${path} failed with status code ${res.status}`,
+					{
+						cause: text,
+					},
+				);
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Effettua il login.
 	 * @returns Il client aggiornato
 	 */
 	async login() {
+		await Promise.all([
+			this.token && this.dataProvider?.write("token", this.token),
+			this.loginData && this.dataProvider?.write("login", this.loginData),
+			this.profile && this.dataProvider?.write("profile", this.profile),
+			this.dashboard && this.dataProvider?.write("dashboard", this.dashboard),
+		]);
 		await this.loadData();
 		const oldToken = this.token;
 
 		await this.refreshToken();
-		if (!this.loginData) await login(this);
+		if (!this.loginData) await this.getLoginData();
 		if (oldToken) {
-			await logToken(this, {
+			await this.logToken({
 				oldToken,
 				isWhat: this.profile !== undefined,
 			});
 			if (this.profile) {
-				const whatData = await what(this, {
-					lastUpdate:
-						this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
-				});
+				const whatData = await this.what(
+					this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+				);
 
 				if (whatData.isModificato || whatData.differenzaSchede) {
 					Object.assign(this.profile, whatData);
@@ -168,11 +290,11 @@ export class Client {
 				this.#ready = true;
 				if (whatData.mostraPallino || !this.dashboard)
 					await this.getDashboard();
-				aggiornaData(this).catch(console.error);
+				this.aggiornaData().catch(console.error);
 				return this as ReadyClient & this & { dashboard: Dashboard };
 			}
 		}
-		if (!this.profile) await getProfilo(this);
+		if (!this.profile) await this.getProfilo();
 		this.#ready = true;
 		await this.getDashboard();
 		return this as ReadyClient & this & { dashboard: Dashboard };
@@ -207,39 +329,70 @@ export class Client {
 	 */
 	async refreshToken() {
 		if (!this.token) return this.getToken();
-		if (this.token.expireDate.getTime() <= Date.now())
-			return refreshToken(this);
+		if (this.token.expireDate.getTime() <= Date.now()) {
+			const date = new Date();
+			const { res, body } = await this.apiRequest<APIToken>(
+				"auth/refresh-token",
+				{
+					method: "POST",
+					body: {
+						"r-token": this.token.refresh_token,
+						"client-id": clientId,
+						scopes: `[${this.token.scope.split(" ").join(", ")}]`,
+						"old-bearer": this.token.access_token,
+						"primo-accesso": "false",
+						"ripeti-login": "false",
+						"exp-bearer": formatDate(this.token.expireDate),
+						"ts-app": formatDate(date),
+						proc: "initState_global_random_12345",
+						username: this.loginData?.username,
+					},
+				},
+			);
+			const expireDate = new Date(res.headers.get("date") ?? date);
+
+			if ("error" in body)
+				throw new Error(body.error, { cause: body.error_description });
+			expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
+			this.token = Object.assign(this.token, body, { expireDate });
+			void this.dataProvider?.write("token", this.token);
+			if (!this.noTypeCheck) validateToken(body);
+		}
 		return this.token;
 	}
 
 	/**
 	 * Ottieni il token tramite l'API.
+	 * @param code - The code for the access
 	 * @returns I dati del token
 	 */
-	async getToken() {
-		if (
-			[
-				this.credentials?.password,
-				this.credentials?.schoolCode,
-				this.credentials?.username,
-			].includes(undefined)
-		)
-			throw new TypeError("Password, school code, or username missing");
-		const code = await getCode(this.credentials as Credentials);
+	async getToken(code?: LoginLink & { code: string }) {
+		if (!code) {
+			if (
+				[
+					this.credentials?.password,
+					this.credentials?.schoolCode,
+					this.credentials?.username,
+				].includes(undefined)
+			)
+				throw new TypeError("Password, school code, or username missing");
+			code = await getCode(this.credentials as Credentials);
+		}
+		const { expireDate, ...token } = await getToken(code);
 
-		return getToken(this, {
-			code: code.code,
-			codeVerifier: code.codeVerifier,
-		});
+		this.token = Object.assign(this.token ?? {}, token, { expireDate });
+		void this.dataProvider?.write("token", this.token);
+		if (!this.noTypeCheck) validateToken(token);
+		return this.token;
 	}
 
 	/**
 	 * Rimuovi il profilo.
 	 */
-	async rimuoviProfilo() {
+	async logOut() {
 		if (!this.token || !this.loginData)
 			throw new Error("Client is not logged in!");
-		await rimuoviProfilo(this);
+		await this.rimuoviProfilo();
 		delete this.token;
 		delete this.loginData;
 		delete this.profile;
@@ -252,9 +405,17 @@ export class Client {
 	 */
 	async getDettagliProfilo<T extends APIDettagliProfilo["data"]>(old?: T) {
 		this.checkReady();
-		return getDettagliProfilo(this, {
-			old,
-		});
+		const { body } = await this.apiRequest<APIDettagliProfilo>(
+			"dettaglioprofilo",
+			{
+				body: null,
+				method: "POST",
+			},
+		);
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateDettagliProfilo(body);
+		return Object.assign(old ?? {}, body.data);
 	}
 
 	/**
@@ -268,11 +429,24 @@ export class Client {
 		day?: number;
 	}) {
 		this.checkReady();
-		return getOrarioGiornaliero(this, {
-			day: date?.day,
-			month: date?.month,
-			year: date?.year,
-		});
+		const now = new Date();
+		const { body } = await this.apiRequest<APIOrarioGiornaliero>(
+			"orario-giorno",
+			{
+				method: "POST",
+				body: {
+					datGiorno: formatDate(
+						`${date?.year ?? now.getFullYear()}-${
+							date?.month ?? now.getMonth() + 1
+						}-${date?.day ?? now.getDate() + 1}`,
+					),
+				},
+			},
+		);
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateOrarioGiornaliero(body);
+		return Object.values(body.data.dati).flat();
 	}
 
 	/**
@@ -282,52 +456,41 @@ export class Client {
 	 */
 	async getLinkAllegato(uid: string) {
 		this.checkReady();
-		return downloadAllegato(this, { uid });
-	}
+		const { body } = await this.apiRequest<APIDownloadAllegato>(
+			"downloadallegatobacheca",
+			{
+				method: "POST",
+				body: { uid },
+			},
+		);
 
-	/**
-	 * Scarica un allegato.
-	 * @param uid - L'uid dell'allegato
-	 * @param file - Il percorso dove salvare il file
-	 */
-	async downloadAllegato(uid: string, file: string) {
-		this.checkReady();
-		const { body } = await request(await this.getLinkAllegato(uid));
-
-		await writeFile(file, body);
+		if (!body.success) throw new Error(body.msg);
+		if (!this.noTypeCheck) validateDownloadAllegato(body);
+		return body.url;
 	}
 
 	/**
 	 * Ottieni il link per scaricare un allegato della bacheca alunno.
 	 * @param uid - l'uid dell'allegato
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns L'url
 	 */
-	async getLinkAllegatoStudente(uid: string, profileId?: string) {
-		this.checkReady();
-		return downloadAllegatoStudente(this, {
-			uid,
-			profileId: profileId ?? this.profile.scheda.pk,
-		});
-	}
-
-	/**
-	 * Scarica un allegato dello studente.
-	 * @param uid - L'uid dell'allegato
-	 * @param file - Il percorso dove salvare il file
-	 * @param profileId - L'id del profilo
-	 */
-	async downloadAllegatoStudente(
+	async getLinkAllegatoStudente(
 		uid: string,
-		file: string,
-		profileId?: string,
+		pkScheda = this.profile?.scheda.pk,
 	) {
 		this.checkReady();
-		const { body } = await request(
-			await this.getLinkAllegatoStudente(uid, profileId),
+		const { body } = await this.apiRequest<APIDownloadAllegato>(
+			"downloadallegatobachecaalunno",
+			{
+				method: "POST",
+				body: { uid, pkScheda },
+			},
 		);
 
-		await writeFile(file, body);
+		if (!body.success) throw new Error(body.msg);
+		if (!this.noTypeCheck) validateDownloadAllegato(body);
+		return body.url;
 	}
 
 	/**
@@ -337,20 +500,19 @@ export class Client {
 	 */
 	async getRicevuta(iuv: string) {
 		this.checkReady();
-		return getRicevutaTelematica(this, { iuv });
-	}
+		const { body } = await this.apiRequest<APIRicevutaTelematica>(
+			"ricevutatelematica",
+			{
+				method: "POST",
+				body: { iuv },
+			},
+		);
 
-	/**
-	 * Scarica la ricevuta di un pagamento.
-	 * @param iuv - L'iuv del pagamento
-	 * @param file - Il percorso dove salvare il file
-	 */
-	async downloadRicevuta(iuv: string, file: string) {
-		this.checkReady();
-		const ricevuta = await this.getRicevuta(iuv);
-		const { body } = await request(ricevuta.url);
+		if (!body.success) throw new Error(body.msg);
+		const { success, msg, ...rest } = body;
 
-		await writeFile(file, body);
+		if (!this.noTypeCheck) validateRicevutaTelematica(body);
+		return rest;
 	}
 
 	/**
@@ -359,7 +521,14 @@ export class Client {
 	 */
 	async getVotiScrutinio() {
 		this.checkReady();
-		return getVotiScrutinio(this);
+		const { body } = await this.apiRequest<APIVotiScrutinio>("votiscrutinio", {
+			method: "POST",
+			body: {},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateVotiScrutinio(body);
+		return body.data.votiScrutinio[0].periodi;
 	}
 
 	/**
@@ -368,83 +537,127 @@ export class Client {
 	 */
 	async getRicevimenti<T extends APIRicevimenti["data"]>(old?: T) {
 		this.checkReady();
-		return getRicevimenti(this, { old });
+		const { body } = await this.apiRequest<APIRicevimenti>("ricevimento", {
+			method: "POST",
+			body: {},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateRicevimenti(body);
+		return Object.assign(old ?? {}, body.data);
 	}
 
 	/**
 	 * Ottieni le tasse dello studente.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
-	async getTasse(profileId?: string) {
+	async getTasse(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		return getTasse(this, {
-			profileId: profileId ?? this.profile.scheda.pk,
+		const { body } = await this.apiRequest<APITasse>("listatassealunni", {
+			method: "POST",
+			body: { pkScheda },
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		const { success, msg, data, ...rest } = body;
+
+		if (!this.noTypeCheck) validateTasse(body);
+		return {
+			...rest,
+			tasse: data,
+		};
 	}
 
 	/**
 	 * Ottieni i dati del PCTO dello studente.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
-	async getPCTOData(profileId?: string) {
+	async getPCTOData(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		return getPCTOData(this, {
-			profileId: profileId ?? this.profile.scheda.pk,
+		const { body } = await this.apiRequest<APIPCTO>("pcto", {
+			method: "POST",
+			body: { pkScheda },
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validatePCTO(body);
+		return body.data.pcto;
 	}
 
 	/**
 	 * Ottieni i dati dei corsi di recupero dello studente.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
 	async getCorsiRecupero<T extends APICorsiRecupero["data"]>(
-		profileId?: string,
+		pkScheda = this.profile?.scheda.pk,
 		old?: T,
 	) {
 		this.checkReady();
-		return getCorsiRecupero(this, {
-			profileId: profileId ?? this.profile.scheda.pk,
-			old,
+		const { body } = await this.apiRequest<APICorsiRecupero>("corsirecupero", {
+			method: "POST",
+			body: { pkScheda },
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateCorsiRecupero(body);
+		return Object.assign(old ?? {}, body.data);
 	}
 
 	/**
 	 * Ottieni il curriculum dello studente.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
-	async getCurriculum(profileId?: string) {
+	async getCurriculum(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		return getCurriculum(this, {
-			profileId: profileId ?? this.profile.scheda.pk,
+		const { body } = await this.apiRequest<APICurriculum>("curriculumalunno", {
+			method: "POST",
+			body: { pkScheda },
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateCurriculum(body);
+		return body.data.curriculum;
 	}
 
 	/**
 	 * Ottieni lo storico della bacheca.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
-	async getStoricoBacheca(profileId: string) {
+	async getStoricoBacheca(pkScheda: string) {
 		this.checkReady();
-		return getStoricoBacheca(this, {
-			profileId,
+		const { body } = await this.apiRequest<APIBacheca>("storicobacheca", {
+			method: "POST",
+			body: { pkScheda },
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateBacheca(body);
+		return handleOperation(body.data.bacheca);
 	}
 
 	/**
 	 * Ottieni lo storico della bacheca alunno.
-	 * @param profileId - L'id del profilo
+	 * @param pkScheda - L'id del profilo
 	 * @returns I dati
 	 */
-	async getStoricoBachecaAlunno(profileId: string) {
+	async getStoricoBachecaAlunno(pkScheda: string) {
 		this.checkReady();
-		return getStoricoBachecaAlunno(this, {
-			profileId,
-		});
+		const { body } = await this.apiRequest<APIBachecaAlunno>(
+			"storicobachecaalunno",
+			{
+				method: "POST",
+				body: { pkScheda },
+			},
+		);
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateBachecaAlunno(body);
+		return handleOperation(body.data.bachecaAlunno);
 	}
 
 	/**
@@ -453,10 +666,150 @@ export class Client {
 	 */
 	private async getDashboard() {
 		this.checkReady();
-		return getDashboard(this, {
-			lastUpdate:
-				this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+		const date = new Date();
+		const {
+			body,
+			res: { headers },
+		} = await this.apiRequest<APIDashboard>("dashboard/dashboard", {
+			body: {
+				dataultimoaggiornamento: formatDate(
+					this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
+				),
+				opzioni: JSON.stringify(
+					Object.fromEntries(
+						this.loginData.opzioni.map((a) => [a.chiave, a.valore]),
+					),
+				),
+			},
+			method: "POST",
 		});
+
+		if (!body.success) throw new Error(body.msg!);
+		const [data] = body.data.dati;
+
+		this.dashboard = Object.assign(this.dashboard ?? {}, {
+			...data,
+			fuoriClasse: handleOperation(
+				data.fuoriClasse,
+				this.dashboard?.fuoriClasse,
+			),
+			promemoria: handleOperation(data.promemoria, this.dashboard?.promemoria),
+			bacheca: handleOperation(data.bacheca, this.dashboard?.bacheca),
+			voti: handleOperation(data.voti, this.dashboard?.voti),
+			bachecaAlunno: handleOperation(
+				data.bachecaAlunno,
+				this.dashboard?.bachecaAlunno,
+			),
+			registro: handleOperation(data.registro, this.dashboard?.registro),
+			appello: handleOperation(data.appello, this.dashboard?.appello),
+			prenotazioniAlunni: handleOperation(
+				data.prenotazioniAlunni,
+				this.dashboard?.prenotazioniAlunni,
+				(a) => a.prenotazione.pk,
+			),
+			dataAggiornamento: new Date(headers.get("date") ?? date),
+		});
+		void this.dataProvider?.write("dashboard", this.dashboard);
+		if (!this.noTypeCheck) validateDashboard(body);
+		return this.dashboard;
+	}
+
+	private async getProfilo() {
+		const { body } = await this.apiRequest<APIProfilo>("profilo", {});
+
+		if (!body.success) throw new Error(body.msg!);
+		this.profile = Object.assign(this.profile ?? {}, body.data);
+		void this.dataProvider?.write("profile", this.profile);
+		if (!this.noTypeCheck) validateProfilo(body);
+		return this.profile;
+	}
+
+	private async getLoginData() {
+		const { body } = await this.apiRequest<APILogin>("login", {
+			method: "POST",
+			body: {
+				"lista-opzioni-notifiche": "{}",
+				"lista-x-auth-token": "[]",
+				clientID: randomString(163),
+			},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+		this.loginData = Object.assign(this.loginData ?? {}, body.data[0]);
+		void this.dataProvider?.write("login", this.loginData);
+		if (!this.noTypeCheck) validateLogin(body);
+		return this.loginData;
+	}
+
+	private async logToken(options: { oldToken: Token; isWhat?: boolean }) {
+		const { body } = await this.apiRequest<APIResponse>("logtoken", {
+			method: "POST",
+			body: {
+				bearerOld: options.oldToken.access_token,
+				dateExpOld: formatDate(options.oldToken.expireDate),
+				refreshOld: options.oldToken.refresh_token,
+				bearerNew: this.token?.access_token,
+				dateExpNew: this.token?.expireDate && formatDate(this.token.expireDate),
+				refreshNew: this.token?.refresh_token,
+				isWhat: (options.isWhat ?? false).toString(),
+				isRefreshed: (
+					this.token?.access_token === options.oldToken.access_token
+				).toString(),
+				proc: "initState_global_random_12345",
+			},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+	}
+
+	private async rimuoviProfilo() {
+		const { body } = await this.apiRequest<APIResponse>("rimuoviprofilo", {
+			method: "POST",
+			body: {},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+		await this.dataProvider?.reset();
+	}
+
+	private async what(
+		lastUpdate: Date | number | string,
+		old?: APIWhat["data"]["dati"][number],
+	) {
+		const authToken = JSON.stringify([this.loginData?.token]);
+		const { body } = await this.apiRequest<APIWhat>("dashboard/what", {
+			method: "POST",
+			body: {
+				dataultimoaggiornamento: formatDate(lastUpdate),
+				opzioni:
+					this.loginData &&
+					JSON.stringify(
+						Object.fromEntries(
+							this.loginData.opzioni.map((a) => [a.chiave, a.valore]),
+						),
+					),
+				"lista-x-auth-token": authToken,
+				"lista-x-auth-token-account": authToken,
+			},
+		});
+
+		if (!body.success) throw new Error(body.msg!);
+		if (!this.noTypeCheck) validateWhat(body);
+		return Object.assign(old ?? {}, body.data.dati[0]);
+	}
+
+	private async aggiornaData() {
+		const { body } = await this.apiRequest<APIResponse>(
+			"dashboard/aggiornadata",
+			{
+				method: "POST",
+				body: {
+					dataultimoaggiornamento: formatDate(new Date()),
+				},
+			},
+		);
+
+		if (!body.success) throw new Error(body.msg!);
 	}
 
 	private checkReady(): asserts this is ReadyClient {

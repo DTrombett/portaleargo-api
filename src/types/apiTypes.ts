@@ -1,4 +1,4 @@
-import type { Json } from "..";
+import type { Json } from ".";
 
 export type APIResponse<T = Json> = {
 	success: boolean;
@@ -26,14 +26,19 @@ export type APIOperation<T, P extends boolean = false> = (P extends true
 							operazione?: "I";
 					  }))
 	);
-export type APIToken = {
-	access_token: string;
-	expires_in: number;
-	id_token: string;
-	refresh_token: string;
-	scope: string;
-	token_type: string;
-};
+export type APIToken =
+	| {
+			access_token: string;
+			expires_in: number;
+			id_token: string;
+			refresh_token: string;
+			scope: string;
+			token_type: string;
+	  }
+	| {
+			error: string;
+			error_description: string;
+	  };
 export type APILogin = APIResponse<
 	[
 		{

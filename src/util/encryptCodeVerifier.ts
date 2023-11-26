@@ -1,9 +1,19 @@
-import CryptoJS from "crypto-js";
-
 /**
  * Crittografa un codice.
  * @param codeVerifier - Il codice
  * @returns Il codice crittografato
  */
-export const encryptCodeVerifier = (codeVerifier: string) =>
-	CryptoJS.SHA256(codeVerifier).toString(CryptoJS.enc.Base64url);
+export const encryptCodeVerifier = async (codeVerifier: string) =>
+	btoa(
+		String.fromCharCode(
+			...new Uint8Array(
+				await crypto.subtle.digest(
+					"SHA-256",
+					new TextEncoder().encode(codeVerifier),
+				),
+			),
+		),
+	)
+		.replace(/\+/g, "-")
+		.replace(/\//g, "_")
+		.replace(/=+$/, "");
