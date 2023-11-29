@@ -39,8 +39,10 @@ export const handleOperation = <T, P extends boolean>(
 		if (a.operazione === "D") toDelete.push(a.pk);
 		else {
 			const { operazione, ...rest } = a;
+			const found = old.find((b) => a.pk === getPk(b));
 
-			old.push(rest);
+			if (found) Object.assign(found, rest);
+			else old.push(rest);
 		}
 	return old.filter((a) => !toDelete.includes(getPk(a)));
 };
