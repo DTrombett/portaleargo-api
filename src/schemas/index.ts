@@ -40,7 +40,6 @@ const ajv = new Ajv({
 	allErrors: true,
 	strictRequired: "log",
 	verbose: true,
-	// code: { esm: true },
 });
 const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 	const func = ajv.compile(schema);
@@ -52,10 +51,7 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 				const { errors } = func;
 
 				if (errors) {
-					const resolvedErrors = errors.map(
-						(err) =>
-							`${name}${err.instancePath.replaceAll("/", ".")} ${err.message!}`,
-					);
+					const error = ajv.errorsText(errors);
 
 					if (typeof process !== "undefined") {
 						const fileName = `${name}-${Date.now()}`;
@@ -68,14 +64,7 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 						const stats = await stat(errorsPath).catch(() => mkdir(errorsPath));
 
 						if (!stats || stats.isDirectory())
-							await writeToFile(
-								fileName,
-								{
-									data,
-									errors: resolvedErrors,
-								},
-								errorsPath,
-							);
+							await writeToFile(fileName, { data, error }, errorsPath);
 						console.warn(
 							`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
 								errorsPath,
@@ -85,9 +74,8 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 						return;
 					}
 					console.warn(
-						`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data)`,
+						`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data): ${error}`,
 						data,
-						resolvedErrors,
 					);
 				}
 			} catch (err) {
