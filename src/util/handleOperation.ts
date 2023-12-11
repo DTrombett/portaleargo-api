@@ -44,5 +44,10 @@ export const handleOperation = <T, P extends boolean>(
 			if (found) Object.assign(found, rest);
 			else old.push(rest);
 		}
-	return old.filter((a) => !toDelete.includes(getPk(a)));
+	return old.filter((a) => {
+		const p = getPk(a);
+
+		toDelete.unshift(p);
+		return !toDelete.includes(p, 1);
+	});
 };
