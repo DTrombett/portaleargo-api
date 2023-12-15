@@ -687,28 +687,48 @@ export class Client {
 		if (!body.success) throw new Error(body.msg!);
 		const [data] = body.data.dati;
 
-		this.dashboard = Object.assign(this.dashboard ?? {}, {
-			...data,
-			fuoriClasse: handleOperation(
-				data.fuoriClasse,
-				this.dashboard?.fuoriClasse,
-			),
-			promemoria: handleOperation(data.promemoria, this.dashboard?.promemoria),
-			bacheca: handleOperation(data.bacheca, this.dashboard?.bacheca),
-			voti: handleOperation(data.voti, this.dashboard?.voti),
-			bachecaAlunno: handleOperation(
-				data.bachecaAlunno,
-				this.dashboard?.bachecaAlunno,
-			),
-			registro: handleOperation(data.registro, this.dashboard?.registro),
-			appello: handleOperation(data.appello, this.dashboard?.appello),
-			prenotazioniAlunni: handleOperation(
-				data.prenotazioniAlunni,
-				this.dashboard?.prenotazioniAlunni,
-				(a) => a.prenotazione.pk,
-			),
-			dataAggiornamento: new Date(headers.get("date") ?? date),
-		});
+		this.dashboard = Object.assign(
+			(data.rimuoviDatiLocali ? null : this.dashboard) ?? {},
+			{
+				...data,
+				fuoriClasse: handleOperation(
+					data.fuoriClasse,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.fuoriClasse,
+				),
+				promemoria: handleOperation(
+					data.promemoria,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.promemoria,
+				),
+				bacheca: handleOperation(
+					data.bacheca,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.bacheca,
+				),
+				voti: handleOperation(
+					data.voti,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.voti,
+				),
+				bachecaAlunno: handleOperation(
+					data.bachecaAlunno,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.bachecaAlunno,
+				),
+				registro: handleOperation(
+					data.registro,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.registro,
+				),
+				appello: handleOperation(
+					data.appello,
+					data.rimuoviDatiLocali ? undefined : this.dashboard?.appello,
+				),
+				prenotazioniAlunni: handleOperation(
+					data.prenotazioniAlunni,
+					data.rimuoviDatiLocali
+						? undefined
+						: this.dashboard?.prenotazioniAlunni,
+					(a) => a.prenotazione.pk,
+				),
+				dataAggiornamento: new Date(headers.get("date") ?? date),
+			},
+		);
 		void this.dataProvider?.write("dashboard", this.dashboard);
 		if (!this.noTypeCheck) validateDashboard(body);
 		return this.dashboard;
