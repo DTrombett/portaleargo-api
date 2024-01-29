@@ -5,5 +5,5 @@ dist/
 .argo/
 .vscode/settings.json
 _test.ts
-types/
+./types/
 tsconfig.tsbuildinfo

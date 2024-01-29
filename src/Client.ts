@@ -528,7 +528,7 @@ export class Client {
 
 		if (!body.success) throw new Error(body.msg!);
 		if (!this.noTypeCheck) validateVotiScrutinio(body);
-		return body.data.votiScrutinio[0].periodi;
+		return body.data.votiScrutinio[0]?.periodi;
 	}
 
 	/**

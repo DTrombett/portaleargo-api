@@ -123,7 +123,7 @@ export type APIDashboard = APIResponse<{
 			mediaGenerale: number;
 			// eslint-disable-next-line @typescript-eslint/ban-types
 			mensa?: {};
-			mediaPerMese: Record<string, number>;
+			mediaPerMese?: Record<string, number>;
 			listaMaterie: {
 				abbreviazione: string;
 				scrut: boolean;
@@ -133,7 +133,7 @@ export type APIDashboard = APIResponse<{
 				pk: string;
 			}[];
 			rimuoviDatiLocali: boolean;
-			listaPeriodi: {
+			listaPeriodi?: {
 				pkPeriodo: string;
 				dataInizio: string;
 				descrizione: string;
@@ -250,7 +250,7 @@ export type APIDashboard = APIResponse<{
 				isPresaVisione: boolean;
 			}>[];
 			profiloDisabilitato: boolean;
-			mediaPerPeriodo: Record<
+			mediaPerPeriodo?: Record<
 				string,
 				{
 					mediaGenerale: number;
@@ -286,7 +286,8 @@ export type APIDashboard = APIResponse<{
 					sommaValutazioniScritto: number;
 					mediaOrale: number;
 				}
-			>;
+				// eslint-disable-next-line @typescript-eslint/ban-types
+			> & { listaMaterie: {} };
 			// eslint-disable-next-line @typescript-eslint/ban-types
 			autocertificazione?: {};
 			registro: APIOperation<{
@@ -475,18 +476,16 @@ export type APIDownloadAllegato =
 			url: string;
 	  };
 export type APIVotiScrutinio = APIResponse<{
-	votiScrutinio: [
-		{
-			periodi: {
-				desDescrizione: string;
-				materie: string[];
-				suddivisione: string;
-				votiGiudizi: boolean;
-				scrutinioFinale: boolean;
-			}[];
-			pk: string;
-		},
-	];
+	votiScrutinio: {
+		periodi: {
+			desDescrizione: string;
+			materie: string[];
+			suddivisione: string;
+			votiGiudizi: boolean;
+			scrutinioFinale: boolean;
+		}[];
+		pk: string;
+	}[];
 }>;
 export type APIRicevimenti = APIResponse<{
 	disponibilita: Record<
@@ -530,7 +529,7 @@ export type APIRicevimenti = APIResponse<{
 		prenotazione: {
 			prgScuola: number;
 			datPrenotazione: string;
-			numPrenotazione: number;
+			numPrenotazione: number | null;
 			prgAlunno: number;
 			genitore: string;
 			numMax: number;

@@ -345,26 +345,20 @@ export const validateVotiScrutinio = validate<APIVotiScrutinio>(
 	"votiScrutinio",
 	apiResponse(
 		allRequired({
-			votiScrutinio: {
-				type: "array",
-				minItems: 1,
-				maxItems: 1,
-				additionalItems: false,
-				items: [
-					allRequired({
-						pk: string,
-						periodi: array(
-							allRequired({
-								desDescrizione: string,
-								materie: array(string),
-								suddivisione: string,
-								votiGiudizi: boolean,
-								scrutinioFinale: boolean,
-							}),
-						),
-					}),
-				],
-			},
+			votiScrutinio: array(
+				allRequired({
+					pk: string,
+					periodi: array(
+						allRequired({
+							desDescrizione: string,
+							materie: array(string),
+							suddivisione: string,
+							votiGiudizi: boolean,
+							scrutinioFinale: boolean,
+						}),
+					),
+				}),
+			),
 		}),
 	),
 );
@@ -388,7 +382,7 @@ export const validateRicevimenti = validate<APIRicevimenti>(
 					prenotazione: allRequired({
 						prgScuola: number,
 						datPrenotazione: string,
-						numPrenotazione: number,
+						numPrenotazione: nullableNumber,
 						prgAlunno: number,
 						genitore: string,
 						numMax: number,
@@ -652,7 +646,7 @@ export const validateDashboard = validate<APIDashboard>(
 									valore: boolean,
 								}),
 							),
-							mediaPerMese: record(string, number),
+							mediaPerMese: { ...record(string, number), nullable: true },
 							listaMaterie: array(
 								allRequired({
 									abbreviazione: string,
@@ -663,33 +657,38 @@ export const validateDashboard = validate<APIDashboard>(
 									pk: string,
 								}),
 							),
-							listaPeriodi: array({
-								...base,
-								properties: {
-									pkPeriodo: string,
-									dataInizio: string,
-									descrizione: string,
-									datInizio: { type: "string", nullable: true },
-									votoUnico: boolean,
-									mediaScrutinio: number,
-									isMediaScrutinio: boolean,
-									dataFine: string,
-									datFine: { type: "string", nullable: true },
-									codPeriodo: string,
-									isScrutinioFinale: boolean,
-								},
-								required: [
-									"codPeriodo",
-									"dataFine",
-									"dataInizio",
-									"descrizione",
-									"isMediaScrutinio",
-									"isScrutinioFinale",
-									"mediaScrutinio",
-									"pkPeriodo",
-									"votoUnico",
-								],
-							}),
+							listaPeriodi: {
+								...array<
+									NonNullable<APIDashboard["data"]["dati"][0]["listaPeriodi"]>
+								>({
+									...base,
+									properties: {
+										pkPeriodo: string,
+										dataInizio: string,
+										descrizione: string,
+										datInizio: { type: "string", nullable: true },
+										votoUnico: boolean,
+										mediaScrutinio: number,
+										isMediaScrutinio: boolean,
+										dataFine: string,
+										datFine: { type: "string", nullable: true },
+										codPeriodo: string,
+										isScrutinioFinale: boolean,
+									},
+									required: [
+										"codPeriodo",
+										"dataFine",
+										"dataInizio",
+										"descrizione",
+										"isMediaScrutinio",
+										"isScrutinioFinale",
+										"mediaScrutinio",
+										"pkPeriodo",
+										"votoUnico",
+									],
+								}),
+								nullable: true,
+							},
 							fileCondivisi: allRequired({
 								fileAlunniScollegati: array(any),
 								listaFile: array(any),
@@ -703,42 +702,66 @@ export const validateDashboard = validate<APIDashboard>(
 									desEmail: string,
 								}),
 							),
-							mediaPerPeriodo: record(
-								string,
-								allRequired({
-									mediaGenerale: number,
-									mediaMese: record(string, number),
-									listaMaterie: record(
-										string,
-										allRequired({
-											sommaValutazioniOrale: number,
-											numValutazioniOrale: number,
-											mediaMateria: number,
-											mediaScritta: number,
-											sumValori: number,
-											numValori: number,
-											numVoti: number,
-											numValutazioniScritto: number,
-											sommaValutazioniScritto: number,
-											mediaOrale: number,
-										}),
-									),
-								}),
-							),
-							mediaMaterie: record(
-								string,
-								allRequired({
-									sommaValutazioniOrale: number,
-									numValutazioniOrale: number,
-									mediaMateria: number,
-									mediaScritta: number,
-									sumValori: number,
-									numValori: number,
-									numVoti: number,
-									numValutazioniScritto: number,
-									sommaValutazioniScritto: number,
-									mediaOrale: number,
-								}),
+							mediaPerPeriodo: {
+								...record(
+									string,
+									allRequired({
+										mediaGenerale: number,
+										mediaMese: record(string, number),
+										listaMaterie: record(
+											string,
+											allRequired({
+												sommaValutazioniOrale: number,
+												numValutazioniOrale: number,
+												mediaMateria: number,
+												mediaScritta: number,
+												sumValori: number,
+												numValori: number,
+												numVoti: number,
+												numValutazioniScritto: number,
+												sommaValutazioniScritto: number,
+												mediaOrale: number,
+											}),
+										),
+									}),
+								),
+								nullable: true,
+							},
+							mediaMaterie: merge<
+								Record<
+									string,
+									{
+										sommaValutazioniOrale: number;
+										numValutazioniOrale: number;
+										mediaMateria: number;
+										mediaScritta: number;
+										sumValori: number;
+										numValori: number;
+										numVoti: number;
+										numValutazioniScritto: number;
+										sommaValutazioniScritto: number;
+										mediaOrale: number;
+									}
+								>,
+								// eslint-disable-next-line @typescript-eslint/ban-types
+								{ listaMaterie: {} }
+							>(
+								record(
+									string,
+									allRequired({
+										sommaValutazioniOrale: number,
+										numValutazioniOrale: number,
+										mediaMateria: number,
+										mediaScritta: number,
+										sumValori: number,
+										numValori: number,
+										numVoti: number,
+										numValutazioniScritto: number,
+										sommaValutazioniScritto: number,
+										mediaOrale: number,
+									}),
+								),
+								allRequired({ listaMaterie: { type: "object" } }),
 							),
 							appello: apiOperation(
 								allRequired({
@@ -895,11 +918,8 @@ export const validateDashboard = validate<APIDashboard>(
 							"fuoriClasse",
 							"listaDocentiClasse",
 							"listaMaterie",
-							"listaPeriodi",
 							"mediaGenerale",
 							"mediaMaterie",
-							"mediaPerMese",
-							"mediaPerPeriodo",
 							"msg",
 							"noteDisciplinari",
 							"opzioni",
