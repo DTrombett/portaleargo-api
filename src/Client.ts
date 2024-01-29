@@ -677,7 +677,10 @@ export class Client {
 				),
 				opzioni: JSON.stringify(
 					Object.fromEntries(
-						this.loginData.opzioni.map((a) => [a.chiave, a.valore]),
+						(this.dashboard ?? this.loginData).opzioni.map((a) => [
+							a.chiave,
+							a.valore,
+						]),
 					),
 				),
 			},
@@ -797,16 +800,15 @@ export class Client {
 		old?: APIWhat["data"]["dati"][number],
 	) {
 		const authToken = JSON.stringify([this.loginData?.token]);
+		const opzioni = (this.dashboard ?? this.loginData)?.opzioni;
 		const { body } = await this.apiRequest<APIWhat>("dashboard/what", {
 			method: "POST",
 			body: {
 				dataultimoaggiornamento: formatDate(lastUpdate),
 				opzioni:
-					this.loginData &&
+					opzioni &&
 					JSON.stringify(
-						Object.fromEntries(
-							this.loginData.opzioni.map((a) => [a.chiave, a.valore]),
-						),
+						Object.fromEntries(opzioni.map((a) => [a.chiave, a.valore])),
 					),
 				"lista-x-auth-token": authToken,
 				"lista-x-auth-token-account": authToken,
