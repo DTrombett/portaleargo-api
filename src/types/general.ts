@@ -59,13 +59,8 @@ export type Credentials = {
 };
 export type ClearOperations<T> = {
 	[K in keyof T]: T[K] extends APIOperation<infer A, infer P>[]
-		? (A &
-				(boolean extends P
-					? // eslint-disable-next-line @typescript-eslint/ban-types
-					  {}
-					: P extends true
-					  ? { new?: boolean }
-					  : { pk: string; new?: boolean }))[]
+		? // eslint-disable-next-line @typescript-eslint/ban-types
+		  (A & (P extends false ? { pk: string } : {}))[]
 		: T[K] extends object
 		  ? ClearOperations<T[K]>
 		  : T[K];

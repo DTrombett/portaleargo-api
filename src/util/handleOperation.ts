@@ -9,10 +9,10 @@ import type { APIOperation } from "..";
  */
 export const handleOperation = <T, P extends boolean>(
 	array: APIOperation<T, P>[],
-	old: (Omit<
+	old: Omit<
 		Extract<APIOperation<T, P>, { operazione?: "I" }>,
 		"operazione"
-	> & { new?: boolean })[] = [],
+	>[] = [],
 	...[pk]: P extends true
 		? [
 				pk: (
@@ -42,7 +42,7 @@ export const handleOperation = <T, P extends boolean>(
 			const found = old.find((b) => a.pk === getPk(b));
 
 			if (found) Object.assign(found, rest);
-			else old.push({ ...rest, new: true });
+			else old.push(rest);
 		}
 	return old.filter((a) => {
 		const p = getPk(a);
