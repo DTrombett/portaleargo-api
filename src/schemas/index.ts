@@ -53,29 +53,29 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 				if (errors) {
 					const error = ajv.errorsText(errors);
 
-					if (typeof window !== "undefined") {
+					if (typeof process !== "undefined") {
+						const fileName = `${name}-${Date.now()}`;
+						const { mkdir, stat } =
+							require("node:fs/promises") as typeof import("node:fs/promises");
+						const { tmpdir } = require("node:os") as typeof import("node:os");
+						// eslint-disable-next-line @typescript-eslint/unbound-method
+						const { join } = require("node:path") as typeof import("node:path");
+						const errorsPath = join(tmpdir(), "argo");
+						const stats = await stat(errorsPath).catch(() => mkdir(errorsPath));
+
+						if (!stats || stats.isDirectory())
+							await writeToFile(fileName, { data, error }, errorsPath);
 						console.warn(
-							`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data): ${error}`,
-							data,
+							`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
+								errorsPath,
+								fileName,
+							)}.json (remember to hide eventual sensitive data)\x1b[0m`,
 						);
 						return;
 					}
-					const fileName = `${name}-${Date.now()}`;
-					const { mkdir, stat } =
-						require("node:fs/promises") as typeof import("node:fs/promises");
-					const { tmpdir } = require("node:os") as typeof import("node:os");
-					// eslint-disable-next-line @typescript-eslint/unbound-method
-					const { join } = require("node:path") as typeof import("node:path");
-					const errorsPath = join(tmpdir(), "argo");
-					const stats = await stat(errorsPath).catch(() => mkdir(errorsPath));
-
-					if (!stats || stats.isDirectory())
-						await writeToFile(fileName, { data, error }, errorsPath);
 					console.warn(
-						`\x1b[33m⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the data received from the API and the errors saved in ${join(
-							errorsPath,
-							fileName,
-						)}.json (remember to hide eventual sensitive data)\x1b[0m`,
+						`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data): ${error}`,
+						data,
 					);
 				}
 			} catch (err) {
