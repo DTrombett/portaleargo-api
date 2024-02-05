@@ -287,7 +287,7 @@ export type APIDashboard = APIResponse<{
 					mediaOrale: number;
 				}
 				// eslint-disable-next-line @typescript-eslint/ban-types
-			> & { listaMaterie: {} };
+			> & { listaMaterie?: {} };
 			// eslint-disable-next-line @typescript-eslint/ban-types
 			autocertificazione?: {};
 			registro: APIOperation<{
