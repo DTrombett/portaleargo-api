@@ -173,12 +173,18 @@ export class Client {
 					};
 				else if (typeof process !== "undefined") {
 					const fs = require("node:fs") as typeof import("node:fs");
+					let exists = fs.existsSync(options.dataPath!);
 
 					options.dataPath ??= getAuthFolder();
-					if (!fs.existsSync(options.dataPath)) fs.mkdirSync(options.dataPath);
 					this.dataProvider = {
 						read: (name) => importData(name, options.dataPath!),
-						write: (name, value) => writeToFile(name, value, options.dataPath!),
+						write: (name, value) => {
+							if (!exists) {
+								exists = true;
+								fs.mkdirSync(options.dataPath!);
+							}
+							return writeToFile(name, value, options.dataPath!);
+						},
 						reset: () =>
 							(
 								require("node:fs/promises") as typeof import("node:fs/promises")

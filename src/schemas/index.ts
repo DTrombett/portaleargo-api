@@ -53,6 +53,13 @@ const validate = <T>(name: string, schema: JSONSchemaType<T>) => {
 				if (errors) {
 					const error = ajv.errorsText(errors);
 
+					if (typeof window !== "undefined") {
+						console.warn(
+							`⚠️  Received an unexpected ${name}\n⚠️  Please, create an issue on https://github.com/DTrombett/portaleargo-api/issues providing the following data received from the API with the errors (remember to hide eventual sensitive data): ${error}`,
+							data,
+						);
+						return;
+					}
 					if (typeof process !== "undefined") {
 						const fileName = `${name}-${Date.now()}`;
 						const { mkdir, stat } =
