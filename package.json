@@ -39,18 +39,18 @@
 		"ajv": "^8.12.0",
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.3.3",
-		"undici": "^6.0.1",
-		"webpack": "^5.89.0",
+		"undici": "^6.6.1",
+		"webpack": "^5.90.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-merge": "^5.10.0",
 		"webpack-node-externals": "^3.0.0"
 	},
 	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^6.13.2",
-		"@typescript-eslint/parser": "^6.14.0",
-		"dotenv": "^16.3.1",
-		"eslint": "^8.55.0",
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
+		"dotenv": "^16.4.1",
+		"eslint": "^8.56.0",
 		"eslint-plugin-node": "^11.1.0",
-		"prettier": "^3.1.1"
+		"prettier": "^3.2.5"
 	}
 }
