@@ -280,10 +280,10 @@ export class Client {
 		await this.refreshToken();
 		if (!this.loginData) await this.getLoginData();
 		if (oldToken) {
-			await this.logToken({
+			this.logToken({
 				oldToken,
 				isWhat: this.profile !== undefined,
-			});
+			}).catch(console.error);
 			if (this.profile) {
 				const whatData = await this.what(
 					this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
