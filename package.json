@@ -32,7 +32,7 @@
 		"node": ">=20"
 	},
 	"dependencies": {
-		"@tsconfig/node20": "^20.1.2",
+		"@tsconfig/node20": "^20.1.4",
 		"@tsconfig/recommended": "^1.0.3",
 		"@tsconfig/strictest": "^2.0.2",
 		"@types/node": "^20.9.2",
