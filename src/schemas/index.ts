@@ -404,7 +404,7 @@ export const validateRicevimenti = validate<APIRicevimenti>(
 						pk: string,
 						genitorePK: string,
 						desEMailGenitore: string,
-						numPrenotazioni: number,
+						numPrenotazioni: nullableNumber,
 					}),
 					disponibilita: allRequired({
 						ora_Fine: string,

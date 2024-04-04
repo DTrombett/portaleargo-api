@@ -8,10 +8,10 @@ export type APIResponse<T = Json> = {
 export type APIOperation<T, P extends boolean = false> = (P extends true
 	? {
 			pk?: undefined;
-	  }
+		}
 	: {
 			pk: string;
-	  }) &
+		}) &
 	(
 		| {
 				operazione: "D";
@@ -21,10 +21,10 @@ export type APIOperation<T, P extends boolean = false> = (P extends true
 				(P extends true
 					? {
 							operazione: "I";
-					  }
+						}
 					: {
 							operazione?: "I";
-					  }))
+						}))
 	);
 export type APIToken =
 	| {
@@ -544,7 +544,7 @@ export type APIRicevimenti = APIResponse<{
 			pk: string;
 			genitorePK: string;
 			desEMailGenitore: string;
-			numPrenotazioni: number;
+			numPrenotazioni: number | null;
 		};
 		disponibilita: {
 			ora_Fine: string;

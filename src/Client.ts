@@ -127,7 +127,7 @@ export class Client {
 				(typeof process === "undefined"
 					? undefined
 					: // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-					  process.env?.CODICE_SCUOLA),
+						process.env?.CODICE_SCUOLA),
 			password:
 				options.password ??
 				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -173,9 +173,10 @@ export class Client {
 					};
 				else if (typeof process !== "undefined") {
 					const fs = require("node:fs") as typeof import("node:fs");
-					let exists = fs.existsSync(options.dataPath!);
 
 					options.dataPath ??= getAuthFolder();
+					let exists = fs.existsSync(options.dataPath);
+
 					this.dataProvider = {
 						read: (name) => importData(name, options.dataPath!),
 						write: (name, value) => {
