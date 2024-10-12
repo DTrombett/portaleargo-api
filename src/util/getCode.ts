@@ -2,18 +2,6 @@ import type undici from "undici";
 import { clientId, generateLoginLink } from ".";
 import type { Credentials } from "..";
 
-const baseHeaders = {
-	accept:
-		"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-	"accept-encoding": "gzip, deflate, br",
-	"sec-fetch-dest": "document",
-	"sec-fetch-mode": "navigate",
-	"sec-fetch-user": "?1",
-	"upgrade-insecure-requests": "1",
-	"user-agent":
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.29 Safari/537.36",
-} as const;
-
 /**
  * Ottieni il codice per il login.
  * @param credentials - Le credenziali per l'accesso
@@ -22,13 +10,7 @@ const baseHeaders = {
 export const getCode = async (credentials: Credentials) => {
 	const { request } = require("undici") as typeof undici;
 	const link = await generateLoginLink();
-	const res = await request(link.url, {
-		headers: {
-			...baseHeaders,
-			"sec-fetch-site": "none",
-		},
-		method: "GET",
-	});
+	const res = await request(link.url);
 	const url = res.headers.location;
 	const cookies: string[] = [];
 	let cookieHeaders = res.headers["set-cookie"];
@@ -51,14 +33,7 @@ export const getCode = async (credentials: Credentials) => {
 			credentials.username,
 		)}&password=${encodeURIComponent(credentials.password)}&login=true`,
 		headers: {
-			...baseHeaders,
-			"cache-control": "max-age=0",
-			connection: "keep-alive",
 			"content-type": "application/x-www-form-urlencoded",
-			host: "www.portaleargo.it",
-			origin: "https://www.portaleargo.it",
-			referer: url,
-			"sec-fetch-site": "same-origin",
 		},
 		method: "POST",
 	});
@@ -70,13 +45,8 @@ export const getCode = async (credentials: Credentials) => {
 		);
 	const res2 = await request(url1, {
 		headers: {
-			...baseHeaders,
-			"cache-control": "max-age=0",
 			cookie: cookies.join("; "),
-			referer: "https://www.portaleargo.it/",
-			"sec-fetch-site": "same-site",
 		},
-		method: "GET",
 	});
 	const url2 = res2.headers.location;
 
@@ -91,17 +61,7 @@ export const getCode = async (credentials: Credentials) => {
 
 		if (cookie != null) cookies.push(cookie);
 	}
-	const res3 = await request(url2, {
-		headers: {
-			...baseHeaders,
-			"cache-control": "max-age=0",
-			connection: "keep-alive",
-			host: "www.portaleargo.it",
-			referer: "https://www.portaleargo.it/",
-			"sec-fetch-site": "same-site",
-		},
-		method: "GET",
-	});
+	const res3 = await request(url2);
 	const url3 = res3.headers.location;
 
 	if (typeof url3 !== "string")
@@ -110,13 +70,8 @@ export const getCode = async (credentials: Credentials) => {
 		);
 	const res4 = await request(url3, {
 		headers: {
-			...baseHeaders,
-			"cache-control": "max-age=0",
 			cookie: cookies.join("; "),
-			referer: "https://www.portaleargo.it/",
-			"sec-fetch-site": "same-site",
 		},
-		method: "GET",
 	});
 	const url4 = res4.headers.location;
 
