@@ -1,3 +1,5 @@
+const encoder = new TextEncoder();
+
 /**
  * Crittografa un codice.
  * @param codeVerifier - Il codice
@@ -7,10 +9,7 @@ export const encryptCodeVerifier = async (codeVerifier: string) =>
 	btoa(
 		String.fromCharCode(
 			...new Uint8Array(
-				await crypto.subtle.digest(
-					"SHA-256",
-					new TextEncoder().encode(codeVerifier),
-				),
+				await crypto.subtle.digest("SHA-256", encoder.encode(codeVerifier)),
 			),
 		),
 	)
