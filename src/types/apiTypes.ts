@@ -121,7 +121,7 @@ export type APIDashboard = APIResponse<{
 				chiave: string;
 			}[];
 			mediaGenerale: number;
-			// eslint-disable-next-line @typescript-eslint/ban-types
+			// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 			mensa?: {};
 			mediaPerMese?: Record<string, number>;
 			listaMaterie: {
@@ -286,9 +286,9 @@ export type APIDashboard = APIResponse<{
 					sommaValutazioniScritto: number;
 					mediaOrale: number;
 				}
-				// eslint-disable-next-line @typescript-eslint/ban-types
+				// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 			> & { listaMaterie?: {} };
-			// eslint-disable-next-line @typescript-eslint/ban-types
+			// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 			autocertificazione?: {};
 			registro: APIOperation<{
 				datEvento: string;

@@ -59,11 +59,11 @@ export type Credentials = {
 };
 export type ClearOperations<T> = {
 	[K in keyof T]: T[K] extends APIOperation<infer A, infer P>[]
-		? // eslint-disable-next-line @typescript-eslint/ban-types
-		  (A & (P extends false ? { pk: string } : {}))[]
+		? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+			(A & (P extends false ? { pk: string } : {}))[]
 		: T[K] extends object
-		  ? ClearOperations<T[K]>
-		  : T[K];
+			? ClearOperations<T[K]>
+			: T[K];
 };
 export type Token = Exclude<APIToken, { error: string }> & {
 	expireDate: Date;
@@ -146,14 +146,14 @@ export type Jsonify<T, D extends boolean = true> = [D, T] extends [
 ]
 	? Jsonify<J, false>
 	: T extends boolean | number | string | null
-	  ? T
-	  : T extends bigint
-	    ? never
-	    : T extends symbol | ((...args: any[]) => any) | undefined
-	      ? undefined
-	      : T extends (infer A)[]
-	        ? Jsonify<A>[]
-	        : {
+		? T
+		: T extends bigint
+			? never
+			: T extends symbol | ((...args: any[]) => any) | undefined
+				? undefined
+				: T extends (infer A)[]
+					? Jsonify<A>[]
+					: {
 							[K in keyof T as T[K] extends
 								| bigint
 								| symbol
@@ -161,7 +161,7 @@ export type Jsonify<T, D extends boolean = true> = [D, T] extends [
 								| undefined
 								? never
 								: K]: Jsonify<T[K]>;
-	          };
+						};
 export type LoginLink = {
 	url: string;
 	redirectUri: string;
