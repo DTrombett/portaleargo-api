@@ -1,7 +1,15 @@
+import { CookieClient } from "http-cookie-agent/undici";
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
+import { CookieJar } from "tough-cookie";
+import {
+	fetch,
+	interceptors,
+	type RequestInfo,
+	type RequestInit,
+} from "undici";
 import { BaseClient } from "./BaseClient";
 import type { ClientOptions, Credentials } from "./types";
 import { getCode } from "./util/getCode";
@@ -12,6 +20,17 @@ import { writeToFile } from "./util/writeToFile";
  * Un client per interagire con l'API
  */
 export class Client extends BaseClient {
+	client = new CookieClient(BaseClient.BASE_URL, {
+		allowH2: true,
+		autoSelectFamily: true,
+		autoSelectFamilyAttemptTimeout: 1,
+		cookies: { jar: new CookieJar() },
+	}).compose(
+		interceptors.retry(),
+		interceptors.cache({ cacheByDefault: 3_600_000, type: "private" }),
+	);
+	override fetch = this.createFetch();
+
 	/**
 	 * @param options - Le opzioni per il client
 	 */
@@ -22,22 +41,36 @@ export class Client extends BaseClient {
 			password: options.password ?? env.PASSWORD,
 			username: options.username ?? env.NOME_UTENTE,
 		};
-		if (options.dataProvider !== null && !this.dataProvider) {
-			options.dataPath ??= join(cwd(), ".argo");
-			let exists = existsSync(options.dataPath);
+		if (options.dataProvider !== null)
+			this.dataProvider ??= Client.createDataProvider(
+				options.dataPath ?? undefined,
+			);
+	}
 
-			this.dataProvider = {
-				read: (name) => importData(name, options.dataPath!),
-				write: async (name, value) => {
-					if (!exists) {
-						exists = true;
-						await mkdir(options.dataPath!);
-					}
-					return writeToFile(name, value, options.dataPath!);
-				},
-				reset: () => rm(options.dataPath!, { recursive: true, force: true }),
-			};
-		}
+	static createDataProvider(
+		dataPath = join(cwd(), ".argo"),
+	): NonNullable<ClientOptions["dataProvider"]> {
+		let exists = existsSync(dataPath);
+
+		return {
+			read: (name) => importData(name, dataPath),
+			write: async (name, value) => {
+				if (!exists) {
+					exists = true;
+					await mkdir(dataPath);
+				}
+				return writeToFile(name, value, dataPath);
+			},
+			reset: () => rm(dataPath, { recursive: true, force: true }),
+		};
+	}
+
+	createFetch(): typeof window.fetch {
+		return (info, init) =>
+			fetch(info as RequestInfo, {
+				dispatcher: this.client,
+				...(init as RequestInit),
+			}) as unknown as Promise<Response>;
 	}
 
 	async getCode() {

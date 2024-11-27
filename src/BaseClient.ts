@@ -39,6 +39,13 @@ import {
  * Un client per interagire con l'API
  */
 export abstract class BaseClient {
+	static readonly BASE_URL = "https://www.portaleargo.it";
+
+	/**
+	 * A custom fetch implementation
+	 */
+	fetch = fetch;
+
 	/**
 	 * I dati del token
 	 */
@@ -144,33 +151,34 @@ export abstract class BaseClient {
 			noWait: boolean;
 		}> = {},
 	): Promise<unknown> {
-		options.method ??= options.body ? "POST" : "GET";
 		const headers: Record<string, string> = {
 			accept: "application/json",
 			"argo-client-version": this.version,
 			authorization: `Bearer ${this.token?.access_token ?? ""}`,
-			"content-type": "application/json; charset=utf-8",
-			...this.headers,
 		};
 
+		options.method ??= options.body ? "POST" : "GET";
+		if (options.body != null) headers["content-type"] = "application/json";
 		if (this.loginData) {
 			headers["x-auth-token"] = this.loginData.token;
 			headers["x-cod-min"] = this.loginData.codMin;
 		}
 		if (this.token)
 			headers["x-date-exp-auth"] = formatDate(this.token.expireDate);
-		const res = await fetch(
-			`https://www.portaleargo.it/appfamiglia/api/rest/${path}`,
+		if (this.headers) Object.assign(headers, this.headers);
+		const res = await this.fetch(
+			`${BaseClient.BASE_URL}/appfamiglia/api/rest/${path}`,
 			{
 				headers,
 				method: options.method,
 				body:
-					options.method === "POST" && options.body
+					options.method === "POST" && options.body != null
 						? JSON.stringify(options.body)
 						: undefined,
 			},
 		);
-		if (this.debug) console.log(`${options.method} /${path} ${res.status}`);
+
+		if (this.debug) console.debug(`${options.method} /${path} ${res.status}`);
 		return options.noWait ? res : (res.json() as unknown);
 	}
 

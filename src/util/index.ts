@@ -1,4 +1,3 @@
-export * from "./apiRequest";
 export * from "./Constants";
 export * from "./encryptCodeVerifier";
 export * from "./formatDate";
