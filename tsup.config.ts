@@ -3,12 +3,13 @@ import { env } from "process";
 import { defineConfig, type Options } from "tsup";
 
 const baseConfig: Options = {
-	// clean: true,
+	clean: true,
 	format: "esm",
 	keepNames: true,
 	minify: env.NODE_ENV === "production",
 	removeNodeProtocol: false,
 	replaceNodeEnv: true,
+	skipNodeModulesBundle: true,
 	sourcemap: true,
 };
 const options: Options[] = [

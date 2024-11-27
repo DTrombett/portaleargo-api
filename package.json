@@ -13,7 +13,7 @@
 		"build": "tsup && tsc",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
-		"test": "npm run test:cli && npm run build && node --enable-source-maps dist/_test.js",
+		"test": "npm run test:cli && cross-env NODE_ENV=development tsup && node --enable-source-maps dist/_test.js",
 		"test:cli": "eslint src && tsc --noEmit",
 		"postinstall": "npm run build"
 	},
@@ -31,6 +31,8 @@
 		"node": ">=18"
 	},
 	"dependencies": {
+		"http-cookie-agent": "^6.0.6",
+		"tough-cookie": "^5.0.0",
 		"undici": "^7.0.0"
 	},
 	"devDependencies": {
@@ -39,6 +41,7 @@
 		"@types/node": "^18.19.66",
 		"@typescript-eslint/eslint-plugin": "^8.16.0",
 		"@typescript-eslint/parser": "^8.16.0",
+		"cross-env": "^7.0.3",
 		"dotenv": "^16.4.5",
 		"eslint": "^8.57.1",
 		"eslint-plugin-node": "^11.1.0",
