@@ -120,15 +120,31 @@ export abstract class BaseClient {
 	 * @param options - Altre opzioni
 	 * @returns La risposta
 	 */
-	async apiRequest<T extends Json, R extends boolean = false>(
+	apiRequest<T extends Json>(
+		path: string,
+		options?: Partial<{
+			body: Json;
+			method: HttpMethod;
+			noWait: false;
+		}>,
+	): Promise<T>;
+	apiRequest<T extends Json>(
+		path: string,
+		options: {
+			body?: Json;
+			method?: HttpMethod;
+			noWait: true;
+		},
+	): Promise<Omit<Response, "json"> & { json: () => Promise<T> }>;
+	async apiRequest(
 		path: string,
 		options: Partial<{
 			body: Json;
 			method: HttpMethod;
-			noWaitAfter: R;
+			noWait: boolean;
 		}> = {},
-	) {
-		options.method ??= "GET";
+	): Promise<unknown> {
+		options.method ??= options.body ? "POST" : "GET";
 		const headers: Record<string, string> = {
 			accept: "application/json",
 			"argo-client-version": this.version,
@@ -149,29 +165,13 @@ export abstract class BaseClient {
 				headers,
 				method: options.method,
 				body:
-					options.method === "POST" ? JSON.stringify(options.body) : undefined,
+					options.method === "POST" && options.body
+						? JSON.stringify(options.body)
+						: undefined,
 			},
 		);
 		if (this.debug) console.log(`${options.method} /${path} ${res.status}`);
-		const result = {
-			res,
-		} as {
-			res: typeof res;
-			body: R extends true ? undefined : T;
-		};
-
-		if (options.noWaitAfter !== true) {
-			const text = await res.text();
-
-			try {
-				result.body = JSON.parse(text);
-			} catch (err) {
-				throw new TypeError(
-					`${options.method} /${path} failed with status code ${res.status}: ${text}`,
-				);
-			}
-		}
-		return result;
+		return options.noWait ? res : (res.json() as unknown);
 	}
 
 	/**
@@ -248,30 +248,28 @@ export abstract class BaseClient {
 		if (!this.token) return this.getToken();
 		if (this.token.expireDate.getTime() <= Date.now()) {
 			const date = new Date();
-			const { res, body } = await this.apiRequest<APIToken>(
-				"auth/refresh-token",
-				{
-					method: "POST",
-					body: {
-						"r-token": this.token.refresh_token,
-						"client-id": clientId,
-						scopes: `[${this.token.scope.split(" ").join(", ")}]`,
-						"old-bearer": this.token.access_token,
-						"primo-accesso": "false",
-						"ripeti-login": "false",
-						"exp-bearer": formatDate(this.token.expireDate),
-						"ts-app": formatDate(date),
-						proc: "initState_global_random_12345",
-						username: this.loginData?.username,
-					},
+			const res = await this.apiRequest<APIToken>("auth/refresh-token", {
+				body: {
+					"r-token": this.token.refresh_token,
+					"client-id": clientId,
+					scopes: `[${this.token.scope.split(" ").join(", ")}]`,
+					"old-bearer": this.token.access_token,
+					"primo-accesso": "false",
+					"ripeti-login": "false",
+					"exp-bearer": formatDate(this.token.expireDate),
+					"ts-app": formatDate(date),
+					proc: "initState_global_random_12345",
+					username: this.loginData?.username,
 				},
-			);
+				noWait: true,
+			});
 			const expireDate = new Date(res.headers.get("date") ?? date);
+			const token = await res.json();
 
-			if ("error" in body)
-				throw new Error(`${body.error} ${body.error_description}`);
-			expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
-			this.token = Object.assign(this.token, body, { expireDate });
+			if ("error" in token)
+				throw new Error(`${token.error} ${token.error_description}`);
+			expireDate.setSeconds(expireDate.getSeconds() + token.expires_in);
+			this.token = Object.assign(this.token, token, { expireDate });
 			void this.dataProvider?.write("token", this.token);
 		}
 		return this.token;
@@ -310,13 +308,9 @@ export abstract class BaseClient {
 	 */
 	async getDettagliProfilo<T extends APIDettagliProfilo["data"]>(old?: T) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIDettagliProfilo>(
-			"dettaglioprofilo",
-			{
-				body: null,
-				method: "POST",
-			},
-		);
+		const body = await this.apiRequest<APIDettagliProfilo>("dettaglioprofilo", {
+			method: "POST",
+		});
 
 		if (!body.success) throw new Error(body.msg!);
 		return Object.assign(old ?? {}, body.data);
@@ -334,10 +328,9 @@ export abstract class BaseClient {
 	}) {
 		this.checkReady();
 		const now = new Date();
-		const { body } = await this.apiRequest<APIOrarioGiornaliero>(
+		const orario = await this.apiRequest<APIOrarioGiornaliero>(
 			"orario-giorno",
 			{
-				method: "POST",
 				body: {
 					datGiorno: formatDate(
 						`${date?.year ?? now.getFullYear()}-${
@@ -348,8 +341,8 @@ export abstract class BaseClient {
 			},
 		);
 
-		if (!body.success) throw new Error(body.msg!);
-		return Object.values(body.data.dati).flat();
+		if (!orario.success) throw new Error(orario.msg!);
+		return Object.values(orario.data.dati).flat();
 	}
 
 	/**
@@ -359,16 +352,13 @@ export abstract class BaseClient {
 	 */
 	async getLinkAllegato(uid: string) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIDownloadAllegato>(
+		const download = await this.apiRequest<APIDownloadAllegato>(
 			"downloadallegatobacheca",
-			{
-				method: "POST",
-				body: { uid },
-			},
+			{ body: { uid } },
 		);
 
-		if (!body.success) throw new Error(body.msg);
-		return body.url;
+		if (!download.success) throw new Error(download.msg);
+		return download.url;
 	}
 
 	/**
@@ -382,16 +372,13 @@ export abstract class BaseClient {
 		pkScheda = this.profile?.scheda.pk,
 	) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIDownloadAllegato>(
+		const download = await this.apiRequest<APIDownloadAllegato>(
 			"downloadallegatobachecaalunno",
-			{
-				method: "POST",
-				body: { uid, pkScheda },
-			},
+			{ body: { uid, pkScheda } },
 		);
 
-		if (!body.success) throw new Error(body.msg);
-		return body.url;
+		if (!download.success) throw new Error(download.msg);
+		return download.url;
 	}
 
 	/**
@@ -401,16 +388,13 @@ export abstract class BaseClient {
 	 */
 	async getRicevuta(iuv: string) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIRicevutaTelematica>(
+		const ricevuta = await this.apiRequest<APIRicevutaTelematica>(
 			"ricevutatelematica",
-			{
-				method: "POST",
-				body: { iuv },
-			},
+			{ body: { iuv } },
 		);
 
-		if (!body.success) throw new Error(body.msg);
-		const { success, msg, ...rest } = body;
+		if (!ricevuta.success) throw new Error(ricevuta.msg);
+		const { success, msg, ...rest } = ricevuta;
 
 		return rest;
 	}
@@ -421,13 +405,12 @@ export abstract class BaseClient {
 	 */
 	async getVotiScrutinio() {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIVotiScrutinio>("votiscrutinio", {
-			method: "POST",
+		const voti = await this.apiRequest<APIVotiScrutinio>("votiscrutinio", {
 			body: {},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return body.data.votiScrutinio[0]?.periodi;
+		if (!voti.success) throw new Error(voti.msg!);
+		return voti.data.votiScrutinio[0]?.periodi;
 	}
 
 	/**
@@ -436,13 +419,12 @@ export abstract class BaseClient {
 	 */
 	async getRicevimenti<T extends APIRicevimenti["data"]>(old?: T) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIRicevimenti>("ricevimento", {
-			method: "POST",
+		const ricevimenti = await this.apiRequest<APIRicevimenti>("ricevimento", {
 			body: {},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return Object.assign(old ?? {}, body.data);
+		if (!ricevimenti.success) throw new Error(ricevimenti.msg!);
+		return Object.assign(old ?? {}, ricevimenti.data);
 	}
 
 	/**
@@ -452,13 +434,12 @@ export abstract class BaseClient {
 	 */
 	async getTasse(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APITasse>("listatassealunni", {
-			method: "POST",
+		const taxes = await this.apiRequest<APITasse>("listatassealunni", {
 			body: { pkScheda },
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		const { success, msg, data, ...rest } = body;
+		if (!taxes.success) throw new Error(taxes.msg!);
+		const { success, msg, data, ...rest } = taxes;
 
 		return {
 			...rest,
@@ -473,13 +454,12 @@ export abstract class BaseClient {
 	 */
 	async getPCTOData(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIPCTO>("pcto", {
-			method: "POST",
+		const pcto = await this.apiRequest<APIPCTO>("pcto", {
 			body: { pkScheda },
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return body.data.pcto;
+		if (!pcto.success) throw new Error(pcto.msg!);
+		return pcto.data.pcto;
 	}
 
 	/**
@@ -492,13 +472,12 @@ export abstract class BaseClient {
 		old?: T,
 	) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APICorsiRecupero>("corsirecupero", {
-			method: "POST",
+		const courses = await this.apiRequest<APICorsiRecupero>("corsirecupero", {
 			body: { pkScheda },
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return Object.assign(old ?? {}, body.data);
+		if (!courses.success) throw new Error(courses.msg!);
+		return Object.assign(old ?? {}, courses.data);
 	}
 
 	/**
@@ -508,13 +487,15 @@ export abstract class BaseClient {
 	 */
 	async getCurriculum(pkScheda = this.profile?.scheda.pk) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APICurriculum>("curriculumalunno", {
-			method: "POST",
-			body: { pkScheda },
-		});
+		const curriculum = await this.apiRequest<APICurriculum>(
+			"curriculumalunno",
+			{
+				body: { pkScheda },
+			},
+		);
 
-		if (!body.success) throw new Error(body.msg!);
-		return body.data.curriculum;
+		if (!curriculum.success) throw new Error(curriculum.msg!);
+		return curriculum.data.curriculum;
 	}
 
 	/**
@@ -524,13 +505,12 @@ export abstract class BaseClient {
 	 */
 	async getStoricoBacheca(pkScheda: string) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIBacheca>("storicobacheca", {
-			method: "POST",
+		const bacheca = await this.apiRequest<APIBacheca>("storicobacheca", {
 			body: { pkScheda },
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return handleOperation(body.data.bacheca);
+		if (!bacheca.success) throw new Error(bacheca.msg!);
+		return handleOperation(bacheca.data.bacheca);
 	}
 
 	/**
@@ -540,16 +520,15 @@ export abstract class BaseClient {
 	 */
 	async getStoricoBachecaAlunno(pkScheda: string) {
 		this.checkReady();
-		const { body } = await this.apiRequest<APIBachecaAlunno>(
+		const bacheca = await this.apiRequest<APIBachecaAlunno>(
 			"storicobachecaalunno",
 			{
-				method: "POST",
 				body: { pkScheda },
 			},
 		);
 
-		if (!body.success) throw new Error(body.msg!);
-		return handleOperation(body.data.bachecaAlunno);
+		if (!bacheca.success) throw new Error(bacheca.msg!);
+		return handleOperation(bacheca.data.bachecaAlunno);
 	}
 
 	/**
@@ -559,10 +538,7 @@ export abstract class BaseClient {
 	private async getDashboard() {
 		this.checkReady();
 		const date = new Date();
-		const {
-			body,
-			res: { headers },
-		} = await this.apiRequest<APIDashboard>("dashboard/dashboard", {
+		const res = await this.apiRequest<APIDashboard>("dashboard/dashboard", {
 			body: {
 				dataultimoaggiornamento: formatDate(
 					this.dashboard?.dataAggiornamento ?? this.profile.anno.dataInizio,
@@ -576,8 +552,9 @@ export abstract class BaseClient {
 					),
 				),
 			},
-			method: "POST",
+			noWait: true,
 		});
+		const body = await res.json();
 
 		if (!body.success) throw new Error(body.msg!);
 		const [data] = body.data.dati;
@@ -621,7 +598,7 @@ export abstract class BaseClient {
 						: this.dashboard?.prenotazioniAlunni,
 					(a) => a.prenotazione.pk,
 				),
-				dataAggiornamento: new Date(headers.get("date") ?? date),
+				dataAggiornamento: new Date(res.headers.get("date") ?? date),
 			},
 		);
 		void this.dataProvider?.write("dashboard", this.dashboard);
@@ -629,17 +606,16 @@ export abstract class BaseClient {
 	}
 
 	private async getProfilo() {
-		const { body } = await this.apiRequest<APIProfilo>("profilo", {});
+		const profile = await this.apiRequest<APIProfilo>("profilo");
 
-		if (!body.success) throw new Error(body.msg!);
-		this.profile = Object.assign(this.profile ?? {}, body.data);
+		if (!profile.success) throw new Error(profile.msg!);
+		this.profile = Object.assign(this.profile ?? {}, profile.data);
 		void this.dataProvider?.write("profile", this.profile);
 		return this.profile;
 	}
 
 	private async getLoginData() {
-		const { body } = await this.apiRequest<APILogin>("login", {
-			method: "POST",
+		const login = await this.apiRequest<APILogin>("login", {
 			body: {
 				"lista-opzioni-notifiche": "{}",
 				"lista-x-auth-token": "[]",
@@ -647,15 +623,14 @@ export abstract class BaseClient {
 			},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		this.loginData = Object.assign(this.loginData ?? {}, body.data[0]);
+		if (!login.success) throw new Error(login.msg!);
+		this.loginData = Object.assign(this.loginData ?? {}, login.data[0]);
 		void this.dataProvider?.write("login", this.loginData);
 		return this.loginData;
 	}
 
 	private async logToken(options: { oldToken: Token; isWhat?: boolean }) {
-		const { body } = await this.apiRequest<APIResponse>("logtoken", {
-			method: "POST",
+		const res = await this.apiRequest<APIResponse>("logtoken", {
 			body: {
 				bearerOld: options.oldToken.access_token,
 				dateExpOld: formatDate(options.oldToken.expireDate),
@@ -671,16 +646,15 @@ export abstract class BaseClient {
 			},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
+		if (!res.success) throw new Error(res.msg!);
 	}
 
 	private async rimuoviProfilo() {
-		const { body } = await this.apiRequest<APIResponse>("rimuoviprofilo", {
-			method: "POST",
+		const res = await this.apiRequest<APIResponse>("rimuoviprofilo", {
 			body: {},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
+		if (!res.success) throw new Error(res.msg!);
 		await this.dataProvider?.reset();
 	}
 
@@ -690,8 +664,7 @@ export abstract class BaseClient {
 	) {
 		const authToken = JSON.stringify([this.loginData?.token]);
 		const opzioni = (this.dashboard ?? this.loginData)?.opzioni;
-		const { body } = await this.apiRequest<APIWhat>("dashboard/what", {
-			method: "POST",
+		const what = await this.apiRequest<APIWhat>("dashboard/what", {
 			body: {
 				dataultimoaggiornamento: formatDate(lastUpdate),
 				opzioni:
@@ -704,22 +677,16 @@ export abstract class BaseClient {
 			},
 		});
 
-		if (!body.success) throw new Error(body.msg!);
-		return Object.assign(old ?? {}, body.data.dati[0]);
+		if (!what.success) throw new Error(what.msg!);
+		return Object.assign(old ?? {}, what.data.dati[0]);
 	}
 
 	private async aggiornaData() {
-		const { body } = await this.apiRequest<APIResponse>(
-			"dashboard/aggiornadata",
-			{
-				method: "POST",
-				body: {
-					dataultimoaggiornamento: formatDate(new Date()),
-				},
-			},
-		);
+		const res = await this.apiRequest<APIResponse>("dashboard/aggiornadata", {
+			body: { dataultimoaggiornamento: formatDate(new Date()) },
+		});
 
-		if (!body.success) throw new Error(body.msg!);
+		if (!res.success) throw new Error(res.msg!);
 	}
 
 	private checkReady(): asserts this is ReadyClient {
