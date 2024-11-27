@@ -254,10 +254,7 @@ export class Client {
 				result.body = JSON.parse(text);
 			} catch (err) {
 				throw new TypeError(
-					`${options.method} /${path} failed with status code ${res.status}`,
-					{
-						cause: text,
-					},
+					`${options.method} /${path} failed with status code ${res.status}: ${text}`,
 				);
 			}
 		}
@@ -359,7 +356,7 @@ export class Client {
 			const expireDate = new Date(res.headers.get("date") ?? date);
 
 			if ("error" in body)
-				throw new Error(body.error, { cause: body.error_description });
+				throw new Error(`${body.error} ${body.error_description}`);
 			expireDate.setSeconds(expireDate.getSeconds() + body.expires_in);
 			this.token = Object.assign(this.token, body, { expireDate });
 			void this.dataProvider?.write("token", this.token);

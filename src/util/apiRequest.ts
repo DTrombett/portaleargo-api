@@ -1,5 +1,5 @@
-import type { Client, HttpMethod, Json } from "..";
 import { formatDate } from ".";
+import type { Client, HttpMethod, Json } from "..";
 
 /**
  * Effettua una richiesta API.
@@ -56,10 +56,7 @@ export const apiRequest = async <T extends Json, R extends boolean = false>(
 			result.body = JSON.parse(text);
 		} catch (err) {
 			throw new TypeError(
-				`${options.method} /${path} failed with status code ${res.status}`,
-				{
-					cause: text,
-				},
+				`${options.method} /${path} failed with status code ${res.status}: ${text}`,
 			);
 		}
 	}

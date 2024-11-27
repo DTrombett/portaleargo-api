@@ -4,6 +4,5 @@ coverage/
 dist/
 .argo/
 .vscode/settings.json
-_test.ts
 ./types/
 tsconfig.tsbuildinfo

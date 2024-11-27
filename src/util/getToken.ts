@@ -19,7 +19,7 @@ export const getToken = async (code: LoginLink & { code: string }) => {
 	const expireDate = new Date(res.headers.get("date") ?? date);
 
 	if ("error" in data)
-		throw new Error(data.error, { cause: data.error_description });
+		throw new Error(`${data.error} ${data.error_description}`);
 	expireDate.setSeconds(expireDate.getSeconds() + data.expires_in);
 	return Object.assign(data, { expireDate });
 };

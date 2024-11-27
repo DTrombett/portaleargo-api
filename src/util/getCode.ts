@@ -8,6 +8,7 @@ import type { Credentials } from "..";
  * @returns I dati del codice da usare
  */
 export const getCode = async (credentials: Credentials) => {
+	// TODO: Refactor this to use cookie agent and redirect interceptor
 	const { request } = require("undici") as typeof undici;
 	const link = await generateLoginLink();
 	const res = await request(link.url);
@@ -17,8 +18,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof url !== "string")
 		throw new TypeError(
-			`Auth request returned an invalid redirect url with status code ${res.statusCode}`,
-			{ cause: await res.body.text().catch((err: unknown) => err) },
+			`Auth request returned an invalid redirect url with status code ${res.statusCode}: ${await res.body.text().catch((err?: Error) => err?.message)}`,
 		);
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
 	for (const c of cookieHeaders ?? []) {
@@ -42,8 +42,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof url1 !== "string")
 		throw new TypeError(
-			`Login request returned an invalid redirect url with status code ${res1.statusCode}`,
-			{ cause: await res1.body.text().catch((err: unknown) => err) },
+			`Login request returned an invalid redirect url with status code ${res1.statusCode}: ${await res.body.text().catch((err?: Error) => err?.message)}`,
 		);
 	const res2 = await request(url1, {
 		headers: {
@@ -54,8 +53,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof url2 !== "string")
 		throw new TypeError(
-			`First redirect returned an invalid redirect url with status code ${res2.statusCode}`,
-			{ cause: await res2.body.text().catch((err: unknown) => err) },
+			`First redirect returned an invalid redirect url with status code ${res2.statusCode}: ${await res.body.text().catch((err?: Error) => err?.message)}`,
 		);
 	cookieHeaders = res2.headers["set-cookie"];
 	if (typeof cookieHeaders === "string") cookieHeaders = [cookieHeaders];
@@ -69,8 +67,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof url3 !== "string")
 		throw new TypeError(
-			`Third redirect returned an invalid redirect url with status code ${res3.statusCode}`,
-			{ cause: await res3.body.text().catch((err: unknown) => err) },
+			`Third redirect returned an invalid redirect url with status code ${res3.statusCode}: ${await res.body.text().catch((err?: Error) => err?.message)}`,
 		);
 	const res4 = await request(url3, {
 		headers: {
@@ -81,8 +78,7 @@ export const getCode = async (credentials: Credentials) => {
 
 	if (typeof url4 !== "string")
 		throw new TypeError(
-			`Last redirect returned an invalid redirect url with status code ${res4.statusCode}`,
-			{ cause: await res4.body.text().catch((err: unknown) => err) },
+			`Last redirect returned an invalid redirect url with status code ${res4.statusCode}: ${await res.body.text().catch((err?: Error) => err?.message)}`,
 		);
 	const code = new URL(url4).searchParams.get("code");
 
