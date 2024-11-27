@@ -1,5 +1,6 @@
-import { formatDate } from ".";
-import type { Client, HttpMethod, Json } from "..";
+import type { BaseClient } from "../BaseClient";
+import type { HttpMethod, Json } from "../types";
+import { formatDate } from "./formatDate";
 
 /**
  * Effettua una richiesta API.
@@ -10,7 +11,7 @@ import type { Client, HttpMethod, Json } from "..";
  */
 export const apiRequest = async <T extends Json, R extends boolean = false>(
 	path: string,
-	client: Client,
+	client: BaseClient,
 	options: Partial<{
 		body: Json;
 		method: HttpMethod;

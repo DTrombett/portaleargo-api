@@ -1,5 +1,7 @@
-import { clientId, encryptCodeVerifier, randomString } from ".";
-import type { LoginLink } from "..";
+import type { LoginLink } from "../types";
+import { clientId } from "./Constants";
+import { encryptCodeVerifier } from "./encryptCodeVerifier";
+import { randomString } from "./randomString";
 
 /**
  * Genera un link per il login tramite browser.

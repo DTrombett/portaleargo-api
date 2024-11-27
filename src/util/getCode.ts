@@ -1,6 +1,7 @@
-import type undici from "undici";
-import { clientId, generateLoginLink } from ".";
-import type { Credentials } from "..";
+import { request } from "undici";
+import type { Credentials } from "../types";
+import { clientId } from "./Constants";
+import { generateLoginLink } from "./generateLoginLink";
 
 /**
  * Ottieni il codice per il login.
@@ -9,7 +10,6 @@ import type { Credentials } from "..";
  */
 export const getCode = async (credentials: Credentials) => {
 	// TODO: Refactor this to use cookie agent and redirect interceptor
-	const { request } = require("undici") as typeof undici;
 	const link = await generateLoginLink();
 	const res = await request(link.url);
 	const cookies: string[] = [];

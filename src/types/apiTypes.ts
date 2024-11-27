@@ -1,4 +1,4 @@
-import type { Json } from ".";
+import type { Json } from "./general";
 
 export type APIResponse<T = Json> = {
 	success: boolean;

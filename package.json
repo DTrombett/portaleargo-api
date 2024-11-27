@@ -3,9 +3,10 @@
 	"version": "1.0.0",
 	"description": "A library to interact with the api of ArgoScuolaNext",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"default": "./dist/index.js"
+		"./web": "./dist/web.js",
+		".": "./dist/index.js"
 	},
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
@@ -30,8 +31,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"ajv": "^8.17.1",
-		"undici": "^6.21.0"
+		"undici": "^7.0.0"
 	},
 	"devDependencies": {
 		"@tsconfig/recommended": "^1.0.8",
@@ -45,5 +45,8 @@
 		"prettier": "^3.4.1",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2"
+	},
+	"optionalDependencies": {
+		"ajv": "^8.17.1"
 	}
 }

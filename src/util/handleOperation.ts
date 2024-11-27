@@ -1,4 +1,4 @@
-import type { APIOperation } from "..";
+import type { APIOperation } from "../types";
 
 /**
  * Gestisci dei dati dell'API contenenti un'operazione.
@@ -21,7 +21,7 @@ export const handleOperation = <T, P extends boolean>(
 						"operazione"
 					>,
 				) => string,
-		  ]
+			]
 		: []
 ) => {
 	const toDelete: string[] = [];

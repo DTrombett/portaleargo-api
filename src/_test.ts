@@ -1,6 +1,6 @@
 // #region Config
 import "dotenv/config";
-import { Client } from ".";
+import { Client } from "./Client";
 
 const fn = async () => {
 	const client = new Client({ debug: true });

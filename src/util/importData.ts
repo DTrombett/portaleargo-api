@@ -1,4 +1,6 @@
-import { getAuthFolder, type ReadData } from "..";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import type { ReadData } from "../types";
 
 /**
  * Importa dei dati salvati in un file.
@@ -7,17 +9,15 @@ import { getAuthFolder, type ReadData } from "..";
  */
 export const importData = async <T extends keyof ReadData>(
 	name: T,
-	path = getAuthFolder(),
-) =>
-	(require("node:fs/promises") as typeof import("node:fs/promises"))
-		.readFile(
-			(require("node:path") as typeof import("node:path")).join(
-				path,
-				`${name}.json`,
-			),
-			{
+	path: string,
+) => {
+	try {
+		return JSON.parse(
+			await readFile(join(path, `${name}.json`), {
 				encoding: "utf8",
-			},
-		)
-		.then(async (content) => JSON.parse(content) as ReadData[T])
-		.catch(() => undefined);
+			}),
+		) as ReadData[T];
+	} catch {
+		return undefined;
+	}
+};

@@ -175,7 +175,6 @@ module.exports = {
 		"@typescript-eslint/prefer-ts-expect-error": "warn",
 		"@typescript-eslint/require-await": "off",
 		"@typescript-eslint/return-await": "warn",
-		"@typescript-eslint/strict-boolean-expressions": "warn",
 		"@typescript-eslint/sort-type-constituents": "warn",
 		"@typescript-eslint/switch-exhaustiveness-check": "warn",
 		"@typescript-eslint/unified-signatures": "warn",
