@@ -7,40 +7,88 @@ import { CookieJar } from "tough-cookie";
 import {
 	fetch,
 	interceptors,
+	Pool,
+	type Dispatcher,
 	type RequestInfo,
 	type RequestInit,
+	type RetryHandler,
 } from "undici";
+import type CacheHandler from "undici/types/cache-interceptor";
 import { BaseClient } from "./BaseClient";
 import type { ClientOptions, Credentials } from "./types";
 import { getCode } from "./util/getCode";
 import { importData } from "./util/importData";
 import { writeToFile } from "./util/writeToFile";
 
+const factory = (origin: import("url").URL, opts: object): CookieClient =>
+	new CookieClient(origin, {
+		...opts,
+		cookies: { jar: new CookieJar() },
+	});
+
 /**
  * Un client per interagire con l'API
  */
 export class Client extends BaseClient {
-	client = new CookieClient(BaseClient.BASE_URL, {
-		allowH2: true,
-		autoSelectFamily: true,
-		autoSelectFamilyAttemptTimeout: 1,
-		cookies: { jar: new CookieJar() },
-	}).compose(
-		interceptors.retry(),
-		interceptors.cache({ cacheByDefault: 3_600_000, type: "private" }),
-	);
+	/**
+	 * Custom dispatcher.
+	 */
+	dispatcher: Dispatcher;
+
 	override fetch = this.createFetch();
 
 	/**
 	 * @param options - Le opzioni per il client
 	 */
-	constructor(options: ClientOptions = {}) {
+	constructor(
+		options: ClientOptions & {
+			/**
+			 * Il percorso della cartella dove salvare i dati.
+			 * * Ignorato se `dataProvider` viene fornito
+			 */
+			dataPath?: string | null;
+
+			/**
+			 * Additional options for the pool
+			 */
+			poolOptions?: Pool.Options;
+
+			/**
+			 * Retry options
+			 */
+			retryOptions?: RetryHandler.RetryOptions;
+
+			/**
+			 * Cache options
+			 */
+			cacheOptions?: CacheHandler.CacheOptions;
+		} = {},
+	) {
 		super(options);
 		this.credentials = {
 			schoolCode: options.schoolCode ?? env.CODICE_SCUOLA,
 			password: options.password ?? env.PASSWORD,
 			username: options.username ?? env.NOME_UTENTE,
 		};
+		this.dispatcher = new Pool(BaseClient.BASE_URL, {
+			allowH2: true,
+			autoSelectFamily: true,
+			factory,
+			...options.poolOptions,
+		}).compose(
+			interceptors.retry({
+				maxRetries: 4,
+				minTimeout: 100,
+				timeoutFactor: 4,
+				maxTimeout: 10_000,
+				...options.retryOptions,
+			}),
+			interceptors.cache({
+				cacheByDefault: 3_600_000,
+				type: "private",
+				...options.cacheOptions,
+			}),
+		);
 		if (options.dataProvider !== null)
 			this.dataProvider ??= Client.createDataProvider(
 				options.dataPath ?? undefined,
@@ -68,7 +116,7 @@ export class Client extends BaseClient {
 	createFetch(): typeof window.fetch {
 		return (info, init) =>
 			fetch(info as RequestInfo, {
-				dispatcher: this.client,
+				dispatcher: this.dispatcher,
 				...(init as RequestInit),
 			}) as unknown as Promise<Response>;
 	}

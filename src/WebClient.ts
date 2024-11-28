@@ -10,30 +10,34 @@ export class WebClient extends BaseClient {
 	 */
 	constructor(options: ClientOptions = {}) {
 		super(options);
-		if (options.dataProvider !== null && !this.dataProvider)
-			this.dataProvider = {
-				read: async (name) => {
-					const text = localStorage.getItem(name);
+		if (options.dataProvider !== null)
+			this.dataProvider ??= WebClient.createDataProvider();
+	}
 
-					if (text == null) return undefined;
-					try {
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-						return JSON.parse(text);
-					} catch (err) {
-						return undefined;
-					}
-				},
-				write: async (name, value) => {
-					try {
-						const text = JSON.stringify(value);
+	static createDataProvider(): NonNullable<ClientOptions["dataProvider"]> {
+		return {
+			read: async (name) => {
+				const text = localStorage.getItem(name);
 
-						localStorage.setItem(name, text);
-					} catch (err) {}
-				},
-				reset: async () => {
-					localStorage.clear();
-				},
-			};
+				if (text == null) return undefined;
+				try {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+					return JSON.parse(text);
+				} catch (err) {
+					return undefined;
+				}
+			},
+			write: async (name, value) => {
+				try {
+					const text = JSON.stringify(value);
+
+					localStorage.setItem(name, text);
+				} catch (err) {}
+			},
+			reset: async () => {
+				localStorage.clear();
+			},
+		};
 	}
 
 	getCode() {

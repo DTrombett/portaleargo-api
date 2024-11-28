@@ -171,10 +171,7 @@ export abstract class BaseClient {
 			{
 				headers,
 				method: options.method,
-				body:
-					options.method === "POST" && options.body != null
-						? JSON.stringify(options.body)
-						: undefined,
+				body: options.body != null ? JSON.stringify(options.body) : undefined,
 			},
 		);
 

@@ -106,12 +106,6 @@ export type ClientOptions = Partial<
 		headers: Record<string, string>;
 
 		/**
-		 * Il percorso della cartella dove salvare i dati.
-		 * * Ignorato se `dataProvider` viene fornito
-		 */
-		dataPath: string | null;
-
-		/**
 		 * Le funzioni per leggere e scrivere i dati
 		 */
 		dataProvider: {
