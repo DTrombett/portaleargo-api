@@ -31,23 +31,23 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"http-cookie-agent": "^6.0.6",
-		"tough-cookie": "^5.0.0",
-		"undici": "^7.0.0"
+		"http-cookie-agent": "^6.0.8",
+		"tough-cookie": "^5.1.2",
+		"undici": "^7.5.0"
 	},
 	"devDependencies": {
 		"@tsconfig/recommended": "^1.0.8",
 		"@tsconfig/strictest": "^2.0.5",
-		"@types/node": "^18.19.66",
-		"@typescript-eslint/eslint-plugin": "^8.16.0",
-		"@typescript-eslint/parser": "^8.16.0",
+		"@types/node": "^18.19.80",
+		"@typescript-eslint/eslint-plugin": "^8.26.1",
+		"@typescript-eslint/parser": "^8.26.1",
 		"cross-env": "^7.0.3",
-		"dotenv": "^16.4.5",
+		"dotenv": "^16.4.7",
 		"eslint": "^8.57.1",
 		"eslint-plugin-node": "^11.1.0",
-		"prettier": "^3.4.1",
-		"tsup": "^8.3.5",
-		"typescript": "^5.7.2"
+		"prettier": "^3.5.3",
+		"tsup": "^8.4.0",
+		"typescript": "^5.8.2"
 	},
 	"optionalDependencies": {
 		"ajv": "^8.17.1"
