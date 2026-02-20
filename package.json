@@ -10,12 +10,11 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
-		"build": "tsup && tsc",
+		"build": "node esbuild.ts && tsc",
 		"lint": "eslint src --fix",
 		"prettier": "prettier --write src/**/*.ts",
-		"test": "npm run test:cli && cross-env NODE_ENV=development tsup && node --enable-source-maps dist/_test.js",
-		"test:cli": "eslint src && tsc --noEmit",
-		"postinstall": "npm run build"
+		"test": "npm run test:cli && cross-env NODE_ENV=development node esbuild.ts && node --enable-source-maps dist/_test.js",
+		"test:cli": "eslint src && tsc --noEmit"
 	},
 	"repository": {
 		"type": "git",
@@ -28,28 +27,29 @@
 	},
 	"homepage": "https://github.com/DTrombett/portaleargo-api#readme",
 	"engines": {
-		"node": ">=18"
+		"node": ">=20"
 	},
 	"dependencies": {
-		"http-cookie-agent": "^6.0.8",
-		"tough-cookie": "^5.1.2",
-		"undici": "^7.5.0"
+		"http-cookie-agent": "^7.0.3",
+		"tough-cookie": "^6.0.0",
+		"undici": "^7.22.0"
 	},
 	"devDependencies": {
-		"@tsconfig/recommended": "^1.0.8",
-		"@tsconfig/strictest": "^2.0.5",
-		"@types/node": "^18.19.80",
-		"@typescript-eslint/eslint-plugin": "^8.26.1",
-		"@typescript-eslint/parser": "^8.26.1",
-		"cross-env": "^7.0.3",
-		"dotenv": "^16.4.7",
-		"eslint": "^8.57.1",
+		"@eslint/js": "^10.0.1",
+		"@tsconfig/node20": "^20.1.9",
+		"@tsconfig/recommended": "^1.0.13",
+		"@tsconfig/strictest": "^2.0.8",
+		"@types/node": "^20.19.33",
+		"cross-env": "^10.1.0",
+		"dotenv": "^17.3.1",
+		"esbuild": "^0.27.3",
+		"eslint": "^10.0.0",
 		"eslint-plugin-node": "^11.1.0",
-		"prettier": "^3.5.3",
-		"tsup": "^8.4.0",
-		"typescript": "^5.8.2"
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.56.0"
 	},
 	"optionalDependencies": {
-		"ajv": "^8.17.1"
+		"ajv": "^8.18.0"
 	}
 }

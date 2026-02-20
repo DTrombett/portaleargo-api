@@ -1,4 +1,4 @@
-import { CookieClient } from "http-cookie-agent/undici";
+import { cookie } from "http-cookie-agent/undici";
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
@@ -19,12 +19,6 @@ import type { ClientOptions, Credentials } from "./types";
 import { getCode } from "./util/getCode";
 import { importData } from "./util/importData";
 import { writeToFile } from "./util/writeToFile";
-
-const factory = (origin: import("url").URL, opts: object): CookieClient =>
-	new CookieClient(origin, {
-		...opts,
-		cookies: { jar: new CookieJar() },
-	});
 
 /**
  * Un client per interagire con l'API
@@ -73,16 +67,15 @@ export class Client extends BaseClient {
 		this.dispatcher = new Pool(BaseClient.BASE_URL, {
 			allowH2: true,
 			autoSelectFamily: true,
-			factory,
 			...options.poolOptions,
 		}).compose(
+			interceptors.redirect({ maxRedirections: 4 }),
 			interceptors.retry({
 				maxRetries: 4,
-				minTimeout: 100,
-				timeoutFactor: 4,
-				maxTimeout: 10_000,
+				minTimeout: 300,
 				...options.retryOptions,
 			}),
+			cookie({ jar: new CookieJar() }),
 			interceptors.cache({
 				cacheByDefault: 3_600_000,
 				type: "private",

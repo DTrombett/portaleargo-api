@@ -1,8 +1,8 @@
 import { CookieAgent } from "http-cookie-agent/undici";
-import { ok } from "node:assert";
+import { ok } from "node:assert/strict";
 import { URL, URLSearchParams } from "node:url";
 import { CookieJar } from "tough-cookie";
-import { interceptors, request } from "undici";
+import { Dispatcher, interceptors, request } from "undici";
 import type { Credentials } from "../types";
 import { clientId } from "./Constants";
 import { generateLoginLink } from "./generateLoginLink";
@@ -17,39 +17,35 @@ export const getCode = async (credentials: Credentials) => {
 	const dispatcher = new CookieAgent({
 		allowH2: true,
 		autoSelectFamily: true,
-		autoSelectFamilyAttemptTimeout: 1,
 		cookies: { jar: new CookieJar() },
 	}).compose(
 		interceptors.retry(),
 		interceptors.redirect({ maxRedirections: 3 }),
 	);
-	const url = (await request(link.url, { dispatcher, maxRedirections: 0 }))
-		.headers.location;
+	let res: Dispatcher.ResponseData;
 
-	ok(typeof url === "string", "Invalid login url");
+	res = await request(link.url, { dispatcher });
+	// strictEqual(res.statusCode, 200, "Failed to request login url");
+	const url = res.headers.location;
+	ok(typeof url === "string", await res.body.text());
 	const challenge = new URL(url).searchParams.get("login_challenge");
-
 	ok(challenge, "Invalid login challenge");
-	const { location } = await request(
-		"https://www.portaleargo.it/auth/sso/login",
-		{
-			dispatcher,
-			body: new URLSearchParams({
-				challenge,
-				client_id: clientId,
-				famiglia_customer_code: credentials.schoolCode,
-				login: "true",
-				password: credentials.password,
-				username: credentials.username,
-			}).toString(),
-			headers: { "content-type": "application/x-www-form-urlencoded" },
-			method: "POST",
-		},
-	).then((r) => r.headers);
-
+	res = await request("https://www.portaleargo.it/auth/sso/login", {
+		dispatcher,
+		body: new URLSearchParams({
+			challenge,
+			client_id: clientId,
+			famiglia_customer_code: credentials.schoolCode,
+			login: "true",
+			password: credentials.password,
+			username: credentials.username,
+		}).toString(),
+		headers: { "content-type": "application/x-www-form-urlencoded" },
+		method: "POST",
+	});
+	const { location } = res.headers;
 	ok(typeof location === "string", "Invalid login redirect");
 	const code = new URL(location).searchParams.get("code");
-
 	ok(code, "Invalid login code");
 	return { ...link, code };
 };
