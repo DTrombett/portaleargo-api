@@ -32,7 +32,9 @@ export class WebClient extends BaseClient {
 					const text = JSON.stringify(value);
 
 					localStorage.setItem(name, text);
-				} catch (err) {}
+				} catch (err) {
+					// Ignore errors; probably user disabled cookies
+				}
 			},
 			reset: async () => {
 				localStorage.clear();

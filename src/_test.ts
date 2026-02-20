@@ -14,8 +14,8 @@ await Promise.allSettled([
 		.getCurriculum()
 		.then((c) =>
 			Promise.allSettled([
-				client.getStoricoBacheca(c.at(-1)!.pkScheda),
-				client.getStoricoBachecaAlunno(c.at(-1)!.pkScheda),
+				client.getStoricoBacheca(c[0]!.pkScheda),
+				client.getStoricoBachecaAlunno(c[0]!.pkScheda),
 			]),
 		),
 	client.getDettagliProfilo(),

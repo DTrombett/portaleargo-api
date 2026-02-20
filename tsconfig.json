@@ -1,22 +1,19 @@
 {
 	"include": ["src"],
 	"extends": [
-		"@tsconfig/recommended/tsconfig.json",
-		"@tsconfig/strictest/tsconfig.json"
+		"@tsconfig/strictest/tsconfig.json",
+		"@tsconfig/node20/tsconfig.json"
 	],
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
-		"alwaysStrict": true,
 		"declaration": true,
 		"declarationDir": "./dist",
 		"esModuleInterop": true,
 		"exactOptionalPropertyTypes": false,
-		"lib": ["es2020", "dom"],
-		"module": "ES2022",
-		"target": "ES2020",
+		"lib": ["es2022", "dom"],
+		"module": "preserve",
+		"target": "ES2022",
 		"moduleResolution": "bundler",
-		"noImplicitAny": true,
-		"noImplicitThis": true,
 		"noPropertyAccessFromIndexSignature": false,
 		"outDir": "./dist",
 		"emitDeclarationOnly": true,

@@ -1,9 +1,8 @@
-import { CookieClient } from "http-cookie-agent/undici";
+import { CookieClient } from "http-cookie-agent/undici/v6";
 import { existsSync } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
-import { CookieJar } from "tough-cookie";
 import {
 	fetch,
 	interceptors,
@@ -19,11 +18,12 @@ import type { ClientOptions, Credentials } from "./types";
 import { getCode } from "./util/getCode";
 import { importData } from "./util/importData";
 import { writeToFile } from "./util/writeToFile";
+import { jar } from "./util/cookies"
 
 const factory = (origin: import("url").URL, opts: object): CookieClient =>
 	new CookieClient(origin, {
 		...opts,
-		cookies: { jar: new CookieJar() },
+		cookies: { jar },
 	});
 
 /**

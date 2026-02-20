@@ -1,55 +1,102 @@
 import { CookieAgent } from "http-cookie-agent/undici";
 import { ok } from "node:assert";
 import { URL, URLSearchParams } from "node:url";
-import { CookieJar } from "tough-cookie";
 import { interceptors, request } from "undici";
 import type { Credentials } from "../types";
 import { clientId } from "./Constants";
+import { jar } from "./cookies";
 import { generateLoginLink } from "./generateLoginLink";
 
-/**
- * Ottieni il codice per il login.
- * @param credentials - Le credenziali per l'accesso
- * @returns I dati del codice da usare
- */
 export const getCode = async (credentials: Credentials) => {
 	const link = await generateLoginLink();
+
 	const dispatcher = new CookieAgent({
 		allowH2: true,
 		autoSelectFamily: true,
 		autoSelectFamilyAttemptTimeout: 1,
-		cookies: { jar: new CookieJar() },
+		cookies: { jar },
 	}).compose(
 		interceptors.retry(),
-		interceptors.redirect({ maxRedirections: 3 }),
+		interceptors.redirect({ maxRedirections: 0 }),
 	);
-	const url = (await request(link.url, { dispatcher, maxRedirections: 0 }))
-		.headers.location;
 
-	ok(typeof url === "string", "Invalid login url");
-	const challenge = new URL(url).searchParams.get("login_challenge");
+	// STEP 1 ─ redirect a login
+	const response = await request(link.url, { dispatcher });
+	const loginUrl = response.headers.location;
+	ok(typeof loginUrl === "string", "Invalid login url");
 
-	ok(challenge, "Invalid login challenge");
-	const { location } = await request(
+	const loginChallenge = new URL(loginUrl).searchParams.get("login_challenge");
+	ok(loginChallenge, "Invalid login challenge");
+
+	// STEP 2 ─ login POST
+	const loginResponse = await request(
 		"https://www.portaleargo.it/auth/sso/login",
 		{
 			dispatcher,
+			method: "POST",
+			headers: { "content-type": "application/x-www-form-urlencoded" },
 			body: new URLSearchParams({
-				challenge,
+				challenge: loginChallenge,
 				client_id: clientId,
 				famiglia_customer_code: credentials.schoolCode,
 				login: "true",
 				password: credentials.password,
 				username: credentials.username,
 			}).toString(),
-			headers: { "content-type": "application/x-www-form-urlencoded" },
-			method: "POST",
 		},
-	).then((r) => r.headers);
+	);
 
-	ok(typeof location === "string", "Invalid login redirect");
-	const code = new URL(location).searchParams.get("code");
+	const authUrl = loginResponse.headers.location;
+	ok(typeof authUrl === "string", "Invalid login redirect");
 
+	const code_challenge = new URL(authUrl).searchParams.get("code_challenge");
+	ok(typeof code_challenge === "string", "Invalid code challenge");
+
+	// STEP 3 ─ GET consent page
+	const consentPageResponse = await request(authUrl, { dispatcher });
+	const consentUrl = consentPageResponse.headers.location;
+	ok(typeof consentUrl === "string", "Invalid consent redirect");
+
+	const consentChallenge = new URL(consentUrl).searchParams.get(
+		"consent_challenge",
+	);
+	ok(consentChallenge, "Invalid consent challenge");
+
+	// STEP 4 ─ POST consent (fast-path)
+	const params = new URLSearchParams();
+	params.append("challenge", consentChallenge);
+	params.append("grant_scope", "openid");
+	params.append("grant_scope", "offline");
+	params.append("grant_scope", "profile");
+	params.append("grant_scope", "user.roles");
+	params.append("grant_scope", "argo");
+	params.append("consent", "Accetta");
+
+	const consentResponse = await request(
+		"https://www.portaleargo.it/auth/sso/consent",
+		{
+			dispatcher,
+			method: "POST",
+			headers: { "content-type": "application/x-www-form-urlencoded" },
+			body: params.toString(),
+		},
+	);
+
+	// STEP 5 ─ follow redirect with consent_verifier
+	const authAfterConsentUrl = consentResponse.headers.location;
+	ok(
+		typeof authAfterConsentUrl === "string",
+		"Invalid auth redirect after consent",
+	);
+
+	const finalResponse = await request(authAfterConsentUrl, { dispatcher });
+
+	const finalRedirect = finalResponse.headers.location;
+	ok(typeof finalRedirect === "string", "Invalid final redirect");
+
+	// STEP 6 ─ extract code
+	const code = new URL(finalRedirect).searchParams.get("code");
 	ok(code, "Invalid login code");
+
 	return { ...link, code };
 };
