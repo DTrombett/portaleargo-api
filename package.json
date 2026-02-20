@@ -32,7 +32,7 @@
 	},
 	"dependencies": {
 		"http-cookie-agent": "^6.0.8",
-		"tough-cookie": "^5.1.2",
+		"tough-cookie": "^6.0.0",
 		"undici": "^7.5.0"
 	},
 	"devDependencies": {
