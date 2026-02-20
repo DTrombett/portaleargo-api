@@ -31,7 +31,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"http-cookie-agent": "^6.0.8",
+		"http-cookie-agent": "^7.0.3",
 		"tough-cookie": "^5.1.2",
 		"undici": "^7.5.0"
 	},
