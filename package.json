@@ -50,6 +50,6 @@
 		"typescript": "^5.8.2"
 	},
 	"optionalDependencies": {
-		"ajv": "^8.17.1"
+		"ajv": "^8.18.0"
 	}
 }
