@@ -36,7 +36,7 @@
 		"undici": "^7.5.0"
 	},
 	"devDependencies": {
-		"@tsconfig/recommended": "^1.0.8",
+		"@tsconfig/recommended": "^1.0.13",
 		"@tsconfig/strictest": "^2.0.5",
 		"@types/node": "^18.19.80",
 		"@typescript-eslint/eslint-plugin": "^8.26.1",
