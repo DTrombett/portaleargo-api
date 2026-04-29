@@ -2,6 +2,7 @@ import type {
 	APIBacheca,
 	APIBachecaAlunno,
 	APICorsiRecupero,
+	APIPresavisioneAdesione,
 	APICurriculum,
 	APIDashboard,
 	APIDettagliProfilo,
@@ -534,6 +535,38 @@ export abstract class BaseClient {
 
 		if (!bacheca.success) throw new Error(bacheca.msg!);
 		return handleOperation(bacheca.data.bachecaAlunno);
+	}
+
+	/**
+	 * Conferma la presa visione di un avviso della bacheca.
+	 *
+	 * Il server richiede che almeno un allegato dell'avviso sia stato scaricato
+	 * prima di poter confermare la presa visione. Questo metodo scarica
+	 * automaticamente il link del primo allegato fornito prima di inviare la
+	 * conferma tramite l'endpoint `presavisioneadesione`.
+	 *
+	 * Nota: gli avvisi senza allegati (`listaAllegati` vuota) non possono essere
+	 * confermati tramite questa API.
+	 *
+	 * @param pkScheda - L'id del profilo
+	 * @param prgMessaggio - Il pk dell'avviso (campo `pk` restituito da `getStoricoBacheca`)
+	 * @param allegatoUid - Il pk di un allegato dell'avviso (campo `pk` in `listaAllegati`)
+	 * @returns Il risultato della conferma
+	 */
+	async confirmPresaVisioneBacheca(
+		pkScheda: string,
+		prgMessaggio: string,
+		allegatoUid: string,
+	) {
+		this.checkReady();
+		await this.getLinkAllegato(allegatoUid);
+		const result = await this.apiRequest<APIPresavisioneAdesione>(
+			"presavisioneadesione",
+			{ body: { pkScheda, prgMessaggio } },
+		);
+
+		if (!result.success) throw new Error(result.message ?? result.msg);
+		return result;
 	}
 
 	/**
