@@ -655,3 +655,54 @@ export type APIPresavisioneAdesione = {
 	message?: string;
 	msg?: string;
 };
+export type APIDisponibilitaSlot = {
+	pk: string;
+	datDisponibilita: string;
+	ora_Inizio: string;
+	ora_Fine: string;
+	desLuogoRicevimento: string;
+	desNota: string;
+	desUrl: string;
+	numMax: number;
+	numPrenotazioni: number | null;
+	flgAttivo: string;
+};
+export type APIRicevimentoDocenti = APIResponse<{
+	docenti: {
+		pk: string;
+		desNome: string;
+		desCognome: string;
+		desEmail: string | null;
+		disponibilita: APIDisponibilitaSlot[];
+	}[];
+}>;
+export type APIDisponibilitaDocente = APIResponse<{
+	disponibilita: APIDisponibilitaSlot[];
+	docente: {
+		pk: string;
+		desNome: string;
+		desCognome: string;
+		desEmail: string | null;
+	};
+}>;
+export type APIRicevimentoAzione = {
+	success: boolean;
+	msg?: string | null;
+};
+export type APIOrarioLezioni = APIResponse<{
+	dati: Record<
+		string,
+		{
+			numOra: number;
+			mostra: boolean;
+			desCognome: string;
+			desNome: string;
+			docente: string;
+			materia: string;
+			pk?: string;
+			desDenominazione: string;
+			desSezione: string;
+			ora: string | null;
+		}[]
+	>;
+}>;

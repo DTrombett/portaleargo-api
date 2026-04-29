@@ -6,13 +6,17 @@ import type {
 	APICurriculum,
 	APIDashboard,
 	APIDettagliProfilo,
+	APIDisponibilitaDocente,
 	APIDownloadAllegato,
 	APILogin,
 	APIOrarioGiornaliero,
+	APIOrarioLezioni,
 	APIPCTO,
 	APIProfilo,
 	APIResponse,
 	APIRicevimenti,
+	APIRicevimentoAzione,
+	APIRicevimentoDocenti,
 	APIRicevutaTelematica,
 	APITasse,
 	APIToken,
@@ -566,6 +570,138 @@ export abstract class BaseClient {
 		);
 
 		if (!result.success) throw new Error(result.message ?? result.msg);
+		return result;
+	}
+
+	/**
+	 * Ottieni la lista dei docenti con le loro disponibilità per i ricevimenti.
+	 * Nota: questa funzionalità potrebbe non essere disponibile per tutte le scuole.
+	 * @param pkScheda - L'id del profilo
+	 * @returns Lista docenti con disponibilità
+	 */
+	async getRicevimentoDocenti(pkScheda = this.profile?.scheda.pk) {
+		this.checkReady();
+		const result = await this.apiRequest<APIRicevimentoDocenti>(
+			"ricevimentodocenti",
+			{ body: { pkScheda } },
+		);
+
+		return result;
+	}
+
+	/**
+	 * Ottieni le disponibilità di un docente specifico per i ricevimenti.
+	 * Nota: questa funzionalità potrebbe non essere disponibile per tutte le scuole.
+	 * @param pkDocente - Il pk del docente
+	 * @param pkScheda - L'id del profilo
+	 * @returns Disponibilità del docente
+	 */
+	async getDisponibilitaDocente(
+		pkDocente: string,
+		pkScheda = this.profile?.scheda.pk,
+	) {
+		this.checkReady();
+		const result = await this.apiRequest<APIDisponibilitaDocente>(
+			"disponibilita-docente",
+			{ body: { pkScheda, pkDocente } },
+		);
+
+		return result;
+	}
+
+	/**
+	 * Prenota un ricevimento con un docente.
+	 * @param pkDisponibilita - Il pk dello slot di disponibilità del docente
+	 * @param pkGenitore - Il pk del genitore/tutore
+	 * @param telefono - Numero di telefono di contatto
+	 * @param email - Email di contatto
+	 * @param pkScheda - L'id del profilo
+	 * @returns Esito della prenotazione
+	 */
+	async addRicevimento(
+		pkDisponibilita: string,
+		pkGenitore: string,
+		telefono: string,
+		email: string,
+		pkScheda = this.profile?.scheda.pk,
+	) {
+		this.checkReady();
+		const result = await this.apiRequest<APIRicevimentoAzione>(
+			"ricevimento/aggiungi",
+			{ body: { pkScheda, pkDisponibilita, pkGenitore, telefono, email } },
+		);
+
+		if (!result.success) throw new Error(result.msg ?? "Prenotazione fallita");
+		return result;
+	}
+
+	/**
+	 * Modifica una prenotazione di ricevimento esistente.
+	 * @param pkPrenotazione - Il pk della prenotazione da modificare
+	 * @param pkDisponibilita - Il pk del nuovo slot di disponibilità
+	 * @param telefono - Numero di telefono di contatto aggiornato
+	 * @param email - Email di contatto aggiornata
+	 * @param pkScheda - L'id del profilo
+	 * @returns Esito della modifica
+	 */
+	async updateRicevimento(
+		pkPrenotazione: string,
+		pkDisponibilita: string,
+		telefono: string,
+		email: string,
+		pkScheda = this.profile?.scheda.pk,
+	) {
+		this.checkReady();
+		const result = await this.apiRequest<APIRicevimentoAzione>(
+			"ricevimento/modificaprenotazione",
+			{
+				body: {
+					pkScheda,
+					pkPrenotazione,
+					pkDisponibilita,
+					telefono,
+					email,
+				},
+			},
+		);
+
+		if (!result.success) throw new Error(result.msg ?? "Modifica fallita");
+		return result;
+	}
+
+	/**
+	 * Annulla una prenotazione di ricevimento.
+	 * @param pkPrenotazione - Il pk della prenotazione da annullare
+	 * @param pkScheda - L'id del profilo
+	 * @returns Esito dell'annullamento
+	 */
+	async deleteRicevimento(
+		pkPrenotazione: string,
+		pkScheda = this.profile?.scheda.pk,
+	) {
+		this.checkReady();
+		const result = await this.apiRequest<APIRicevimentoAzione>(
+			"ricevimento/eliminaprenotazione",
+			{ body: { pkScheda, pkPrenotazione } },
+		);
+
+		if (!result.success) throw new Error(result.msg ?? "Annullamento fallito");
+		return result;
+	}
+
+	/**
+	 * Ottieni l'orario delle lezioni (timetable settimanale/periodica).
+	 * Nota: questa funzionalità potrebbe non essere disponibile per tutte le scuole.
+	 * @param pkScheda - L'id del profilo
+	 * @returns Orario delle lezioni
+	 */
+	async getOrarioLezioni(pkScheda = this.profile?.scheda.pk) {
+		this.checkReady();
+		const result = await this.apiRequest<APIOrarioLezioni>(
+			"orariolezioni",
+			{ body: { pkScheda } },
+		);
+
 		return result;
 	}
 
