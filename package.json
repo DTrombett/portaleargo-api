@@ -31,9 +31,9 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"http-cookie-agent": "^6.0.8",
+		"http-cookie-agent": "^8.0.0",
 		"tough-cookie": "^5.1.2",
-		"undici": "^7.5.0"
+		"undici": "^7.27.2"
 	},
 	"devDependencies": {
 		"@tsconfig/recommended": "^1.0.8",
